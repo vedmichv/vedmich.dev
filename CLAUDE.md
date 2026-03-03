@@ -238,6 +238,44 @@ npm run preview   # Preview built site locally
 - Custom CSS classes: `.animate-on-scroll`, `.card-glow`, `.typing-cursor`
 - Blog prose styling uses `@tailwindcss/typography` (prose-invert prose-cyan)
 
+### i18n & Language Detection
+
+- Root `/` auto-detects browser language (ru/be/uk → `/ru/`, else → `/en/`)
+- User choice saved in `localStorage('vedmich-lang')` — persists across visits
+- Language switcher in header also saves preference
+- `<noscript>` fallback redirects to `/en/`
+
+---
+
+## MCP Servers (`.mcp.json`)
+
+| Server | Purpose |
+|---|---|
+| **Playwright** | Visual testing, screenshots, responsive checks, accessibility |
+| **Context7** | Live documentation lookup for Astro, Tailwind, and other deps |
+
+### Usage Examples
+
+```
+# Playwright — visual testing
+"Take a screenshot of localhost:4321/en/ at 375px width"
+"Check if all nav links work on /ru/"
+"Verify the blog post renders correctly"
+
+# Context7 — docs lookup
+"Show me Astro Content Collections API"
+"How does Tailwind 4 @theme work?"
+"Astro i18n routing configuration"
+```
+
+### TODO: Future MCP / Tooling
+
+- [ ] Lighthouse MCP — Core Web Vitals, SEO, accessibility audits
+- [ ] Image optimization pipeline (astro:assets or sharp)
+- [ ] RSS feed integration (`@astrojs/rss`)
+- [ ] Search integration (Pagefind or similar)
+- [ ] Obsidian → blog sync script (watch vault, auto-create posts)
+
 ---
 
 ## Deployment

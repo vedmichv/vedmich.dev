@@ -1,3 +1,37 @@
 ---
-return Astro.redirect('/en/');
+// Root page: auto-detect language and redirect
+// For static builds, we output an HTML page with client-side detection
 ---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Redirecting...</title>
+    <script is:inline>
+      (function() {
+        // Check if user has a stored preference
+        var saved = localStorage.getItem('vedmich-lang');
+        if (saved === 'ru' || saved === 'en') {
+          window.location.replace('/' + saved + '/');
+          return;
+        }
+
+        // Auto-detect from browser language
+        var lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+        var target = (lang.startsWith('ru') || lang.startsWith('be') || lang.startsWith('uk')) ? 'ru' : 'en';
+
+        // Save preference and redirect
+        localStorage.setItem('vedmich-lang', target);
+        window.location.replace('/' + target + '/');
+      })();
+    </script>
+    <!-- Fallback for no-JS -->
+    <noscript>
+      <meta http-equiv="refresh" content="0;url=/en/" />
+    </noscript>
+  </head>
+  <body style="background:#0F172A;color:#94A3B8;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui;">
+    <p>Redirecting...</p>
+  </body>
+</html>
