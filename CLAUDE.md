@@ -98,39 +98,105 @@ Edit `src/data/social.ts` → `presentations` array. Add slug matching the Slide
 
 ## Obsidian Vault Cross-References
 
-This site's content is sourced from Viktor's Obsidian PKM vault. When working in the vault context, these paths map to site content:
+This site's content is sourced from Viktor's Obsidian PKM vault (`~/Documents/ViktorVedmich/`). The vault is searchable via **QMD** MCP (BM25 + vector hybrid search).
+
+> **IMPORTANT:** NEVER use `10-AWS/11-Active-Clients/`, `14-Tips-AWS-Internal/`, or `16-Amazon-Employer/` — these contain confidential internal AWS data.
+
+### Site Section → Vault Source
 
 | Site Section | Vault Source Path | Notes |
 |---|---|---|
-| Bio / About | `30-Projects/34-Personal-Brand/2026-02-23-JetBrains-CV-Draft.md` | Skills, certifications, experience |
+| Bio / About | `30-Projects/34-Personal-Brand/2026-02-23-JetBrains-CV-Draft.md` | Skills, certs, experience |
 | Project tracking | `30-Projects/34-Personal-Brand/vedmich.dev Website.md` | Roadmap, TODO, content candidates |
-| DKT podcast data | `30-Projects/32-DKT/+ DKT.md` | Episode count, stats, links |
-| AWS podcast data | `10-AWS/15-Content-YT-Podcat-Talks/15.10-AWS-RU-Podcast/` | Episode stats, format |
-| Speaking / CFPs | `10-AWS/15-Content-YT-Podcat-Talks/15.30-Conference-CFPs/15.31-Talks-Materials/` | Talk titles, ratings |
-| Speaking portfolio | `10-AWS/15-Content-YT-Podcat-Talks/15.50-Speaking-Portfolio/` | Bio, speaker rating |
-| Book | Amazon link: `https://www.amazon.com/dp/1835460038` | |
+| DKT podcast data | `30-Projects/32-DKT/+ DKT.md` | 91+ eps, 10K+ subs, episode MOC |
+| AWS podcast data | `10-AWS/15-Content-YT-Podcat-Talks/15.10-AWS-RU-Podcast/` | 65+ eps, 70K+ listens |
+| Speaking / CFPs | `15-Content-YT-Podcat-Talks/15.30-Conference-CFPs/15.31-Talks-Materials/` | Talk titles, ratings |
+| Speaking portfolio | `15-Content-YT-Podcat-Talks/15.50-Speaking-Portfolio/` | Bio, speaker rating |
+| Book | `30-Projects/33-Book-Kubernetes/` | 128 files, 17 chapters, 50+ diagrams |
 
-### Blog Content Candidates (Vault → Blog)
+### Blog Content Sources (Vault → Blog)
 
-When user asks to publish a vault note as a blog post, source content from these KB areas:
+All vault areas below are fair game for blog posts. Organized by priority.
 
-| Topic | Vault KB Path | QMD Search |
-|---|---|---|
-| AWS services | `73-KB-Tech/73.10-AWS/` | `qmd search "topic" --collection vault` |
-| Kubernetes | `73-KB-Tech/73.50-K8S/` | Search for CKA/CKS/CKAD content |
-| Architecture patterns | `73-KB-Tech/73.30-Architect/` | Distributed systems, microservices |
-| AI/ML | `73-KB-Tech/73.20-AI/` | GenAI, LLM, agents |
-| SRE/DevOps | `73-KB-Tech/73.60-SRE-DevOps/` | Observability, reliability |
-| Conference write-ups | `15.31-Talks-Materials/` | Expanded talk versions |
-| Research | `20-Calendar/27-Research/YYYY/` | Deep research outputs |
+#### HIGHEST priority — rich, ready-to-publish content
 
-**Workflow: Vault note → Blog post:**
-1. Use QMD to find source note(s) in vault
-2. Read and synthesize content
-3. Adapt for web audience (remove internal links, expand context)
-4. Create `src/content/blog/{en,ru}/YYYY-MM-DD-slug.md`
-5. Set frontmatter (title, description, date, tags)
-6. Build and verify: `npm run build`
+| Source | Vault Path | ~Files | Blog Use |
+|---|---|---|---|
+| **Kubernetes Book** | `33-Book-Kubernetes/` | 128 | Chapter extracts → tutorial series (Karpenter, GitOps, HA, troubleshooting) |
+| **Tech KB — AWS** | `73-KB-Tech/73.10-AWS/` | 80+ | Service deep-dives (Lambda, EKS, DynamoDB, VPC, Karpenter) |
+| **Tech KB — K8S** | `73-KB-Tech/73.50-K8S/` | 10+ | ETCD, networking, tools, troubleshooting |
+| **Tech KB — Architect** | `73-KB-Tech/73.30-Architect/` | 8+ | System design, database selection, consistency |
+| **Tech KB — AI/ML** | `73-KB-Tech/73.20-AI/` | 10+ | Claude Code, agents, prompt engineering |
+| **Tech KB — SRE/DevOps** | `73-KB-Tech/73.60-SRE-DevOps/` | 20+ | Interview prep, networking, Linux |
+
+#### HIGH priority — podcast episodes → companion blog posts
+
+| Source | Vault Path | ~Files | Blog Use |
+|---|---|---|---|
+| **DKT episodes** | `32-DKT/` | 111 | Episode companion posts, tool reviews, interview guides |
+| **AWS RU Podcast** | `15.10-AWS-RU-Podcast/` | 24 | Episode summaries, agentic AI patterns, architecture trends |
+| **AI for DevOps course** | `37-AI-DevOps-Course/` | 54 | n8n automation, Claude Code agents, prompt engineering tutorials |
+
+**Podcast → Blog workflow:**
+When a new DKT or AWS podcast episode is published, create a companion blog post:
+1. Find episode notes via QMD: `qmd search "DKT91"` or `qmd search "episode topic"`
+2. Extract key technical insights, code examples, diagrams
+3. Write blog post expanding on the episode's topic
+4. Link to YouTube/Spotify episode in the post
+5. Tag with `podcast`, `dkt` or `aws-podcast`, + topic tags
+
+#### MEDIUM priority — learning & research content
+
+| Source | Vault Path | ~Files | Blog Use |
+|---|---|---|---|
+| **Certifications** | `72-Learn/72.20-Certification/` | 120+ | CKA/CKS/CKAD guides, AWS cert tips |
+| **Research** | `20-Calendar/27-Research/YYYY/` | 35 | Tech evaluations, architectural decisions |
+| **Conference talks** | `15.31-Talks-Materials/` | 7 | Expanded talk write-ups |
+| **Community / UGs** | `10-AWS/17-UG/` | 4 | Community event summaries |
+
+#### LOWER priority — niche but valuable
+
+| Source | Vault Path | ~Files | Blog Use |
+|---|---|---|---|
+| **Homelab** | `35-Homelab-Infrastructure/` | 10 | Proxmox setup, network guides |
+| **Tech KB — CS/prog** | `73-KB-Tech/73.40-CS-programming/` | 5+ | Go, Python, uv package manager |
+| **PKM / Obsidian** | `76-KB-Non-Tech/76.10-PKM-Obsidian/` | 30+ | Personal knowledge management, second brain |
+
+### QMD Search Patterns
+
+```bash
+# Find content by topic
+qmd search "karpenter autoscaling"
+qmd vector_search "kubernetes cost optimization"
+qmd deep_search "agentic AI patterns"
+
+# Find DKT episode notes
+qmd search "DKT91"
+qmd search "DevOps Kitchen Talks mock interview"
+
+# Find AWS podcast episodes
+qmd search "AWS на русском agentic"
+
+# Find book chapters
+qmd search "kubernetes rolling update"
+
+# Find certification notes
+qmd search "CKA RBAC practice"
+```
+
+### Vault → Blog Post Workflow
+
+1. **Find source:** Use QMD to locate vault note(s) on the topic
+2. **Read & synthesize:** Combine multiple vault notes if needed
+3. **Adapt for web:**
+   - Remove `[[internal links]]` — replace with explanations or external links
+   - Expand abbreviations and context (vault notes assume background knowledge)
+   - Add introduction and conclusion for standalone reading
+   - Convert Excalidraw references to inline diagrams or descriptions
+4. **Create post:** `src/content/blog/{en,ru}/YYYY-MM-DD-slug.md`
+5. **Set frontmatter:** title, description, date, tags, draft
+6. **Build & verify:** `npm run build`
+7. **Push:** Auto-deploys via GitHub Actions
 
 ---
 
