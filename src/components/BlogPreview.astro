@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import { t, type Locale, getLocalizedPath } from '../i18n/utils';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const i = t(locale);
+
+const allPosts = await getCollection('blog', ({ data, id }) => {
+  return id.startsWith(`${locale}/`) && !data.draft;
+});
+
+const posts = allPosts
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<section id="blog" class="py-20 sm:py-28 bg-surface/30">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between mb-12">
+      <h2 class="text-3xl font-bold animate-on-scroll">{i.blog.title}</h2>
+      {posts.length > 0 && (
+        <a
+          href={getLocalizedPath('/blog', locale)}
+          class="text-sm text-accent hover:text-accent-light transition-colors animate-on-scroll"
+        >
+          {i.blog.all_posts} &rarr;
+        </a>
+      )}
+    </div>
+
+    {posts.length > 0 ? (
+      <div class="grid md:grid-cols-3 gap-6">
+        {posts.map((post) => {
+          const slug = post.id.replace(`${locale}/`, '');
+          return (
+            <a
+              href={getLocalizedPath(`/blog/${slug}`, locale)}
+              class="group p-5 rounded-xl bg-bg border border-border card-glow animate-on-scroll"
+            >
+              <time class="text-xs text-text-muted">
+                {post.data.date.toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
+              <h3 class="text-lg font-medium mt-2 mb-2 group-hover:text-accent transition-colors">
+                {post.data.title}
+              </h3>
+              <p class="text-sm text-text-muted line-clamp-2">{post.data.description}</p>
+              {post.data.tags && (
+                <div class="flex flex-wrap gap-1.5 mt-3">
+                  {post.data.tags.map((tag: string) => (
+                    <span class="text-xs px-2 py-0.5 rounded bg-surface border border-border text-text-muted">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </a>
+          );
+        })}
+      </div>
+    ) : (
+      <p class="text-text-muted animate-on-scroll">
+        {locale === 'ru' ? 'Посты появятся скоро...' : 'Posts coming soon...'}
+      </p>
+    )}
+  </div>
+</section>

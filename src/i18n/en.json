@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "about": "About",
+    "podcasts": "Podcasts",
+    "speaking": "Speaking",
+    "book": "Book",
+    "presentations": "Slides",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "name": "Viktor Vedmich",
+    "role": "Senior Solutions Architect @ AWS",
+    "tagline": "Distributed Systems \u00b7 Kubernetes \u00b7 Cloud Architecture",
+    "cta": "Get in touch"
+  },
+  "about": {
+    "title": "About Me",
+    "bio": "Solutions Architect with 15+ years of experience designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and real-time data platforms. CNCF Kubernaut and author of \"Cracking the Kubernetes Interview\".",
+    "skills_title": "Expertise",
+    "certs_title": "Certifications"
+  },
+  "podcasts": {
+    "title": "Podcasts",
+    "dkt_name": "DevOps Kitchen Talks",
+    "dkt_desc": "Technical deep-dives into DevOps, Kubernetes, and infrastructure. Interviews with industry experts, mock interviews, and hands-on topics.",
+    "dkt_stats": "91+ episodes \u00b7 10K+ subscribers",
+    "aws_name": "AWS \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u043e\u043c",
+    "aws_desc": "AWS services, architectural patterns, AI applications, and IT careers \u2014 all in Russian. Vendor-agnostic perspective from inside AWS.",
+    "aws_stats": "65+ episodes \u00b7 70K+ listens",
+    "listen": "Listen"
+  },
+  "speaking": {
+    "title": "Speaking",
+    "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5\u20134.7/5.0"
+  },
+  "book": {
+    "title": "Book",
+    "name": "Cracking the Kubernetes Interview",
+    "desc": "A comprehensive guide covering Kubernetes concepts, architecture, networking, security, and real-world scenarios to help you ace your next interview.",
+    "cta": "Get on Amazon"
+  },
+  "presentations": {
+    "title": "Presentations",
+    "subtitle": "Interactive slide decks built with Slidev"
+  },
+  "blog": {
+    "title": "Blog",
+    "read_more": "Read more",
+    "all_posts": "All posts"
+  },
+  "contact": {
+    "title": "Let's Connect",
+    "subtitle": "Find me on these platforms"
+  },
+  "footer": {
+    "built_with": "Built with Astro",
+    "copyright": "\u00a9 {year} Viktor Vedmich"
+  }
+}

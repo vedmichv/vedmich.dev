@@ -1,0 +1,61 @@
+---
+import { t, type Locale } from '../i18n/utils';
+import { speakingEvents } from '../data/social';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const i = t(locale);
+---
+
+<section id="speaking" class="py-20 sm:py-28">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <h2 class="text-3xl font-bold mb-2 animate-on-scroll">{i.speaking.title}</h2>
+    <p class="text-text-muted mb-12 animate-on-scroll">{i.speaking.subtitle}</p>
+
+    <div class="relative">
+      <!-- Timeline line -->
+      <div class="absolute left-4 sm:left-8 top-0 bottom-0 w-px bg-border"></div>
+
+      <div class="space-y-12">
+        {speakingEvents.map((yearGroup) => (
+          <div class="animate-on-scroll">
+            <!-- Year marker -->
+            <div class="relative flex items-center mb-6">
+              <div class="w-8 sm:w-16 flex justify-center">
+                <div class="w-3 h-3 rounded-full bg-accent ring-4 ring-bg"></div>
+              </div>
+              <span class="ml-4 text-2xl font-bold text-accent">{yearGroup.year}</span>
+            </div>
+
+            {yearGroup.events.map((event) => (
+              <div class="relative flex gap-4 ml-8 sm:ml-16 mb-6">
+                <div class="p-4 rounded-xl bg-surface border border-border card-glow flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h3 class="font-semibold">{event.name}</h3>
+                    <span class="text-xs text-text-muted">{event.location}</span>
+                  </div>
+                  <ul class="space-y-1">
+                    {event.talks.map((talk) => (
+                      <li class="text-sm text-text-muted flex items-start gap-2">
+                        <svg class="w-4 h-4 text-accent shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                        {talk}
+                      </li>
+                    ))}
+                  </ul>
+                  {'highlight' in event && event.highlight && (
+                    <p class="mt-2 text-xs text-warm">{event.highlight}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

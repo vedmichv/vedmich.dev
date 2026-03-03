@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import About from '../../components/About.astro';
+import Podcasts from '../../components/Podcasts.astro';
+import Speaking from '../../components/Speaking.astro';
+import Book from '../../components/Book.astro';
+import Presentations from '../../components/Presentations.astro';
+import BlogPreview from '../../components/BlogPreview.astro';
+import Contact from '../../components/Contact.astro';
+
+const locale = 'ru';
+---
+
+<BaseLayout title="Виктор Ведмич — Solutions Architect, Автор, Спикер" locale={locale} path="/">
+  <Hero locale={locale} />
+  <About locale={locale} />
+  <Podcasts locale={locale} />
+  <Speaking locale={locale} />
+  <Book locale={locale} />
+  <Presentations locale={locale} />
+  <BlogPreview locale={locale} />
+  <Contact locale={locale} />
+</BaseLayout>

@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { t } from '../../../i18n/utils';
+
+const locale = 'en';
+const i = t(locale);
+
+const posts = (await getCollection('blog', ({ data, id }) => {
+  return id.startsWith('en/') && !data.draft;
+})).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title={`${i.blog.title} — Viktor Vedmich`} locale={locale} path="/blog">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20">
+    <h1 class="text-3xl font-bold mb-10">{i.blog.title}</h1>
+
+    {posts.length > 0 ? (
+      <div class="space-y-6">
+        {posts.map((post) => {
+          const slug = post.id.replace('en/', '');
+          return (
+            <a
+              href={`/en/blog/${slug}`}
+              class="group block p-5 rounded-xl bg-surface border border-border card-glow"
+            >
+              <time class="text-xs text-text-muted">
+                {post.data.date.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
+              <h2 class="text-xl font-semibold mt-1 mb-2 group-hover:text-accent transition-colors">
+                {post.data.title}
+              </h2>
+              <p class="text-text-muted">{post.data.description}</p>
+              {post.data.tags && (
+                <div class="flex flex-wrap gap-1.5 mt-3">
+                  {post.data.tags.map((tag) => (
+                    <span class="text-xs px-2 py-0.5 rounded bg-bg border border-border text-text-muted">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </a>
+          );
+        })}
+      </div>
+    ) : (
+      <p class="text-text-muted">Posts coming soon...</p>
+    )}
+  </div>
+</BaseLayout>

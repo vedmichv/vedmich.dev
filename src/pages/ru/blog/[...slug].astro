@@ -1,0 +1,59 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ id }) => id.startsWith('ru/'));
+  return posts.map((post) => ({
+    params: { slug: post.id.replace('ru/', '') },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const locale = 'ru';
+---
+
+<BaseLayout
+  title={`${post.data.title} — Виктор Ведмич`}
+  description={post.data.description}
+  locale={locale}
+  path={`/blog/${post.id.replace('ru/', '')}`}
+>
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
+    <header class="mb-10">
+      <a href="/ru/blog" class="text-sm text-accent hover:text-accent-light transition-colors mb-4 inline-block">
+        &larr; Назад к блогу
+      </a>
+      <time class="block text-sm text-text-muted mb-2">
+        {post.data.date.toLocaleDateString('ru-RU', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+      </time>
+      <h1 class="text-3xl sm:text-4xl font-bold mb-4">{post.data.title}</h1>
+      <p class="text-lg text-text-muted">{post.data.description}</p>
+      {post.data.tags && (
+        <div class="flex flex-wrap gap-1.5 mt-4">
+          {post.data.tags.map((tag) => (
+            <span class="text-xs px-2 py-0.5 rounded bg-surface border border-border text-text-muted">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="prose prose-invert prose-cyan max-w-none
+      prose-headings:font-semibold
+      prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+      prose-code:font-mono prose-code:text-accent-light
+      prose-pre:bg-surface prose-pre:border prose-pre:border-border
+      prose-hr:border-border
+    ">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
