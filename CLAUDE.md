@@ -19,6 +19,7 @@ Personal portfolio website for Viktor Vedmich.
 - **Location:** Germany (Timezone: Europe/Berlin)
 - **Languages:** Russian (native), English (fluent)
 - **Communication:** Respond in the language used by user (Russian or English)
+- **GSD workflows (`/gsd-*`):** Ask the user interactive questions in **Russian** (labels, descriptions, option text in AskUserQuestion). Record everything in artifacts (CONTEXT.md, PLAN.md, RESEARCH.md, commit messages, DISCUSSION-LOG.md) in **English**. Technical terms, code, file paths stay in English even inside Russian questions.
 
 ---
 
