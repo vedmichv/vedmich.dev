@@ -2,42 +2,44 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 3 (Section order + About)
-status: planned
-last_updated: "2026-04-19T21:15:00.000Z"
-stopped_at: "Phase 3 planned — ready for /gsd-execute-phase 3"
+current_phase: 4 (Podcasts: DKT teal + AWS RU amber badges)
+status: complete
+last_updated: "2026-04-19T21:45:00.000Z"
+stopped_at: "Phase 3 complete — atomic commit f21655f pushed; Phase 11 spec expanded with Hero audit findings"
 resume_file: ".planning/phases/03-section-order-about/"
 progress:
   total_phases: 12
-  completed_phases: 2
-  total_plans: 7
-  completed_plans: 4
-  percent: 57
+  completed_phases: 3
+  total_plans: 10
+  completed_plans: 7
+  percent: 58
 ---
 
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 3 (Section order + About — reorder sections, match reference About layout)
-**Status:** Phase 3 planned (3 plans across 2 waves) — ready for /gsd-execute-phase 3
+**Current phase:** 4 (Podcasts — next)
+**Status:** Phase 3 complete. Ready for /gsd-discuss-phase 4 or /gsd-plan-phase 4.
 **Last updated:** 2026-04-19
 
 ## Completed phases
 
 - ✅ Phase 1 — Header search pill + EN · RU switcher (commit `71e38e9`, deployed 2026-04-19)
-- ✅ Phase 2 — Search palette ⌘K (commits `965eac9`, `6f0fb7b`, `e8361e4`, `4bc642b`, pushed 2026-04-19)
+- ✅ Phase 2 — Search palette ⌘K (commits `965eac9`, `6f0fb7b`, `e8361e4`, `4bc642b`)
+- ✅ Phase 3 — Section order + About rewrite + Header token fidelity (commits `f21655f`, `381e0d9`, 2026-04-19)
 
 ## Active context
 
-- Hero phase already shipped ahead of GSD setup (commit `ac3a8fd`). Do NOT include Hero in current milestone — it's done.
 - Reference artifact: `/Users/viktor/.claude/skills/viktor-vedmich-design/ui_kits/vedmich-dev/app.jsx`. Visual: `reference-1440-full.png`.
-- Working tree has uncommitted changes in `.design-handoff/`, `public/favicon.svg`, `.mcp.json` — these will be touched naturally by Phase 10 (logo refresh). Leave alone for now.
+- **Phase 11 (Hero) spec expanded** during Phase 3 review — captures findings about min-h-[90vh] height drift, h1 typography (64/-0.03em/1.05), role mono 18px amber, flat vs grad-hero-soft background, single-line terminal greeting. Do not lose these details — they're in ROADMAP.md Phase 11 section.
+- After Phase 3: About + Header tokens verified byte-for-byte via computed styles. Hero is the only remaining component-level fidelity gap before Phases 4-10 polish the other sections.
+- Working tree has uncommitted changes in `.design-handoff/`, `public/favicon.svg`, `.mcp.json` — these will be touched naturally by Phase 10 (logo refresh) or belong to MCP config changes; leave alone for now.
 
 ## Pending todos
 
 - [x] Phase 1 — Header search pill ✓ (commit `71e38e9`)
 - [x] Phase 2 — Search palette ⌘K ✓ (commits `965eac9`/`6f0fb7b`/`e8361e4`/`4bc642b`)
-- [ ] Phase 3 — Section order + About: match reference
+- [x] Phase 3 — Section order + About + Header tokens ✓ (commits `f21655f`/`381e0d9`)
 - [ ] Phase 4 — Podcasts: DKT teal + AWS RU amber badges
 - [ ] Phase 5 — Book: PACKT cover + V. Vedmich emboss
 - [ ] Phase 6 — Speaking: timeline + arrows + inline city
