@@ -177,6 +177,79 @@ The About section MUST NOT duplicate certification cards that now live in Hero. 
 
 ---
 
+## REQ-011 — Hero: reposition as primary pitch with 4-pill authority strip
+
+**Type:** Component rewrite
+**Priority:** P0
+**Maps to:** Phase 4
+
+The Hero section MUST reframe as the site's primary pitch with a compact authority strip of 4 pills that cover speaker credibility, CNCF achievement, author credibility, and podcast host status:
+
+1. `re:Invent & Keynote Speaker` → scrolls to `#speaking`
+2. `CNCF Kubestronaut` (teal-active, external link) → https://www.cncf.io/training/kubestronaut/
+3. `Author «Cracking the Kubernetes Interview»` → scrolls to `#book`
+4. `Host · DKT + AWS RU` → scrolls to `#podcasts`
+
+The 6 cert pills that currently render from `src/data/social.ts certifications` (CNCF Kubestronaut + CKA/CKS/CKAD/KCNA/KCSA) MUST be replaced in the Hero — "Kubestronaut" already implies the 5 underlying certs. The About section does not render cert cards either (Phase 3). Pill labels are locale-invariant (brand/credential names, stay English in both EN and RU).
+
+**Acceptance:**
+- Hero contains exactly 4 `<a>` elements with class string containing `inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium`.
+- Each pill has the correct href, and the Kubestronaut pill has `target="_blank"`, `rel="noopener"`, and `aria-label="CNCF Kubestronaut program (opens in new tab)"`.
+- No `CKA|CKS|CKAD|KCNA|KCSA` strings appear inside the Hero section in the built HTML.
+- 4-pill row renders on one line at 1440px (no wrap) — verified via Playwright computed width.
+- Both EN (`dist/en/index.html`) and RU (`dist/ru/index.html`) render identically.
+- Scrolling through `#about`, `#book`, `#podcasts`, `#speaking` causes the corresponding nav link to gain `.is-active` (teal underline) — D-09 observer.
+
+---
+
+## REQ-013 — Hero: typography matches reference exactly
+
+**Type:** Component visual fidelity
+**Priority:** P0
+**Maps to:** Phase 4
+
+The Hero h1 computed styles MUST match the reference UI kit (`app.jsx:363`):
+
+- `font-family` resolves to Space Grotesk
+- `font-size: 64px` at viewports ≥800px, scaled via `clamp(40px, 8vw, 64px)` for narrower viewports
+- `font-weight: 700`
+- `letter-spacing: -0.03em` (`-1.92px` computed at 64px)
+- `line-height: 1.05` (`67.2px` computed at 64px)
+- `color: var(--text-primary)` (`#E2E8F0`)
+
+Role line MUST be mono amber 18px (`font-mono text-warm text-lg`).
+Background MUST be flat 160deg gradient via `--grad-hero-flat` token (not `--grad-hero-soft` radial blobs).
+Container MUST be `max-w-[1120px]`. Section padding MUST be `pt-24 pb-16 px-6` (96/64/24).
+Greeting structure MUST be two separate blocks (terminal prompt 14px teal + "Hi, I'm" 16px mute mono), not a single flex row.
+Cursor MUST be an inline `<span>_</span>` with `cursor-blink` CSS animation, not the old `.typing-cursor` pseudo-element.
+
+**Acceptance:**
+- h1 computed style at 1440×900: fontSize = 64px, fontWeight = 700, letterSpacing = -1.92px, lineHeight = 67.2px, fontFamily matches `/Space Grotesk/`.
+- h1 computed fontSize at 375×667: 40px (clamp floor hit).
+- `grep -q 'text-\[clamp(40px,8vw,64px)\]' src/components/Hero.astro` exits 0.
+- `grep -q 'grad-hero-flat' src/styles/design-tokens.css` exits 0 (token declared).
+- `grep -q 'var(--grad-hero-flat)' src/components/Hero.astro` exits 0 (token consumed).
+- No `typing-cursor` class in `src/` or `dist/_astro/*.css`.
+- No hardcoded hex codes in Hero.astro.
+
+---
+
+## REQ-014 — Hero: section height ≤ 540px on 1440×900
+
+**Type:** Component layout constraint
+**Priority:** P0
+**Maps to:** Phase 4
+
+The Hero section computed total height on 1440×900 desktop viewport MUST be ≤ 540px (target ~520px, +20px tolerance for pill wrap sub-pixel DPR). This represents a reduction from the previous ~810px (caused by `min-h-[90vh]` stretching).
+
+**Acceptance:**
+- `document.getElementById('hero').getBoundingClientRect().height` on 1440×900 with all content loaded: **≤ 540**.
+- No `min-h-[90vh]`, `flex items-center`, or `pt-16` classes on the Hero `<section>` wrapper.
+- Hero `<section>` uses `pt-24 pb-16 px-6` classes exactly.
+- All 4 authority pills render on one row on 1440×900 (no wrap).
+
+---
+
 ## Global acceptance (all phases)
 
 - Each phase = 1 atomic commit + push to main
