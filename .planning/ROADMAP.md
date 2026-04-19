@@ -6,44 +6,97 @@
 
 **Execution model:** Sequential — one phase at a time, atomic commit, push main, visual verify on live via playwright-cli attached to user's Chrome.
 
-**Phase numbering NOTE:** Phase 1 (Header visual shell) already shipped (`71e38e9`). Phases below continue from Phase 2.
+**Phase numbering NOTE:** Phase 1 (Header visual shell) already shipped (`71e38e9`). Phases below continue from Phase 2. **Reordered 2026-04-19: Hero promoted to Phase 4** after visual audit during Phase 3 flagged major Hero drift vs reference (user explicit request).
 
 ---
 
-## Phase 2 — Search palette (⌘K modal with fuzzy search)
+## Phase 2 — Search palette (⌘K modal with fuzzy search) ✅
 
+**Status:** Complete (commits `965eac9`, `6f0fb7b`, `e8361e4`, `4bc642b`, 2026-04-19)
 **Requirements:** REQ-001 (upgraded — search must be functional, not placeholder)
-**Files:** `src/components/SearchPalette.astro` (new), `src/components/Header.astro` (wire trigger), `src/data/search-index.ts` (new — build index at compile time from presentations + blog posts), `src/i18n/{en,ru}.json`
-**Approach:**
-- Astro component with small client-side JS (the ONLY allowed island for this phase): keyboard shortcut handler (⌘K / Ctrl+K / "/"), arrow navigation, Enter to open
-- Index built at build time from `social.ts` presentations array + blog Content Collection
-- Fuzzy scoring per `app.jsx:184-195` (title exact = 100, haystack substring = 60, all-tokens-present = 30)
-- Styling matches `app.jsx:233-300` — dark overlay with backdrop-blur, 640px-wide modal with Slides/Post kind badges
-**Est. effort:** 90 min
-**Verification:** Press ⌘K → modal opens, type "karp" → 2 results (Karpenter slides + Karpenter blog), Enter opens URL, Esc closes.
+**Files:** `src/components/SearchPalette.astro`, `src/components/Header.astro`, `src/data/search-index.ts`, `src/i18n/{en,ru}.json`
+**Verification:** Press ⌘K → modal opens, type "karp" → 2 results, Enter opens URL, Esc closes.
 
 ---
 
-## Phase 3 — Section order + About: match reference
+## Phase 3 — Section order + About: match reference ✅
 
+**Status:** Complete (commits `f21655f`, `381e0d9`, `95e7478`, 2026-04-19). Header tokens also fixed in-scope.
 **Requirements:** REQ-008 (upgraded), NEW REQ-009 (section order), NEW REQ-010 (Book before Speaking)
 **Files:** `src/pages/en/index.astro`, `src/pages/ru/index.astro`, `src/components/Header.astro`, `src/components/About.astro`, `src/i18n/en.json`, `src/i18n/ru.json`
-**Change:**
-- Reorder sections: Hero → About → Podcasts → **Book** → Speaking → Presentations → Blog → Contact (Book moves up, before Speaking)
-- Reorder Header `navItems` to match (`about · podcasts · book · speaking · presentations · blog · contact`)
-- About: 2-col grid (`1.4fr 1fr`), bio left with teal-highlighted `«Cracking the Kubernetes Interview»`, skill pills right under "Expertise" overline
-- Drop the duplicate cert cards (and CNCF callout) from About — they are in the Hero cert bar
-- Split `about.bio` i18n key into `bio_before` / `bio_accent` / `bio_after` (D-01); remove `about.certs_title` (D-03)
-**Plans:** 3 plans (Wave 1: 03-01, 03-02 in parallel; Wave 2: 03-03)
-- [ ] 03-01-i18n-keys-PLAN.md — split `about.bio` into three keys in both en.json and ru.json; remove `about.certs_title`
-- [ ] 03-02-section-order-and-nav-PLAN.md — reorder `<Book />` above `<Speaking />` in both locale index pages; reorder `navItems` array in Header.astro to match
-- [ ] 03-03-about-rewrite-PLAN.md — full rewrite of About.astro to match reference `app.jsx:400-421` (grid + bio with teal accent + overline + pills, no cert cards)
-**Est. effort:** 25 min
-**Verification:** Sections in reference order; About layout matches ref screenshot; both locales render identically; no hardcoded hex colors; `npm run build` passes.
+**Verification:** Sections in reference order; About layout byte-match tokens; Header pixel-match tokens.
 
 ---
 
-## Phase 4 — Podcasts: DKT teal + AWS RU amber badges
+## Phase 4 — Hero: match reference pixel-for-pixel 🎯 **NEXT**
+
+**Requirements:** NEW REQ-011, NEW REQ-013 (Hero typography), NEW REQ-014 (Hero height)
+**Files:** `src/components/Hero.astro`, `src/i18n/en.json`, `src/i18n/ru.json`
+**Context:** Promoted to Phase 4 during Phase 3 visual audit (2026-04-19). User flagged massive height mismatch and typography drift vs reference. Was originally scheduled as Phase 11 (cosmetic gradient polish) — new scope is a full component rewrite.
+
+**Findings from Phase 3 audit (`app.jsx:357-391`):**
+
+| # | Element | Reference | Current (Hero.astro) | Action |
+|---|---|---|---|---|
+| 1 | Section height | `padding: '96px 24px 64px'`, content-height | `min-h-[90vh] flex items-center` → stretches to ~810px, centers content | **Remove `min-h-[90vh]` + `flex items-center`**, use `pt-24 pb-16 px-6` (96/64/24) |
+| 2 | Container | `maxWidth: 1120` | `max-w-6xl` (1152) + `max-w-3xl` inner | `max-w-[1120px]`, drop inner `max-w-3xl` |
+| 3 | Background | flat `linear-gradient(160deg,#0F172A,#134E4A)` | `var(--grad-hero-soft)` (multi-layer radial blobs) | Replace with flat gradient to match reference exactly |
+| 4 | Terminal greeting | ONE line mono teal 14px `~/vedmich.dev $ whoami` + separate `Hi, I'm` mono mute 16px (separate block) | Current: `~/vedmich.dev $` + `whoami` in one flex block + `Hi, I'm` at text-sm | Single-line terminal prompt at 14px; separate `Hi, I'm` at 16px mono mute below |
+| 5 | Greeting size | 16px | `text-sm` (14px) | `text-base` |
+| 6 | **h1 size** | **64px** | `text-4xl sm:text-5xl lg:text-6xl` (36→48→60) | `text-[64px]` — no responsive shrinking (reference stays 64 on all viewports) |
+| 7 | h1 weight | 700 | `font-bold` (700) ✓ | keep |
+| 8 | h1 letter-spacing | **-0.03em** | `tracking-tight` (-0.025em) | `tracking-[-0.03em]` |
+| 9 | h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
+| 10 | h1 color | `VV.text` (#E2E8F0) | `text-text-primary` via h1 cascade | keep |
+| 11 | Role ("Senior SA @ AWS") | mono **amber 18px**, margin-top 12 | `font-mono text-xl sm:text-2xl text-warm-light font-medium` (20→24px) | `font-mono text-lg text-warm mt-3` (18px amber) |
+| 12 | Tagline | Inter 18 mute, margin-top 18, **"AI Engineer" emphasized in text-primary** | `text-lg text-text-muted mb-8` — no emphasis split | Split string so "AI Engineer" wraps in `text-text-primary`; margin-top 18px |
+| 13 | Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
+| 14 | CTA margin-top | 32 | `gap-3` (12 gap) | `mt-8` |
+| 15 | Cursor | inline `_` char, teal, blinking opacity | `<span class="typing-cursor text-brand-primary-hover">` (CSS pseudo `|`) | keep current — visually equivalent |
+
+**Typography cross-check (computed styles from Phase 3 audit):**
+- About.astro tokens ✓ all match (Space Grotesk 28/600, Inter 18/1.7, pills Inter 13/500 on #1E293B, overline Inter 11/600 #94A3B8).
+- Header.astro tokens ✓ all match after 03-03 expansion (logo 32px rounded-[7px], nav Inter 14/500 text-secondary, search bg-base rounded-[7px] with mono ⌕).
+- **Only Hero.astro remained drift as of 2026-04-19.**
+
+**Change plan:**
+1. Remove `min-h-[90vh] flex items-center pt-16` from `<section>` wrapper.
+2. Switch wrapper to `pt-24 pb-16 px-6` (96/64/24 reference padding).
+3. Change background from `.hero-deep-signal` (which uses `--grad-hero-soft` complex blobs) to flat `linear-gradient(160deg, var(--bg-base), var(--brand-primary-soft))` — matches reference exactly. Keep noise overlay.
+4. Inner container: `max-w-6xl` → `max-w-[1120px]`, drop the nested `max-w-3xl` wrapper (reference has single column at full container width).
+5. Greeting structure:
+   - Line 1 (terminal): `<div class="font-mono text-brand-primary text-sm mb-4">~/vedmich.dev $ whoami</div>` — mono teal 14px.
+   - Line 2 (Hi): `<div class="font-mono text-text-secondary text-base mb-1">Hi, I'm</div>` — mono mute 16px.
+6. `h1`: `font-display text-[64px] font-bold tracking-[-0.03em] leading-[1.05] text-text-primary m-0`. No responsive shrinking.
+7. Role: `<div class="font-mono text-warm text-lg mt-3">` — amber 18px mono, margin-top 12px (reference `marginTop: 12`).
+8. Tagline: Split `hero.tagline` i18n key:
+   - `hero.tagline_prefix: "Distributed Systems · Kubernetes · "`
+   - `hero.tagline_emphasis: "AI Engineer"`
+   - Render: `<p class="font-body text-lg text-text-secondary max-w-[640px] mt-4">{i.hero.tagline_prefix}<span class="text-text-primary">{i.hero.tagline_emphasis}</span></p>` (mt-4 ≈ 18px).
+9. Cert pills wrapper: `flex flex-wrap gap-2.5 mt-7` (28px from role, 10px gap).
+10. CTA wrapper: `flex flex-wrap items-center gap-3 mt-8` (32px from pills).
+
+**Plans (3 plans across 2 waves — draft, to be formalized by /gsd-plan-phase 4):**
+- [ ] 04-01 — i18n keys: split `hero.tagline` into `tagline_prefix` + `tagline_emphasis` (EN + RU). Mirrors 03-01 pattern.
+- [ ] 04-02 — Hero.astro rewrite: section wrapper (remove min-h, flex centering), container, greeting structure, h1 typography, role mono amber, tagline split rendering, spacings.
+- [ ] 04-03 — Background + visual gate: switch `.hero-deep-signal` to flat `linear-gradient(160deg,var(--bg-base),var(--brand-primary-soft))`, keep noise overlay. Build + checkpoint for user visual verify.
+
+**Est. effort:** 45 min (grew from Phase 11's original 15 min based on audit depth).
+
+**Verification:**
+- Computed styles of h1 match reference: 64px/700/-0.03em/1.05.
+- Hero total height on 1440×900 viewport is ~520px (not 810px like before).
+- `linear-gradient(160deg,#0F172A,#134E4A)` applied as flat background (no radial blobs).
+- Tagline has "AI Engineer" visually distinct (text-primary emphasis).
+- Role text is mono amber, 18px (not 20-24).
+- Terminal greeting is ONE line, not two blocks.
+- `npm run build` exits 0.
+- No hardcoded hex in Hero.astro.
+- Side-by-side against `reference-1440-full.png` — Hero section is pixel-equivalent.
+
+---
+
+## Phase 5 — Podcasts: DKT teal + AWS RU amber badges
 
 **Requirements:** REQ-004
 **Files:** `src/components/Podcasts.astro`
@@ -53,7 +106,7 @@
 
 ---
 
-## Phase 5 — Book: PACKT cover + V. Vedmich emboss
+## Phase 6 — Book: PACKT cover + V. Vedmich emboss
 
 **Requirements:** REQ-005
 **Files:** `src/components/Book.astro`
@@ -63,7 +116,7 @@
 
 ---
 
-## Phase 6 — Speaking: timeline + arrows + inline city
+## Phase 7 — Speaking: timeline + arrows + inline city
 
 **Requirements:** REQ-003
 **Files:** `src/components/Speaking.astro`
@@ -73,7 +126,7 @@
 
 ---
 
-## Phase 7 — Presentations: match card format
+## Phase 8 — Presentations: match card format
 
 **Requirements:** NEW REQ-010 (presentations polish)
 **Files:** `src/components/Presentations.astro`
@@ -83,7 +136,7 @@
 
 ---
 
-## Phase 8 — Blog: 3 posts with correct card format
+## Phase 9 — Blog: 3 posts with correct card format
 
 **Requirements:** REQ-002
 **Files:** `src/content/blog/{en,ru}/*.md` (6 new files), `src/components/BlogPreview.astro`
@@ -95,7 +148,7 @@
 
 ---
 
-## Phase 9 — Contact: letter badges + working form
+## Phase 10 — Contact: letter badges + working form
 
 **Requirements:** REQ-006 (upgraded — form must be functional, not CTA)
 **Files:** `src/components/Contact.astro`, `src/i18n/{en,ru}.json`
@@ -105,68 +158,12 @@
 
 ---
 
-## Phase 10 — Logo + favicon refresh
+## Phase 11 — Logo + favicon refresh
 
 **Requirements:** REQ-007
 **Files:** `public/vv-logo-primary.svg`, `public/vv-logo-inverse.svg`, `public/favicon.svg`, `.design-handoff/deep-signal-design-system/project/assets/*`, `public/vv-logo-hero.png` (new, from skill assets)
 **Change:** Copy from `~/Documents/ViktorVedmich/40-Content/45-Personal-Brand/45.20-Brand-Kit/logo/exports/` + `/Users/viktor/.claude/skills/viktor-vedmich-design/assets/`. Verify Header uses `vv-logo-hero.png` (32×32, radius 7) per ref.
 **Est. effort:** 15 min
-
----
-
-## Phase 11 — Hero: match reference pixel-for-pixel
-
-**Requirements:** NEW REQ-011, NEW REQ-013 (Hero typography), NEW REQ-014 (Hero height)
-**Files:** `src/components/Hero.astro`, possibly `src/i18n/{en,ru}.json`
-**Context:** Discovered during Phase 3 visual audit (2026-04-19). User flagged massive height mismatch and typography drift vs reference.
-
-**Findings from Phase 3 audit (`app.jsx:357-391`):**
-
-| Element | Reference | Current (Hero.astro) | Action |
-|---|---|---|---|
-| Section height | `padding: '96px 24px 64px'`, content-height | `min-h-[90vh] flex items-center` → stretches to ~810px, centers content | **Remove `min-h-[90vh]` + `flex items-center`**, use `pt-24 pb-16 px-6` (96/64/24) |
-| Container | `maxWidth: 1120` | `max-w-6xl` (1152) + `max-w-3xl` inner | `max-w-[1120px]` |
-| Background | flat `linear-gradient(160deg,#0F172A,#134E4A)` | `var(--grad-hero-soft)` (multi-layer radial blobs) | Replace with flat gradient to match reference exactly |
-| Terminal greeting | ONE line: mono teal 14px `~/vedmich.dev $ whoami` + separate `Hi, I'm` mono mute 16px | TWO lines: `~/vedmich.dev $` + `whoami` block + `Hi, I'm` | Simplify to single terminal line + mono-mute greeting (drop extra wrapper) |
-| Greeting size | 16px (`Hi, I'm`) | `text-sm` (14px) | `text-base` |
-| **h1 size** | **64px** | `text-4xl sm:text-5xl lg:text-6xl` (36→48→60) | `text-[64px]` or `text-6xl` with explicit override; never go below 60 on lg |
-| h1 weight | 700 | `font-bold` (700) ✓ | keep |
-| h1 letter-spacing | **-0.03em** | `tracking-tight` (-0.025em) | `tracking-[-0.03em]` |
-| h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
-| h1 color | `VV.text` (#E2E8F0) | `text-text-primary` via h1 cascade | keep (already correct) |
-| Role ("Senior SA @ AWS") | mono **amber 18px**, margin-top 12 | `font-mono text-xl sm:text-2xl text-warm-light font-medium` (20→24px) | `font-mono text-lg text-warm mt-3` (18px amber) |
-| Tagline | Inter 18 mute, margin-top 18, **"AI Engineer" emphasized in text-primary** | `text-lg text-text-muted mb-8` — no emphasis split | Split string so "AI Engineer" wraps in `text-text-primary`; margin-top 18px |
-| Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
-| CTA margin-top | 32 | `gap-3` (12 gap, margin inherited) | `mt-8` |
-| Cursor | inline `_` char, teal, blinking opacity | `<span class="typing-cursor text-brand-primary-hover">` (CSS pseudo `|`) | keep current — visually equivalent |
-
-**Typography cross-check (from computed styles, RU/en):**
-- About.astro tokens ✓ all match (Space Grotesk 28/600, Inter 18/1.7, pills Inter 13/500 on #1E293B, overline Inter 11/600 #94A3B8).
-- Header.astro tokens ✓ all match after 03-03 expansion (logo 32px rounded-[7px], nav Inter 14/500 text-secondary, search bg-base rounded-[7px] with mono ⌕).
-- **Only Hero.astro is the remaining fidelity gap.**
-
-**Change:**
-1. Remove `min-h-[90vh] flex items-center pt-16` from `<section>` wrapper.
-2. Switch wrapper to `pt-24 pb-16 px-6` (96/64/24 reference padding).
-3. Change background from `.hero-deep-signal` (which uses `--grad-hero-soft` complex blobs) to flat `linear-gradient(160deg, var(--bg-base), var(--brand-primary-soft))` — matches reference exactly.
-4. Inner container: `max-w-6xl` → `max-w-[1120px]`, drop the nested `max-w-3xl` wrapper (reference has single column at full container width).
-5. Greeting structure:
-   - Line 1: `<span class="font-mono text-brand-primary text-sm">~/vedmich.dev $ whoami</span>` (single line, mono teal 14px, mb-4)
-   - Line 2: `<span class="font-mono text-text-secondary text-base">Hi, I'm</span>` (mono mute 16px, mb-1)
-6. `h1`: `text-[64px] font-bold tracking-[-0.03em] leading-[1.05] text-text-primary m-0` — explicit pixel sizes, no responsive shrinking (reference has no mobile bump).
-7. Role: `<div class="font-mono text-warm text-lg mt-3">` — amber 18px Inter-mono, margin-top 12px.
-8. Tagline: Split `tagline` i18n string so "AI Engineer" is wrapped — e.g. `tagline_prefix: "Distributed Systems · Kubernetes · "`, `tagline_emphasis: "AI Engineer"`. Render as `<p class="font-body text-lg text-text-secondary max-w-[640px] mt-4">{i.hero.tagline_prefix}<span class="text-text-primary">{i.hero.tagline_emphasis}</span></p>`.
-9. Cert pills wrapper: `mt-7` (28px from role), `gap-2.5` (10px).
-10. CTA wrapper: `mt-8` (32px from pills).
-
-**Est. effort:** 45 min (grew from 15 min based on audit depth)
-**Verification:**
-- Computed styles of h1 match reference: 64px/700/-0.03em/1.05.
-- Hero total height on 1440×900 viewport is ~520px (not 810px like before — visual density matches reference).
-- `linear-gradient(160deg,#0F172A,#134E4A)` applied as flat background (no radial blobs).
-- Tagline has "AI Engineer" visually distinct (lighter vs muted).
-- Role text is mono amber, 18px (not 20-24).
-- Terminal greeting is ONE line, not two blocks.
 
 ---
 
@@ -182,6 +179,10 @@
 ## Milestone-level done criteria
 
 - [ ] Phases 2-12 merged to main with atomic commits
+- [x] Phase 2 complete
+- [x] Phase 3 complete
+- [ ] Phase 4 (Hero) — **next**
+- [ ] Phases 5-12 remaining
 - [ ] Live vedmich.dev visually matches `app.jsx` rendering of reference UI kit
 - [ ] Both /en/ and /ru/ render without regression at 1440px + 375px
 - [ ] ⌘K search works on live

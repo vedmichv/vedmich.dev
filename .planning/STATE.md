@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 4 (Podcasts: DKT teal + AWS RU amber badges)
+current_phase: 4 (Hero — match reference pixel-for-pixel)
 status: complete
-last_updated: "2026-04-19T21:45:00.000Z"
-stopped_at: "Phase 3 complete — atomic commit f21655f pushed; Phase 11 spec expanded with Hero audit findings"
+last_updated: "2026-04-19T21:50:00.000Z"
+stopped_at: "Phase 3 complete; ROADMAP reordered — Hero promoted from Phase 11 to Phase 4 per user request 2026-04-19"
 resume_file: ".planning/phases/03-section-order-about/"
 progress:
   total_phases: 12
@@ -18,8 +18,8 @@ progress:
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 4 (Podcasts — next)
-**Status:** Phase 3 complete. Ready for /gsd-discuss-phase 4 or /gsd-plan-phase 4.
+**Current phase:** 4 (Hero — match reference pixel-for-pixel — **NEXT**)
+**Status:** Phase 3 complete. ROADMAP reordered — Hero is now Phase 4 (was 11). Ready for /gsd-discuss-phase 4 or /gsd-plan-phase 4.
 **Last updated:** 2026-04-19
 
 ## Completed phases
@@ -40,14 +40,14 @@ progress:
 - [x] Phase 1 — Header search pill ✓ (commit `71e38e9`)
 - [x] Phase 2 — Search palette ⌘K ✓ (commits `965eac9`/`6f0fb7b`/`e8361e4`/`4bc642b`)
 - [x] Phase 3 — Section order + About + Header tokens ✓ (commits `f21655f`/`381e0d9`)
-- [ ] Phase 4 — Podcasts: DKT teal + AWS RU amber badges
-- [ ] Phase 5 — Book: PACKT cover + V. Vedmich emboss
-- [ ] Phase 6 — Speaking: timeline + arrows + inline city
-- [ ] Phase 7 — Presentations: match card format
-- [ ] Phase 8 — Blog: 3 posts with correct card format
-- [ ] Phase 9 — Contact: letter badges + working form
-- [ ] Phase 10 — Logo + favicon refresh
-- [ ] Phase 11 — Hero background gradient polish
+- [ ] Phase 4 — **Hero: match reference pixel-for-pixel** ← next (promoted from old Phase 11 on 2026-04-19 after user audit flagged drift)
+- [ ] Phase 5 — Podcasts: DKT teal + AWS RU amber badges
+- [ ] Phase 6 — Book: PACKT cover + V. Vedmich emboss
+- [ ] Phase 7 — Speaking: timeline + arrows + inline city
+- [ ] Phase 8 — Presentations: match card format
+- [ ] Phase 9 — Blog: 3 posts with correct card format
+- [ ] Phase 10 — Contact: letter badges + working form
+- [ ] Phase 11 — Logo + favicon refresh
 - [ ] Phase 12 — Footer match
 
 ## Blockers
