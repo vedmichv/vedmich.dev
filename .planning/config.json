@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "project_name": "vedmich.dev",
+  "workflow": {
+    "granularity": "coarse",
+    "execution": "sequential",
+    "commit_docs": true,
+    "yolo": false,
+    "research_per_phase": true,
+    "plan_checker": true,
+    "verifier": true,
+    "text_mode": false
+  },
+  "models": {
+    "researcher": "sonnet",
+    "planner": "sonnet",
+    "executor": "sonnet",
+    "plan_checker": "sonnet",
+    "verifier": "sonnet",
+    "synthesizer": "sonnet",
+    "roadmapper": "sonnet"
+  },
+  "current_milestone": "v0.4-reference-audit",
+  "milestone_numbering": {
+    "phase_start": 1,
+    "continue_from_previous": false
+  }
+}
