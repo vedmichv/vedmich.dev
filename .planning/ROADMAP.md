@@ -76,10 +76,12 @@
 9. Cert pills wrapper: `flex flex-wrap gap-2.5 mt-7` (28px from role, 10px gap).
 10. CTA wrapper: `flex flex-wrap items-center gap-3 mt-8` (32px from pills).
 
-**Plans (3 plans across 2 waves — draft, to be formalized by /gsd-plan-phase 4):**
-- [ ] 04-01 — i18n keys: split `hero.tagline` into `tagline_prefix` + `tagline_emphasis` (EN + RU). Mirrors 03-01 pattern.
-- [ ] 04-02 — Hero.astro rewrite: section wrapper (remove min-h, flex centering), container, greeting structure, h1 typography, role mono amber, tagline split rendering, spacings.
-- [ ] 04-03 — Background + visual gate: switch `.hero-deep-signal` to flat `linear-gradient(160deg,var(--bg-base),var(--brand-primary-soft))`, keep noise overlay. Build + checkpoint for user visual verify.
+**Plans:** 3 plans across 2 waves
+
+Plans:
+- [ ] 04-01-i18n-kubestronaut-PLAN.md — Wave 1: 3-key hero.tagline split in both locales + Kubernaut→Kubestronaut fix in about.bio_before (bilingual).
+- [ ] 04-02-hero-rewrite-PLAN.md — Wave 2 (depends 04-01): Add --grad-hero-flat token + full Hero.astro rewrite (4-pill authority strip, clamp h1, inline _ cursor, flat gradient) + remove .typing-cursor from global.css + build gate.
+- [ ] 04-03-rename-observer-gate-PLAN.md — Wave 2 (depends 04-02): Kubestronaut rename in social.ts/BaseLayout/CLAUDE.md + Header.astro nav-active observer + scroll-margin-top global + inline REQ-011/013/014 into REQUIREMENTS.md + user visual checkpoint for REQ-013/014 acceptance.
 
 **Est. effort:** 45 min (grew from Phase 11's original 15 min based on audit depth).
 
