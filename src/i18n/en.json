@@ -29,9 +29,10 @@
   },
   "about": {
     "title": "About Me",
-    "bio": "Solutions Architect and AI Engineer with 15+ years designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and GenAI / agentic platforms. CNCF Kubernaut and author of \"Cracking the Kubernetes Interview\".",
-    "skills_title": "Expertise",
-    "certs_title": "Certifications"
+    "bio_before": "Solutions Architect and AI Engineer with 15+ years designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and GenAI / agentic platforms. CNCF Kubernaut and author of ",
+    "bio_accent": "«Cracking the Kubernetes Interview»",
+    "bio_after": ".",
+    "skills_title": "Expertise"
   },
   "podcasts": {
     "title": "Podcasts",

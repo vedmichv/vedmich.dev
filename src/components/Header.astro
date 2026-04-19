@@ -12,8 +12,8 @@ const altLocale = getAlternateLocale(locale);
 const navItems = [
   { href: '#about', label: i.nav.about },
   { href: '#podcasts', label: i.nav.podcasts },
-  { href: '#speaking', label: i.nav.speaking },
   { href: '#book', label: i.nav.book },
+  { href: '#speaking', label: i.nav.speaking },
   { href: '#presentations', label: i.nav.presentations },
   { href: '#blog', label: i.nav.blog },
   { href: '#contact', label: i.nav.contact },
@@ -21,59 +21,57 @@ const navItems = [
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 border-b border-border/50 backdrop-blur-md bg-bg/80" id="site-header">
-  <nav class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+  <nav class="max-w-[1120px] mx-auto px-6 py-[14px] flex items-center justify-between gap-6">
     <!-- Logo -->
-    <a href={getLocalizedPath('/', locale)} class="flex items-center gap-2 group">
-      <img src="/favicon.svg" alt="VV" width="28" height="28" class="rounded-md shrink-0" />
-      <span class="font-display font-semibold text-sm text-text group-hover:text-accent-light transition-colors tracking-tight">
+    <a href={getLocalizedPath('/', locale)} class="flex items-center gap-2.5 group">
+      <img src="/favicon.svg" alt="VV" width="32" height="32" class="w-8 h-8 rounded-[7px] shrink-0" />
+      <span class="font-display font-bold text-base text-text-primary group-hover:text-brand-primary transition-colors tracking-tight">
         vedmich.dev
       </span>
     </a>
 
-    <!-- Desktop nav -->
-    <ul class="hidden md:flex items-center gap-5 lg:gap-6">
+    <!-- Desktop nav (center) -->
+    <ul class="hidden md:flex items-center gap-6">
       {navItems.map(({ href, label }) => (
         <li>
-          <a href={href} class="text-sm text-text-muted hover:text-text transition-colors">
+          <a href={href} class="font-body text-sm font-medium text-text-secondary hover:text-brand-primary transition-colors">
             {label}
           </a>
         </li>
       ))}
+    </ul>
 
-      <!-- Search pill — opens ⌘K palette -->
-      <li class="hidden lg:block">
-        <button
-          type="button"
-          id="search-trigger-desktop"
-          aria-label={i.nav.search_label}
-          class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-elevated/60 border border-border hover:border-border-strong transition-colors text-sm cursor-pointer"
-        >
-          <svg class="w-3.5 h-3.5 text-brand-primary-hover" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="7" />
-            <path stroke-linecap="round" d="m20 20-3-3" />
-          </svg>
-          <span class="text-text-muted">{i.nav.search_placeholder}</span>
-          <kbd class="px-1.5 py-0.5 text-[11px] font-mono rounded bg-bg-base border border-border text-text-muted">⌘K</kbd>
-        </button>
-      </li>
+    <!-- Right: search + lang -->
+    <div class="hidden md:flex items-center gap-2">
+      <!-- Search trigger — opens ⌘K palette -->
+      <button
+        type="button"
+        id="search-trigger-desktop"
+        aria-label={i.nav.search_label}
+        class="flex items-center gap-2.5 bg-bg-base border border-border hover:border-brand-primary hover:text-text-primary pl-2.5 pr-2 py-1.5 rounded-[7px] text-[13px] text-text-secondary transition-colors cursor-pointer"
+      >
+        <span class="font-mono text-[13px] text-brand-primary leading-none">⌕</span>
+        <span>{i.nav.search_placeholder}</span>
+        <kbd class="font-mono text-[10px] text-text-muted bg-surface border border-border rounded-[3px] px-1.5 py-[1px] leading-none">⌘K</kbd>
+      </button>
 
-      <!-- Locale switcher: EN · RU -->
-      <li class="flex items-center gap-2 text-sm">
+      <!-- Locale switcher: EN · RU as a single button -->
+      <div class="flex items-center font-mono text-xs border border-border rounded-md overflow-hidden">
         <a
           href={getLocalizedPath('/', 'en')}
-          class={`lang-switch transition-colors ${locale === 'en' ? 'font-semibold text-text-primary' : 'text-text-muted hover:text-text-primary'}`}
+          class={`lang-switch px-2.5 py-1.5 transition-colors ${locale === 'en' ? 'text-text-primary bg-surface' : 'text-text-secondary hover:text-text-primary'}`}
           data-lang="en"
           aria-current={locale === 'en' ? 'page' : undefined}
         >EN</a>
-        <span class="text-border-strong select-none" aria-hidden="true">·</span>
+        <span class="text-border-strong select-none px-0" aria-hidden="true">·</span>
         <a
           href={getLocalizedPath('/', 'ru')}
-          class={`lang-switch transition-colors ${locale === 'ru' ? 'font-semibold text-text-primary' : 'text-text-muted hover:text-text-primary'}`}
+          class={`lang-switch px-2.5 py-1.5 transition-colors ${locale === 'ru' ? 'text-text-primary bg-surface' : 'text-text-secondary hover:text-text-primary'}`}
           data-lang="ru"
           aria-current={locale === 'ru' ? 'page' : undefined}
         >RU</a>
-      </li>
-    </ul>
+      </div>
+    </div>
 
     <!-- Mobile menu button -->
     <button
