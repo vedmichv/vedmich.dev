@@ -51,8 +51,57 @@ src/
 - **Zero JS by default** — Astro islands. Only JS: scroll animations (IntersectionObserver) + mobile menu toggle
 - **i18n without deps** — JSON translations + `t(locale)` helper, no `astro-i18n` package
 - **Content Collections** — blog posts in `src/content/blog/{locale}/`, glob loader, Zod schema
-- **Dark theme only** — colors defined in `@theme` (Tailwind 4): bg `#0F172A`, accent `#06B6D4`, warm `#F59E0B`
-- **Fonts** — Inter (body) + JetBrains Mono (code) via Google Fonts
+- **Dark theme default** — "Deep Signal" brand: teal `#14B8A6` primary, amber `#F59E0B` accent, bg `#0F172A`. Light mode tokens available via `.light` class for LinkedIn embeds/OG.
+- **Fonts (self-hosted)** — Space Grotesk (headlines), Inter (body), JetBrains Mono (code). WOFF2 files in `public/fonts/`, declared in `src/styles/design-tokens.css`. No Google Fonts CDN.
+
+---
+
+## Deep Signal Design System — LIVE
+
+This site is the reference implementation of the **Deep Signal** personal brand system.
+Migration from Electric Horizon (cyan) → Deep Signal (teal + amber) completed 2026-04-19.
+
+### Architecture
+- **Canonical token source:** `src/styles/design-tokens.css` — full `:root` block (brand, bg, text, borders, status, topics, 10 gradients, fractalNoise, type scale, spacing, radius, shadows, motion, code syntax). Includes `.light` override for OG/LinkedIn renders.
+- **Tailwind bridge:** `src/styles/global.css` — `@theme` block maps both *canonical* utilities (`bg-brand-primary`, `text-text-primary`) and *shim aliases* (`text-accent`, `bg-bg`, `text-warm`) to Deep Signal tokens. Zero breakage during migration — old utility names remain valid.
+- **Font loading:** 9 WOFF2 files in `public/fonts/` (Inter 400/500/600/700, Space Grotesk 500/600/700, JetBrains Mono 400/500). Declared via `@font-face` in `design-tokens.css`. `<link rel="preload">` in `BaseLayout.astro` for LCP fonts. **No Google Fonts CDN.**
+- **Noise overlay:** `.noise-overlay` utility class in `design-tokens.css` — applies fractalNoise `::after` for gradient banding removal. Used on Hero section.
+- **Vault canonical spec:** `40-Content/45-Personal-Brand/45.20-Brand-Kit/DESIGN.md`
+- **Handoff bundle (read-only):** `.design-handoff/deep-signal-design-system/` (claude.ai/design, 2026-04-19)
+
+### Key constraints
+- **Tailwind 4 `@theme` inlines colors statically** — `.light`/`[data-theme="light"]` override only affects raw CSS rules that use `var(--brand-*)` directly (e.g. `.typing-cursor`, `.card-glow`, `body`). Tailwind utilities like `bg-surface` compile to hex literals and do NOT follow the class toggle. Light mode is therefore intended only for OG/LinkedIn image rendering via dedicated preview templates, not for a user-facing toggle.
+- **Never add hardcoded hex** to components — always reference a token. Especially avoid `#06B6D4`/`#22D3EE` (deprecated cyan).
+
+### Color Tokens (canonical)
+
+**Brand (dark default):**
+- `--brand-primary: #14B8A6` · `--brand-primary-hover: #2DD4BF` · `--brand-primary-deep: #0D9488` · `--brand-primary-soft: #134E4A`
+- `--brand-accent: #F59E0B` · `--brand-accent-hover: #FBBF24` · `--brand-accent-soft: #451A03`
+
+**Surfaces:** `--bg-base: #0F172A` · `--bg-surface: #1E293B` · `--bg-elevated: #334155` · `--bg-code: #0D1117`
+
+**Text:** `--text-primary: #E2E8F0` · `--text-secondary: #94A3B8` · `--text-muted: #78909C`
+
+**Borders:** `--border: #334155` · `--border-strong: #475569`
+
+### Anti-Patterns — MUST avoid
+
+| Never use | Reason |
+|---|---|
+| `#06B6D4` / `#22D3EE` | Deprecated cyan from old Electric Horizon palette |
+| `#7C3AED` / `#10B981` | DKT podcast brand (keep separation) |
+| `#FF9900` / `#232F3E` | AWS employer brand (keep separation) |
+| Pure `#000` / `#FFF` body text | Causes glare — use `#0F172A` / `#E2E8F0` |
+
+### Typography
+
+- **Display/headlines:** `Space Grotesk` 500/600/700
+- **Body/UI:** `Inter` 400/500/600/700
+- **Code (brand DNA):** `JetBrains Mono` 400/500
+- Type scale: display 48px → h1 36 → h2 28 → h3 22 → body 18 → small 16 → caption 14
+- Spacing: 4px base (1,2,3,4,5,6,8,10,12,16 → 4..64px)
+- Radius: sm 4 · md 8 · lg 12 · xl 16 · full 9999
 
 ---
 
@@ -200,6 +249,58 @@ qmd search "CKA RBAC practice"
 
 ---
 
+## Publishing Workflow (small updates — links, presentations, articles)
+
+**Small changes** (adding a new presentation link, a blog post, updating a bio) are fast — **no design work, no PR review needed**, push straight to `main` and GitHub Pages redeploys in ~2 min.
+
+### Adding a new presentation
+
+1. Edit `src/data/social.ts` → `presentations` array. Add an entry:
+   ```ts
+   { title: '...', slug: 'deck-slug', description: '...', tags: ['AI', 'DevOps'] }
+   ```
+2. The `slug` must match the Slidev deployment path (e.g. `s.vedmich.dev/<slug>/`).
+3. `git commit -m "Add <Talk Name> presentation"` → `git push origin main`.
+4. GH Actions deploys in ~2 min. Verify live at `vedmich.dev/en/#presentations`.
+
+### Adding a new blog post
+
+1. Create `src/content/blog/{en,ru}/YYYY-MM-DD-slug.md` (both locales ideally).
+2. Frontmatter: `title`, `description`, `date`, `tags`, `draft: false`.
+3. Write content in markdown. Code blocks get Deep Signal syntax highlighting automatically via Shiki + prose-invert.
+4. `git commit -m "Post: <title>"` → `git push origin main`.
+5. Post appears at `/{locale}/blog/<slug>` + top 3 in homepage BlogPreview.
+
+### Adding a new speaking event
+
+1. Edit `src/data/social.ts` → `speakingEvents` array. Add to the correct `year` group or create a new year.
+2. `git commit && git push`.
+
+### Small text/bio edits
+
+- English strings: `src/i18n/en.json`
+- Russian strings: `src/i18n/ru.json`
+- Keys: `hero.tagline`, `about.bio`, `speaking.subtitle`, etc.
+- `git commit && git push` — auto-deploy.
+
+### Big changes (design tokens, layout, new sections)
+
+These need a PR + visual review:
+1. `git checkout -b <feature-branch>`
+2. Iterate locally with `npm run dev`
+3. `npm run build` must pass with zero errors
+4. Capture before/after screenshots of affected sections (Playwright MCP: "screenshot localhost:4321/en/ at 1440px")
+5. Push branch, open PR to `main`, attach screenshots in PR body
+6. Review → merge → auto-deploy
+
+### Deployment monitoring
+
+- Actions tab: `https://github.com/vedmichv/vedmich.dev/actions`
+- Typical build time: ~90s · Typical deploy: ~60s
+- If deploy fails, check GH Actions log and fix on `main` (`revert` or forward-fix).
+
+---
+
 ## Slidev Presentations Integration
 
 Current presentations are hosted at `s.vedmich.dev` (repo `vedmichv/slidev`).
@@ -234,9 +335,11 @@ npm run preview   # Preview built site locally
 
 ### CSS / Styling
 
-- All custom colors/fonts defined in `src/styles/global.css` via `@theme`
+- Tokens live in `src/styles/design-tokens.css` (CSS variables + @font-face)
+- Tailwind 4 `@theme` in `src/styles/global.css` maps utility names to design tokens
 - Custom CSS classes: `.animate-on-scroll`, `.card-glow`, `.typing-cursor`
-- Blog prose styling uses `@tailwindcss/typography` (prose-invert prose-cyan)
+- Blog prose styling uses `@tailwindcss/typography` (prose-invert, teal accents)
+- **Never add hardcoded hex colors to components** — always reference a token
 
 ### i18n & Language Detection
 
