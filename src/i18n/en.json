@@ -10,6 +10,15 @@
     "search_label": "Open search",
     "search_placeholder": "Search\u2026"
   },
+  "search": {
+    "placeholder": "Search slides, posts, tags\u2026",
+    "empty_hint": "Start typing to search. Try: \u201ckarpenter\u201d, \u201cmcp\u201d, \u201ckubernetes\u201d.",
+    "no_results": "No matches for",
+    "footer_move": "move",
+    "footer_open": "open",
+    "kind_slides": "Slides",
+    "kind_post": "Post"
+  },
   "hero": {
     "greeting": "Hi, I'm",
     "name": "Viktor Vedmich",
