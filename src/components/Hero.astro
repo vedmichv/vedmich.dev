@@ -1,6 +1,5 @@
 ---
 import { t, type Locale } from '../i18n/utils';
-import { certifications } from '../data/social';
 
 interface Props {
   locale: Locale;
@@ -10,69 +9,80 @@ const { locale } = Astro.props;
 const i = t(locale);
 ---
 
-<section class="hero-deep-signal noise-overlay relative min-h-[90vh] flex items-center pt-16 overflow-hidden">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-    <div class="max-w-3xl">
-      <!-- Terminal prompt: ~/vedmich.dev $ whoami -->
-      <div class="font-mono text-sm text-text-muted mb-4 flex items-center gap-2">
-        <span class="text-accent-light">~/vedmich.dev $</span>
-        <span>whoami</span>
-      </div>
+<section id="hero" class="hero-deep-signal noise-overlay relative overflow-hidden pt-24 pb-16 px-6">
+  <div class="max-w-[1120px] mx-auto w-full">
+    <!-- Greeting — two separate blocks per D-17 -->
+    <div class="font-mono text-brand-primary text-sm mb-4">~/vedmich.dev $ whoami</div>
+    <div class="font-mono text-text-secondary text-base mb-1">{i.hero.greeting}</div>
 
-      <!-- Greeting -->
-      <p class="font-mono text-sm text-text-muted mb-3">{i.hero.greeting}</p>
+    <!-- H1 with inline _ cursor per D-11, D-14 -->
+    <h1 class="font-display font-bold tracking-[-0.03em] leading-[1.05] text-text-primary m-0 text-[clamp(40px,8vw,64px)]">
+      {i.hero.name}<span class="cursor-blink text-brand-primary" aria-hidden="true">_</span>
+    </h1>
 
-      <!-- Name with inline cursor -->
-      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight">
-        {i.hero.name}<span class="typing-cursor text-brand-primary-hover"></span>
-      </h1>
+    <!-- Role mono amber 18px per D-18 -->
+    <div class="font-mono text-warm text-lg mt-3">{i.hero.role}</div>
 
-      <p class="font-mono text-xl sm:text-2xl text-warm-light font-medium mb-3">
-        {i.hero.role}
-      </p>
+    <!-- Tagline with 3-key split + text-primary accent on AI Engineer per D-15, D-16 -->
+    <p class="font-body text-lg text-text-secondary max-w-[640px] mt-4">
+      {i.hero.tagline_before}<span class="text-text-primary">{i.hero.tagline_accent}</span>{i.hero.tagline_after}
+    </p>
 
-      <p class="text-lg text-text-muted mb-8">
-        {i.hero.tagline}
-      </p>
+    <!-- Authority pills per D-02, D-03, D-05, D-06, D-07, D-08 -->
+    <div class="flex flex-wrap gap-2.5 mt-7">
+      <a
+        href="#speaking"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium bg-surface border border-border text-text-primary font-body hover:border-brand-primary hover:text-brand-primary-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
+      >
+        re:Invent &amp; Keynote Speaker
+      </a>
+      <a
+        href="https://www.cncf.io/training/kubestronaut/"
+        target="_blank"
+        rel="noopener"
+        aria-label="CNCF Kubestronaut program (opens in new tab)"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium bg-brand-primary-soft border border-brand-primary text-brand-primary-hover font-body hover:bg-brand-primary-hover/20 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-primary-hover"></span>
+        CNCF Kubestronaut
+      </a>
+      <a
+        href="#book"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium bg-surface border border-border text-text-primary font-body hover:border-brand-primary hover:text-brand-primary-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
+      >
+        Author «Cracking the Kubernetes Interview»
+      </a>
+      <a
+        href="#podcasts"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium bg-surface border border-border text-text-primary font-body hover:border-brand-primary hover:text-brand-primary-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
+      >
+        Host · DKT + AWS RU
+      </a>
+    </div>
 
-      <!-- Cert badges: first one is "active" (dot + teal fill), rest outline -->
-      <div class="flex flex-wrap gap-2 mb-10">
-        {certifications.map(({ name }, idx) => (
-          idx === 0 ? (
-            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-brand-primary-soft border border-brand-primary text-brand-primary-hover">
-              <span class="w-1.5 h-1.5 rounded-full bg-brand-primary-hover"></span>
-              {name}
-            </span>
-          ) : (
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-transparent border border-border text-text-secondary">
-              {name}
-            </span>
-          )
-        ))}
-      </div>
-
-      <!-- CTAs: primary teal + ghost "Read more →" -->
-      <div class="flex flex-wrap items-center gap-3">
-        <a
-          href="#contact"
-          class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-bg font-medium rounded-lg transition-colors"
-        >
-          {i.hero.cta}
-        </a>
-        <a
-          href="#about"
-          class="inline-flex items-center gap-2 px-5 py-2.5 border border-border hover:border-brand-primary hover:text-brand-primary-hover text-text-primary font-medium rounded-lg transition-colors"
-        >
-          {i.hero.cta_secondary}
-          <span aria-hidden="true">→</span>
-        </a>
-      </div>
+    <!-- CTAs per D-18 (mt-8 from pills, gap-3 internal) -->
+    <div class="flex flex-wrap items-center gap-3 mt-8">
+      <a
+        href="#contact"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-bg-base font-medium rounded-lg transition-colors"
+      >
+        {i.hero.cta}
+      </a>
+      <a
+        href="#about"
+        class="inline-flex items-center gap-2 px-5 py-2.5 border border-border hover:border-brand-primary hover:text-brand-primary-hover text-text-primary font-medium rounded-lg transition-colors"
+      >
+        {i.hero.cta_secondary}<span aria-hidden="true">→</span>
+      </a>
     </div>
   </div>
 </section>
 
 <style>
-  .hero-deep-signal {
-    background: var(--grad-hero-soft);
+  .hero-deep-signal { background: var(--grad-hero-flat); }
+  .cursor-blink { animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-blink { animation: none; }
   }
 </style>
