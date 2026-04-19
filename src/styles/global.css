@@ -106,18 +106,6 @@ h1, h2, h3, h4,
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-/* Typing cursor animation — follows brand primary via shim alias */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.typing-cursor::after {
-  content: "|";
-  animation: blink 1s step-end infinite;
-  color: var(--brand-primary-hover);  /* #2DD4BF — AA at small size */
-}
-
 /* Card hover glow — uses teal shadow token */
 .card-glow {
   transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
@@ -146,8 +134,5 @@ h1, h2, h3, h4,
   }
   .animate-on-scroll {
     opacity: 1;
-  }
-  .typing-cursor::after {
-    animation: none;
   }
 }
