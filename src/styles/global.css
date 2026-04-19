@@ -79,6 +79,13 @@ h1, h2, h3, h4,
   color: var(--bg-base);
 }
 
+/* Keyboard focus ring — teal, visible on both dark + light surfaces (WCAG 2.4.7). */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* Scroll-triggered fade-in animation */
 @keyframes fadeInUp {
   from {
@@ -124,4 +131,23 @@ h1, h2, h3, h4,
 @keyframes drawLine {
   from { height: 0; }
   to { height: 100%; }
+}
+
+/* Respect user's reduced-motion preference (WCAG 2.3.3 / SC 2.2.2).
+   Keeps scroll-triggered reveals visible (no fade-up) instead of hiding them. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-on-scroll {
+    opacity: 1;
+  }
+  .typing-cursor::after {
+    animation: none;
+  }
 }

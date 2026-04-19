@@ -100,7 +100,11 @@
   --border: #334155;
   --border-strong: #475569;
 
-  /* -- Status -- */
+  /* -- Status --
+     #10B981 = Tailwind emerald-500, used here strictly as a semantic "success"
+     signal (form validation, status chips). It is NOT a brand color — the DKT
+     podcast green is visually similar but never composed with Deep Signal
+     brand identity. Keep `--success` reserved for status UI only. */
   --success: #10B981;
   --warning: #F59E0B;
   --error: #EF4444;
