@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
 current_phase: 4 (Hero — match reference pixel-for-pixel)
-status: complete
-last_updated: "2026-04-19T21:50:00.000Z"
-stopped_at: "Phase 3 complete; ROADMAP reordered — Hero promoted from Phase 11 to Phase 4 per user request 2026-04-19"
-resume_file: ".planning/phases/03-section-order-about/"
+status: context-gathered
+last_updated: "2026-04-19T22:30:00.000Z"
+stopped_at: "Phase 4 context gathered — Hero reframed as primary pitch with 4 authority pills + Kubestronaut rename"
+resume_file: ".planning/phases/04-hero-reference-match/04-CONTEXT.md"
 progress:
   total_phases: 12
   completed_phases: 3
@@ -18,8 +18,8 @@ progress:
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 4 (Hero — match reference pixel-for-pixel — **NEXT**)
-**Status:** Phase 3 complete. ROADMAP reordered — Hero is now Phase 4 (was 11). Ready for /gsd-discuss-phase 4 or /gsd-plan-phase 4.
+**Current phase:** 4 (Hero — match reference pixel-for-pixel — **CONTEXT GATHERED**)
+**Status:** Phase 4 context captured — Hero reframed as the site's primary pitch. 4 authority pills (re:Invent & Keynote Speaker, CNCF Kubestronaut, Author, Host · DKT + AWS RU) replace the 6 cert pills. Project-wide `Kubernaut → Kubestronaut` rename in scope. IntersectionObserver nav highlight also in-scope. Ready for /gsd-plan-phase 4.
 **Last updated:** 2026-04-19
 
 ## Completed phases
