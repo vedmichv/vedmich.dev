@@ -2,27 +2,28 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 2 (Search palette — ⌘K command palette)
-status: executing
-last_updated: "2026-04-19T18:09:16.194Z"
+current_phase: 3 (Section order + About)
+status: ready
+last_updated: "2026-04-19T20:21:00.000Z"
 progress:
-  total_phases: 2
-  completed_phases: 0
+  total_phases: 12
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 4
+  percent: 100
 ---
 
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 2 (Search palette — ⌘K command palette)
-**Status:** Ready to execute
+**Current phase:** 3 (Section order + About — reorder sections, match reference About layout)
+**Status:** Phase 2 complete, ready for Phase 3
 **Last updated:** 2026-04-19
 
 ## Completed phases
 
 - ✅ Phase 1 — Header search pill + EN · RU switcher (commit `71e38e9`, deployed 2026-04-19)
+- ✅ Phase 2 — Search palette ⌘K (commits `965eac9`, `6f0fb7b`, `e8361e4`, `4bc642b`, pushed 2026-04-19)
 
 ## Active context
 
@@ -33,7 +34,7 @@ progress:
 ## Pending todos
 
 - [x] Phase 1 — Header search pill ✓ (commit `71e38e9`)
-- [ ] Phase 2 — Search palette (⌘K modal + fuzzy search)
+- [x] Phase 2 — Search palette ⌘K ✓ (commits `965eac9`/`6f0fb7b`/`e8361e4`/`4bc642b`)
 - [ ] Phase 3 — Section order + About: match reference
 - [ ] Phase 4 — Podcasts: DKT teal + AWS RU amber badges
 - [ ] Phase 5 — Book: PACKT cover + V. Vedmich emboss
