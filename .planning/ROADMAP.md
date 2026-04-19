@@ -28,7 +28,7 @@
 
 ---
 
-## Phase 4 — Hero: match reference pixel-for-pixel 🎯 **NEXT**
+## Phase 4 — Hero: match reference pixel-for-pixel ✅
 
 **Requirements:** NEW REQ-011, NEW REQ-013 (Hero typography), NEW REQ-014 (Hero height)
 **Files:** `src/components/Hero.astro`, `src/i18n/en.json`, `src/i18n/ru.json`
@@ -183,8 +183,9 @@ Plans:
 - [ ] Phases 2-12 merged to main with atomic commits
 - [x] Phase 2 complete
 - [x] Phase 3 complete
-- [ ] Phase 4 (Hero) — **next**
-- [ ] Phases 5-12 remaining
+- [x] Phase 4 complete
+- [ ] Phase 5 (Podcasts) — **next**
+- [ ] Phases 6-12 remaining
 - [ ] Live vedmich.dev visually matches `app.jsx` rendering of reference UI kit
 - [ ] Both /en/ and /ru/ render without regression at 1440px + 375px
 - [ ] ⌘K search works on live
