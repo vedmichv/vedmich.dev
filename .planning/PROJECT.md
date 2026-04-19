@@ -13,7 +13,11 @@ Personal portfolio site for Viktor Vedmich — bio, speaking, podcasts (DKT + AW
 
 ## Current state (2026-04-19)
 
-Deep Signal design system is LIVE (teal #14B8A6 + amber #F59E0B). Hero matches reference artifact (rebuilt in commit `ac3a8fd`). Presentations section has 6 decks. Blog has 1 post. Site is stable, auto-deploying.
+Deep Signal design system is LIVE (teal #14B8A6 + amber #F59E0B). Hero matches reference artifact pixel-for-pixel on 1440×900 after Phase 4 rewrite (4-pill authority strip, clamp h1 typography, `--grad-hero-flat` flat 160deg gradient, 3-key i18n tagline split). Nav active-state IntersectionObserver + scroll-margin-top landed. `CNCF Kubestronaut` rename complete across codebase. Presentations section has 6 decks. Blog has 1 post. Site is stable, auto-deploying.
+
+Phases complete: 01-header ✓, 02-search-palette ✓, 03-section-order-about ✓, 04-hero-reference-match ✓.
+
+Validated in Phase 4: REQ-011 (4-pill authority strip), REQ-013 (Hero typography reference-match), REQ-014 (Hero height ≤ 540px on 1440×900).
 
 ## Current milestone: v0.4 — Reference Design Audit
 
