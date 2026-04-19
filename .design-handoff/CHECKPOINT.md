@@ -1,108 +1,160 @@
 # Deep Signal Migration — Checkpoint
 
-**Timestamp:** 2026-04-19
+**Timestamp:** 2026-04-19 (updated late afternoon)
 **Branch:** `deep-signal-design-system`
-**Status:** Phase 1–5 выполнены локально, 4 atomic commits готовы. Ждём явного согласия юзера на `git push` + PR.
+**Status:** 9 commits + 4 uncommitted SVG fixes. Build passes. Blocked on visual QA of VV logo before merge.
 
 ---
 
 ## Где мы остановились
 
-Все 26 шагов плана из `APPLY-PLAN.md` либо выполнены, либо явно отложены.
-Ветка готова к push, но НЕ запушена (чтобы юзер сначала подтвердил — автодеплой на прод после merge).
+Vault prompt `45.20-Brand-Kit/site-apply-session-prompt.md` почти полностью выполнен.
+Все Phase 4 verification checks passed. Добавили 2 новых фичи поверх плана (3D book cover,
+DKT logo в Podcasts). Сразу перед push обнаружили — header-favicon читается как "W" а не "VV".
 
-### 4 commits на ветке (vs main aaaf03a)
+Запущен fix — новая симметричная VV геометрия в path'ах. Не проверена визуально, не закоммичена.
+Пользователь сказал остановиться — есть более срочная задача.
+
+### 9 commits on branch (vs main aaaf03a)
 
 ```
+02010aa  Show DKT logo in Podcasts section
+af96273  Unify logo family with single visual DNA (rounded square + VV cutout)
+92539a7  Use 3D book cover in Book section
+45e4fcf  Pre-merge a11y + cleanup fixes
+49380b0  Add migration checkpoint for session handoff
 82a352a  Phase 5: Document Deep Signal migration + Publishing Workflow
 9a6f3da  Phase 3: Apply Deep Signal to components, content, and taglines
 c9ff835  Phase 2: Migrate tokens to Deep Signal + self-hosted fonts
 341220e  Phase 1: Import Deep Signal handoff bundle and fonts
 ```
 
-### Осталось сделать
+### Uncommitted changes (VV geometry fix — НЕ закоммичено)
 
-1. **Подтвердить push** — юзер сказал "сделай compact" после того как я показал 4 коммита. После возобновления спросить: пушить + открыть PR?
-   Команды:
-   ```
-   git push -u origin deep-signal-design-system
-   gh pr create --title "Deep Signal design system" --body "..."
-   ```
-2. (Опционально, отложено) Vault-обновления — `~/Documents/ViktorVedmich/40-Content/45-Personal-Brand/vedmich.dev Website.md` и `DESIGN.md` (отметить Tailwind-миграцию как Done). Юзер делает сам в Obsidian — не в скоупе репо.
+- `public/favicon.svg` — symmetric V+V paths (new)
+- `.design-handoff/deep-signal-design-system/project/assets/vv-favicon.svg`
+- `.design-handoff/deep-signal-design-system/project/assets/vv-logo-primary.svg`
+- `.design-handoff/deep-signal-design-system/project/assets/vv-logo-inverse.svg`
 
----
+Old asymmetric paths (reads as W):
+```
+M22 26 L36 74 L44 74 L58 26 L50 26 L40 60 L30 26 Z   (left V)
+M54 26 L66 74 L74 74 L78 26 L70 26 L68 60 L62 26 Z   (right V — "slanted italic")
+```
 
-## Что принципиально важно помнить (не терять)
+New symmetric paths (both V's identical, mirrored):
+```
+M14 26 L22 26 L30 60 L38 26 L46 26 L34 74 L26 74 Z   (left V)
+M54 26 L62 26 L70 60 L78 26 L86 26 L74 74 L66 74 Z   (right V — mirror)
+```
 
-### Стратегия миграции: Strategy B (выбрана из 3)
-- **Не переименовываем Tailwind утилиты** (`text-accent`, `bg-bg`, `text-warm` остались как есть).
-- `@theme` в `global.css` **ремапит значения** через shim aliases: `--color-accent: var(--brand-primary)`.
-- Zero breakage на 50+ use-sites утилит. Canonical tokens тоже доступны (`bg-brand-primary`).
-
-### Архитектура токенов — 3 слоя
-1. `src/styles/design-tokens.css` — canonical `:root` + `.light` override + 10 gradients + fractalNoise + type scale (Deep Signal truth).
-2. `src/styles/global.css` `@theme` — Tailwind 4 bridge (canonical utilities + shim aliases for backwards compat).
-3. Component utilities — `text-accent`, `bg-surface`, `font-display`, `.noise-overlay`, `.typing-cursor`, `.card-glow`.
-
-### КРИТИЧНЫЙ constraint Tailwind 4
-**`@theme` инлайнит цвета статически** (`bg-surface` → literal `#1E293B`). Поэтому `.light` override из `design-tokens.css` НЕ переключает Tailwind утилиты — работает только для raw CSS правил (`body`, `.typing-cursor`, `.card-glow`).
-→ Light mode только для OG/LinkedIn рендера, НЕ user-toggle.
-Задокументировано в `CLAUDE.md`.
-
-### Проверки пройдены
-- `npm run build` → zero errors, 7 pages, 873 ms
-- 9 WOFF2 в `dist/fonts/`
-- Zero `#06B6D4` в `dist/`
-- Google Fonts ссылки удалены
-- Favicon: teal VV rounded square (был cyan V)
-- Playwright screenshots EN/RU hero/about/podcasts/book — все в teal/amber палитре, Space Grotesk headlines, JetBrains Mono role, AA-compliant text
-
-### Скрытые поломки, которые починены (не в APPLY-PLAN)
-1. `design-tokens.css` имел EOF artefact `</content></invoke>` + `:root` блок отсутствовал — полностью переписан.
-2. Font paths были относительные (`url('fonts/...')`) → в prod 404 — переписаны на `/fonts/...`.
-3. `.card-glow` хардкод cyan rgba → `var(--shadow-glow)`.
-4. `.typing-cursor` → `var(--brand-primary-hover)` (#2DD4BF, AA small size).
-5. `prose-cyan` в blog [...slug] (EN+RU) — встроенная тема Typography, переопределяла наш accent. Заменена на token-driven prose overrides.
-6. Google Fonts `<link>` удалены, `<link rel="preload">` добавлены для LCP-шрифтов.
-7. Tagline + bio обновлены "Cloud Architecture" → "AI Engineer" (chat decision).
-8. Skills: prepend "AI Engineering".
-
-### Что отложено явно
-- **⌘K Search Palette** (из UI kit chat) — отдельная будущая фаза, не в скоупе миграции.
-- **Vectorization of `vv-logo-hero.png`** (2 MB) — handoff даёт только PNG, нужна ручная векторизация.
-- **Architecture Diagram utilities** (DESIGN.md §14) — пока нет UI поверхности, которая их требует.
-- **Tailwind utility-name sweep** (rename shim aliases to canonical) — отложено; shims останутся пока не появится время.
+ВАЖНО: vault canonical copy в `~/Documents/ViktorVedmich/40-Content/45-Personal-Brand/45.20-Brand-Kit/logo/exports/`
+использует те же старые асимметричные пути. Если новый geometry будет утверждён — надо
+обновить vault тоже (user делает в Obsidian).
 
 ---
 
-## Измененные/созданные файлы
+## Что выполнено по vault prompt
 
-### New
-- `src/styles/design-tokens.css` — пересобран с нуля
-- `public/fonts/*.woff2` × 9
-- `public/vv-logo-hero.png`, `vv-logo-primary.svg`, `vv-logo-inverse.svg`
-- `.design-handoff/` — полный handoff bundle
-- `.design-handoff/APPLY-PLAN.md` + этот CHECKPOINT.md
+- [x] Step 1 — Unified logo SVG committed (`af96273`)
+- [x] Step 2 — Phase 4 verification: grep clean, build passes, 9 WOFF2 ship, no Google CDN
+- [ ] Step 3 — Merge в main (ЖДЁТ: выбор fast-forward vs PR)
+- [ ] Step 4 — Deploy monitoring после push
+- [ ] Step 5 — Vault trackers update (user делает сам)
 
-### Modified
-- `CLAUDE.md` — Deep Signal LIVE + Publishing Workflow
-- `public/favicon.svg` — teal VV (был cyan V)
-- `src/styles/global.css` — @theme bridge с shim aliases
-- `src/layouts/BaseLayout.astro` — Google Fonts out, preload in
-- `src/components/Header.astro` — VV logo + Space Grotesk wordmark
-- `src/components/Hero.astro` — soft mesh + noise + AA-compliant text colors
-- `src/components/{About,Podcasts,Speaking,Book,Presentations,BlogPreview,Contact}.astro` — `font-display` на h2
-- `src/pages/{en,ru}/blog/[...slug].astro` — `prose-cyan` → token-driven
-- `src/data/social.ts` — "AI Engineering" prepended to skills
-- `src/i18n/{en,ru}.json` — tagline + bio update
-- `.gitignore` — exclude `.playwright-mcp/`
+## Новые фичи поверх плана
+
+- 3D book cover (`92539a7`) — `public/images/book-cover-3d.jpg` (144 KB)
+- DKT logo в Podcasts (`02010aa`) — `public/images/dkt-logo.png` (40 KB, RGBA)
+
+---
+
+## Phase 4 verification — все passed
+
+- ✅ `npm run build` — 7 pages, 781ms, zero errors
+- ✅ `dist/fonts/` — 9 WOFF2 (Inter 4w + Space Grotesk 3w + JetBrains Mono 2w)
+- ✅ `dist/images/` — book-cover-3d.jpg + dkt-logo.png shipped
+- ✅ Zero `#06B6D4` / `#22D3EE` (deprecated cyan) в `src/`, `public/`, `dist/`
+- ✅ Zero `fonts.googleapis.com` / `fonts.gstatic.com` references
+- ✅ `dist/CNAME` = `vedmich.dev`
+
+## Pre-merge a11y fixes (commit 45e4fcf) — applied
+
+- `:focus-visible` outline (WCAG 2.4.7)
+- `prefers-reduced-motion` CSS + JS guard (WCAG 2.3.3)
+- `aria-label` на Hero social-иконках (WCAG 1.1.1/4.1.2)
+- Unused `vv-logo-*` (2 MB PNG + 2 SVG) → `.design-handoff/assets-source/`
+- `--success #10B981` annotated (не DKT brand collision)
+
+---
+
+## Что делать дальше (после срочной задачи)
+
+### 1. Визуально проверить новый VV favicon
+
+```bash
+# Запустить dev server если не идёт
+npm run dev
+# Открыть в браузере:
+#   http://localhost:4321/en/           # header icon
+#   http://localhost:4321/favicon.svg   # stand-alone SVG preview
+```
+
+Если новая геометрия читается как VV — commit:
+```
+git add public/favicon.svg .design-handoff/deep-signal-design-system/project/assets/vv-*.svg
+git commit -m "Fix VV logo readability — symmetric V+V geometry"
+```
+
+Если не нравится — rollback:
+```
+git checkout -- public/favicon.svg .design-handoff/deep-signal-design-system/project/assets/vv-*.svg
+```
+
+### 2. Выбрать стратегию merge (vault prompt, Step 3)
+
+**A. Fast-forward** — для personal site норм:
+```
+git checkout main
+git merge --ff-only deep-signal-design-system
+git push origin main       # ← GitHub Actions auto-deploy ~2 мин
+```
+
+**B. PR с review** — для permanent history + rollback:
+```
+git push -u origin deep-signal-design-system
+gh pr create --title "Deep Signal design system migration" --body "..."
+```
+
+### 3. Live deploy verify
+
+```bash
+# Через ~2-3 мин после push:
+gh run list --limit 3
+curl -sI https://vedmich.dev | head
+# В браузере: https://vedmich.dev — проверить teal + amber, DKT logo, 3D book cover
+```
+
+### 4. Vault trackers (user делает сам в Obsidian)
+
+- `40-Content/45-Personal-Brand/45.20-Brand-Kit/PROGRESS.md` — отметить ⏸ "Финальный push + live apply" как ✅
+- `30-Projects/34-Personal-Brand/vedmich.dev Website.md` — mark Tailwind migration Done
+- Commit в vault: `Deep Signal live on vedmich.dev`
 
 ---
 
 ## Как возобновить после compact
 
-1. Читать `.design-handoff/CHECKPOINT.md` (этот файл) — полный контекст.
-2. Читать `.design-handoff/APPLY-PLAN.md` — оригинальный план.
-3. Запустить `git log --oneline main..HEAD` — увидеть 4 коммита.
-4. Спросить юзера: пушить + открыть PR? (`git push -u origin deep-signal-design-system` + `gh pr create`).
-5. Если да — открыть PR со скриншотами из `.design-handoff/after-*.png`.
+1. Читать этот CHECKPOINT.md + `.design-handoff/APPLY-PLAN.md`
+2. `git status --short` → увидеть 4 uncommitted SVG (VV geometry fix)
+3. `git log --oneline main..HEAD` → увидеть 9 коммитов
+4. Запустить `npm run dev`, открыть `localhost:4321/en/` — оценить header logo
+5. Либо утвердить новый geometry (commit) либо откатить (checkout --) и попробовать другой подход
+6. После utilimate VV — спросить user: fast-forward или PR → deploy → vault update
+
+## Ссылки
+
+- Vault prompt: `/Users/viktor/Documents/ViktorVedmich/40-Content/45-Personal-Brand/45.20-Brand-Kit/site-apply-session-prompt.md`
+- Original plan: `.design-handoff/APPLY-PLAN.md`
+- This checkpoint: `.design-handoff/CHECKPOINT.md`
+- Canonical spec: vault `45.20-Brand-Kit/DESIGN.md`
