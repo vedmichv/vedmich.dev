@@ -101,15 +101,63 @@ export const speakingEvents = [
 
 export const presentations = [
   {
+    date: '2026-04-19',
+    event: 'AWS Community Day',
+    location: 'Bratislava',
+    title: 'Karpenter in production: right-sizing at scale',
+    description:
+      "Architecting cost-efficient K8s clusters. Lessons from 12 production deployments — what worked, what didn't, and the numbers.",
+    slug: 'karpenter-prod',
+    tags: ['Kubernetes', 'AWS', 'Karpenter'],
+  },
+  {
+    date: '2026-03-08',
+    event: 'Code Europe',
+    location: 'Krakow',
+    title: 'MCP servers for platform teams',
+    description:
+      'What the Model Context Protocol actually solves for infrastructure tooling — with three live demos and a reference implementation.',
+    slug: 'mcp-platform',
+    tags: ['AI', 'MCP', 'Agents'],
+  },
+  {
+    date: '2026-02-14',
+    event: 'Slurm AI for DevOps',
+    location: null,
     title: 'Prompt Engineering for DevOps',
+    description:
+      'AI prompt techniques for infrastructure automation. Patterns, anti-patterns, and a shared vocabulary for reviewing AI-generated IaC.',
     slug: 'slurm-prompt-engineering',
-    description: 'AI prompt techniques for infrastructure automation',
     tags: ['AI', 'DevOps', 'Prompt Engineering'],
   },
   {
+    date: '2026-01-22',
+    event: 'Slurm AI for DevOps',
+    location: null,
     title: 'Slurm AI Demo',
+    description:
+      'Course theme showcase — how the curriculum maps AI capabilities onto the everyday DevOps workflow.',
     slug: 'slurm-ai-demo',
-    description: 'AI for DevOps course theme showcase',
     tags: ['AI', 'Demo'],
+  },
+  {
+    date: '2025-11-05',
+    event: 'KubeCon EU',
+    location: 'Paris',
+    title: 'Multi-AZ data on EKS without tears',
+    description:
+      'Topology-aware routing, cost of cross-AZ traffic, and how we got the p99 back under 50ms after a botched migration.',
+    slug: 'eks-multi-az',
+    tags: ['Kubernetes', 'AWS', 'Networking'],
+  },
+  {
+    date: '2025-09-18',
+    event: 'DevOpsConf',
+    location: 'online',
+    title: 'The podcast workflow behind DKT',
+    description:
+      'Five years, 91+ episodes, two shows. The tooling, the outreach script, and the editing pipeline.',
+    slug: 'dkt-workflow',
+    tags: ['Meta', 'Podcasting'],
   },
 ] as const;

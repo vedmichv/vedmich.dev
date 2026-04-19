@@ -42,8 +42,9 @@
     "cta": "Get on Amazon"
   },
   "presentations": {
-    "title": "Presentations",
-    "subtitle": "Interactive slide decks built with Slidev"
+    "title": "Recent decks",
+    "subtitle": "6 talks \u00b7 all slides at s.vedmich.dev",
+    "all_decks": "All decks"
   },
   "blog": {
     "title": "Blog",
