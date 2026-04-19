@@ -1,9 +1,13 @@
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 1 (Header)
-**Status:** Ready for `/gsd-plan-phase 1`
+**Current phase:** 2 (Blog)
+**Status:** Ready for `/gsd-plan-phase 2`
 **Last updated:** 2026-04-19
+
+## Completed phases
+
+- ✅ Phase 1 — Header search pill + EN · RU switcher (commit `71e38e9`, deployed 2026-04-19)
 
 ## Active context
 
@@ -13,7 +17,7 @@
 
 ## Pending todos
 
-- [ ] Phase 1: Header rewrite
+- [x] Phase 1: Header rewrite ✓ (commit `71e38e9`)
 - [ ] Phase 2: Blog × 3 posts
 - [ ] Phase 3: Speaking → arrows
 - [ ] Phase 4: Podcasts monogram badges
