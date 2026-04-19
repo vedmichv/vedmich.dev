@@ -31,7 +31,7 @@ const navItems = [
     </a>
 
     <!-- Desktop nav -->
-    <ul class="hidden md:flex items-center gap-6">
+    <ul class="hidden md:flex items-center gap-5 lg:gap-6">
       {navItems.map(({ href, label }) => (
         <li>
           <a href={href} class="text-sm text-text-muted hover:text-text transition-colors">
@@ -39,14 +39,40 @@ const navItems = [
           </a>
         </li>
       ))}
-      <li>
-        <a
-          href={getLocalizedPath('/', altLocale)}
-          class="lang-switch text-sm font-medium px-2.5 py-1 rounded border border-border hover:border-accent hover:text-accent transition-colors"
-          data-lang={altLocale}
+
+      <!-- Search pill (visual placeholder, disabled) -->
+      <li class="hidden lg:block">
+        <button
+          type="button"
+          tabindex="-1"
+          disabled
+          aria-label={i.nav.search_label}
+          class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-elevated/60 border border-border hover:border-border-strong transition-colors text-sm cursor-not-allowed"
         >
-          {altLocale.toUpperCase()}
-        </a>
+          <svg class="w-3.5 h-3.5 text-brand-primary-hover" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path stroke-linecap="round" d="m20 20-3-3" />
+          </svg>
+          <span class="text-text-muted">{i.nav.search_placeholder}</span>
+          <kbd class="px-1.5 py-0.5 text-[11px] font-mono rounded bg-bg-base border border-border text-text-muted">⌘K</kbd>
+        </button>
+      </li>
+
+      <!-- Locale switcher: EN · RU -->
+      <li class="flex items-center gap-2 text-sm">
+        <a
+          href={getLocalizedPath('/', 'en')}
+          class={`lang-switch transition-colors ${locale === 'en' ? 'font-semibold text-text-primary' : 'text-text-muted hover:text-text-primary'}`}
+          data-lang="en"
+          aria-current={locale === 'en' ? 'page' : undefined}
+        >EN</a>
+        <span class="text-border-strong select-none" aria-hidden="true">·</span>
+        <a
+          href={getLocalizedPath('/', 'ru')}
+          class={`lang-switch transition-colors ${locale === 'ru' ? 'font-semibold text-text-primary' : 'text-text-muted hover:text-text-primary'}`}
+          data-lang="ru"
+          aria-current={locale === 'ru' ? 'page' : undefined}
+        >RU</a>
       </li>
     </ul>
 
@@ -72,14 +98,28 @@ const navItems = [
           </a>
         </li>
       ))}
-      <li class="pt-2 border-t border-border/50">
+      <li class="pt-3 border-t border-border/50">
+        <span class="flex items-center gap-2 text-sm text-text-muted">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path stroke-linecap="round" d="m20 20-3-3" />
+          </svg>
+          {i.nav.search_placeholder}
+          <kbd class="ml-auto px-1.5 py-0.5 text-[11px] font-mono rounded bg-bg-base border border-border">⌘K</kbd>
+        </span>
+      </li>
+      <li class="flex items-center gap-2 text-sm">
         <a
-          href={getLocalizedPath('/', altLocale)}
-          class="lang-switch text-sm font-medium text-accent hover:text-accent-light transition-colors"
-          data-lang={altLocale}
-        >
-          {altLocale === 'ru' ? 'Русский' : 'English'}
-        </a>
+          href={getLocalizedPath('/', 'en')}
+          class={`lang-switch transition-colors ${locale === 'en' ? 'font-semibold text-text-primary' : 'text-text-muted'}`}
+          data-lang="en"
+        >EN</a>
+        <span class="text-border-strong" aria-hidden="true">·</span>
+        <a
+          href={getLocalizedPath('/', 'ru')}
+          class={`lang-switch transition-colors ${locale === 'ru' ? 'font-semibold text-text-primary' : 'text-text-muted'}`}
+          data-lang="ru"
+        >RU</a>
       </li>
     </ul>
   </div>

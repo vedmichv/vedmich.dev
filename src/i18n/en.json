@@ -6,7 +6,9 @@
     "book": "Book",
     "presentations": "Slides",
     "blog": "Blog",
-    "contact": "Contact"
+    "contact": "Contact",
+    "search_label": "Open search",
+    "search_placeholder": "Search\u2026"
   },
   "hero": {
     "greeting": "Hi, I'm",
