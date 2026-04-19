@@ -138,6 +138,10 @@
     radial-gradient(ellipse 95% 85% at 78% 95%, rgba(13,148,136,0.22), transparent 95%),
     linear-gradient(160deg, #0B1220 0%, #0E1A2C 100%);
 
+  /* Flat hero gradient — reference-matched (Phase 4 D-12), no radial blobs.
+     Pair with .noise-overlay to prevent banding on large surfaces. */
+  --grad-hero-flat: linear-gradient(160deg, var(--bg-base), var(--brand-primary-soft));
+
   --grad-aurora:
     radial-gradient(ellipse at top left, rgba(20,184,166,0.25), transparent 45%),
     radial-gradient(ellipse at bottom right, rgba(245,158,11,0.18), transparent 50%),
