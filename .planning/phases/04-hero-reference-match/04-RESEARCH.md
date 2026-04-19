@@ -822,29 +822,29 @@ No third-party consumer. Safe to delete entirely.
 
 **Recommended user confirmation before planning:** A1 (Kubestronaut URL) — if the user has a preferred URL (cncf.io vs kubestronaut.io), confirm before Plan 04-02 locks it.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Keyframe `blink` ownership — Hero-local or global?**
+1. **Keyframe `blink` ownership — Hero-local or global?** — RESOLVED: inline in Hero.astro `<style>` (locked by Plan 04-02 Task 2).
    - What we know: Currently in global.css:110-113 (used by `.typing-cursor::after`). After Phase 4, only `.cursor-blink` needs it. Phase 4 deletes `.typing-cursor`.
    - What's unclear: Keep `@keyframes blink` in global.css (reusable) or move inline to Hero.astro `<style>` (scoped).
    - Recommendation: **Inline in Hero.astro `<style>`** per D-14 Claude's Discretion + project convention (local until second consumer). Planner locks in 04-02.
 
-2. **Pill order on wrap at intermediate viewports (900-1100px)**
+2. **Pill order on wrap at intermediate viewports (900-1100px)** — RESOLVED: executor discretion — keep proposed order, re-test on live.
    - What we know: Proposed order re:Invent → Kubestronaut → Author → Host has two long labels (Author, Host). On 1440×900 they fit in one row. On 1100px they may wrap with Kubestronaut alone on line 2.
    - What's unclear: Visual priority — should Kubestronaut be first (teal anchor left-aligned) or second (anchor middle)?
    - Recommendation: **Test both visually on 1100px, 900px, 768px viewports**. If wrap is ugly, move Kubestronaut to position 1 (fits on wrap). Non-blocking for planning — executor has flexibility per Claude's Discretion.
 
-3. **`scroll-margin-top` scope — section[id] global OR per-section inline**
+3. **`scroll-margin-top` scope — section[id] global OR per-section inline** — RESOLVED: global rule `section[id] { scroll-margin-top: 80px; }` (locked by Plan 04-03 Task 2).
    - What we know: CONTEXT.md Claude's Discretion recommends yes. MDN supports either form.
    - What's unclear: Whether to make it a global rule (touches every present and future section) or apply inline only to the 4 scroll targets Phase 4 adds (`#speaking`, `#book`, `#podcasts`, plus Kubestronaut external — already `target=_blank`, no offset needed).
    - Recommendation: **Global rule** `section[id] { scroll-margin-top: 80px; }` in global.css. One line, handles every future section automatically. Keeps Phase 4 scope small.
 
-4. **Should Plan 04-01 ALSO fix Kubernaut→Kubestronaut in `about.bio_before`, or is that Plan 04-03's scope?**
+4. **Should Plan 04-01 ALSO fix Kubernaut→Kubestronaut in `about.bio_before`, or is that Plan 04-03's scope?** — RESOLVED: bundled in Plan 04-01 (Tasks 1 + 2).
    - What we know: Both mutations touch the same 2 JSON files (en.json, ru.json).
    - What's unclear: One plan (Plan 04-01 bundles all JSON mutations) or two (Plan 04-01 tagline split + Plan 04-03 Kubestronaut rename).
    - Recommendation: **Bundle in Plan 04-01.** Both are JSON mutations, both land before Hero.astro rewrite. Atomic commit at phase end anyway. Simpler cognitive load.
 
-5. **Animation for pill entrance**
+5. **Animation for pill entrance** — RESOLVED: no `.animate-on-scroll` on Hero (locked by Plan 04-02 Task 2).
    - What we know: Phase 3 uses `.animate-on-scroll` on About columns. Hero currently does NOT have `.animate-on-scroll` (content is above fold on load).
    - What's unclear: Add `.animate-on-scroll` to pill row for visual consistency?
    - Recommendation: **No.** Hero is the first paint; animating it delays visual feedback. Keep Hero purely static (no scroll animations). Matches reference.
