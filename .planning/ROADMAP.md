@@ -114,12 +114,59 @@
 
 ---
 
-## Phase 11 — Hero background gradient polish
+## Phase 11 — Hero: match reference pixel-for-pixel
 
-**Requirements:** NEW REQ-011
-**Files:** `src/components/Hero.astro`
-**Change:** Verify background gradient exactly matches `linear-gradient(160deg,#0F172A,#134E4A)` per `app.jsx:359`. Keep noise overlay. Adjust Hero padding to `96px 24px 64px` if needed.
-**Est. effort:** 15 min
+**Requirements:** NEW REQ-011, NEW REQ-013 (Hero typography), NEW REQ-014 (Hero height)
+**Files:** `src/components/Hero.astro`, possibly `src/i18n/{en,ru}.json`
+**Context:** Discovered during Phase 3 visual audit (2026-04-19). User flagged massive height mismatch and typography drift vs reference.
+
+**Findings from Phase 3 audit (`app.jsx:357-391`):**
+
+| Element | Reference | Current (Hero.astro) | Action |
+|---|---|---|---|
+| Section height | `padding: '96px 24px 64px'`, content-height | `min-h-[90vh] flex items-center` → stretches to ~810px, centers content | **Remove `min-h-[90vh]` + `flex items-center`**, use `pt-24 pb-16 px-6` (96/64/24) |
+| Container | `maxWidth: 1120` | `max-w-6xl` (1152) + `max-w-3xl` inner | `max-w-[1120px]` |
+| Background | flat `linear-gradient(160deg,#0F172A,#134E4A)` | `var(--grad-hero-soft)` (multi-layer radial blobs) | Replace with flat gradient to match reference exactly |
+| Terminal greeting | ONE line: mono teal 14px `~/vedmich.dev $ whoami` + separate `Hi, I'm` mono mute 16px | TWO lines: `~/vedmich.dev $` + `whoami` block + `Hi, I'm` | Simplify to single terminal line + mono-mute greeting (drop extra wrapper) |
+| Greeting size | 16px (`Hi, I'm`) | `text-sm` (14px) | `text-base` |
+| **h1 size** | **64px** | `text-4xl sm:text-5xl lg:text-6xl` (36→48→60) | `text-[64px]` or `text-6xl` with explicit override; never go below 60 on lg |
+| h1 weight | 700 | `font-bold` (700) ✓ | keep |
+| h1 letter-spacing | **-0.03em** | `tracking-tight` (-0.025em) | `tracking-[-0.03em]` |
+| h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
+| h1 color | `VV.text` (#E2E8F0) | `text-text-primary` via h1 cascade | keep (already correct) |
+| Role ("Senior SA @ AWS") | mono **amber 18px**, margin-top 12 | `font-mono text-xl sm:text-2xl text-warm-light font-medium` (20→24px) | `font-mono text-lg text-warm mt-3` (18px amber) |
+| Tagline | Inter 18 mute, margin-top 18, **"AI Engineer" emphasized in text-primary** | `text-lg text-text-muted mb-8` — no emphasis split | Split string so "AI Engineer" wraps in `text-text-primary`; margin-top 18px |
+| Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
+| CTA margin-top | 32 | `gap-3` (12 gap, margin inherited) | `mt-8` |
+| Cursor | inline `_` char, teal, blinking opacity | `<span class="typing-cursor text-brand-primary-hover">` (CSS pseudo `|`) | keep current — visually equivalent |
+
+**Typography cross-check (from computed styles, RU/en):**
+- About.astro tokens ✓ all match (Space Grotesk 28/600, Inter 18/1.7, pills Inter 13/500 on #1E293B, overline Inter 11/600 #94A3B8).
+- Header.astro tokens ✓ all match after 03-03 expansion (logo 32px rounded-[7px], nav Inter 14/500 text-secondary, search bg-base rounded-[7px] with mono ⌕).
+- **Only Hero.astro is the remaining fidelity gap.**
+
+**Change:**
+1. Remove `min-h-[90vh] flex items-center pt-16` from `<section>` wrapper.
+2. Switch wrapper to `pt-24 pb-16 px-6` (96/64/24 reference padding).
+3. Change background from `.hero-deep-signal` (which uses `--grad-hero-soft` complex blobs) to flat `linear-gradient(160deg, var(--bg-base), var(--brand-primary-soft))` — matches reference exactly.
+4. Inner container: `max-w-6xl` → `max-w-[1120px]`, drop the nested `max-w-3xl` wrapper (reference has single column at full container width).
+5. Greeting structure:
+   - Line 1: `<span class="font-mono text-brand-primary text-sm">~/vedmich.dev $ whoami</span>` (single line, mono teal 14px, mb-4)
+   - Line 2: `<span class="font-mono text-text-secondary text-base">Hi, I'm</span>` (mono mute 16px, mb-1)
+6. `h1`: `text-[64px] font-bold tracking-[-0.03em] leading-[1.05] text-text-primary m-0` — explicit pixel sizes, no responsive shrinking (reference has no mobile bump).
+7. Role: `<div class="font-mono text-warm text-lg mt-3">` — amber 18px Inter-mono, margin-top 12px.
+8. Tagline: Split `tagline` i18n string so "AI Engineer" is wrapped — e.g. `tagline_prefix: "Distributed Systems · Kubernetes · "`, `tagline_emphasis: "AI Engineer"`. Render as `<p class="font-body text-lg text-text-secondary max-w-[640px] mt-4">{i.hero.tagline_prefix}<span class="text-text-primary">{i.hero.tagline_emphasis}</span></p>`.
+9. Cert pills wrapper: `mt-7` (28px from role), `gap-2.5` (10px).
+10. CTA wrapper: `mt-8` (32px from pills).
+
+**Est. effort:** 45 min (grew from 15 min based on audit depth)
+**Verification:**
+- Computed styles of h1 match reference: 64px/700/-0.03em/1.05.
+- Hero total height on 1440×900 viewport is ~520px (not 810px like before — visual density matches reference).
+- `linear-gradient(160deg,#0F172A,#134E4A)` applied as flat background (no radial blobs).
+- Tagline has "AI Engineer" visually distinct (lighter vs muted).
+- Role text is mono amber, 18px (not 20-24).
+- Terminal greeting is ONE line, not two blocks.
 
 ---
 
