@@ -3,8 +3,10 @@ gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
 current_phase: 3 (Section order + About)
-status: ready
-last_updated: "2026-04-19T20:21:00.000Z"
+status: context_gathered
+last_updated: "2026-04-19T20:52:00.000Z"
+stopped_at: "Phase 3 context gathered"
+resume_file: ".planning/phases/03-section-order-about/03-CONTEXT.md"
 progress:
   total_phases: 12
   completed_phases: 2
@@ -17,7 +19,7 @@ progress:
 
 **Current milestone:** v0.4 — Reference Design Audit
 **Current phase:** 3 (Section order + About — reorder sections, match reference About layout)
-**Status:** Phase 2 complete, ready for Phase 3
+**Status:** Phase 3 context gathered — ready for /gsd-plan-phase 3
 **Last updated:** 2026-04-19
 
 ## Completed phases
