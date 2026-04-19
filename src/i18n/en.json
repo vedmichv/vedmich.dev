@@ -13,7 +13,8 @@
     "name": "Viktor Vedmich",
     "role": "Senior Solutions Architect @ AWS",
     "tagline": "Distributed Systems \u00b7 Kubernetes \u00b7 AI Engineer",
-    "cta": "Get in touch"
+    "cta": "Get in touch",
+    "cta_secondary": "Read more"
   },
   "about": {
     "title": "About Me",
