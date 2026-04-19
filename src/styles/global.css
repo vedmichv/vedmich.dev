@@ -1,20 +1,58 @@
+/* Design tokens MUST come before Tailwind — so :root vars are in scope
+   when @theme references them via var(...) and .light override cascades. */
+@import "./design-tokens.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-bg: #0F172A;
-  --color-surface: #1E293B;
-  --color-surface-hover: #334155;
-  --color-accent: #06B6D4;
-  --color-accent-light: #22D3EE;
-  --color-warm: #F59E0B;
-  --color-warm-light: #FBBF24;
-  --color-text: #F1F5F9;
-  --color-text-muted: #94A3B8;
-  --color-border: #334155;
+  /* ---------- Canonical Deep Signal tokens (new API) ---------- */
+  --color-brand-primary:       var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-primary-deep:  var(--brand-primary-deep);
+  --color-brand-primary-soft:  var(--brand-primary-soft);
+  --color-brand-accent:        var(--brand-accent);
+  --color-brand-accent-hover:  var(--brand-accent-hover);
+  --color-brand-accent-soft:   var(--brand-accent-soft);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --color-bg-base:     var(--bg-base);
+  --color-bg-surface:  var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-code:     var(--bg-code);
+
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted-new: var(--text-muted);
+
+  --color-border-new:    var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error:   var(--error);
+  --color-info:    var(--info);
+
+  --color-topic-k8s:          var(--topic-k8s);
+  --color-topic-architecture: var(--topic-architecture);
+  --color-topic-opinion:      var(--topic-opinion);
+  --color-topic-tutorial:     var(--topic-tutorial);
+
+  /* ---------- Shim aliases — keep existing utility classes working.
+       Values now flow from Deep Signal tokens; nothing visual breaks. ---------- */
+  --color-bg:             var(--bg-base);              /* bg-bg, text-bg */
+  --color-surface:        var(--bg-surface);           /* bg-surface, bg-surface/30 */
+  --color-surface-hover:  var(--bg-elevated);          /* bg-surface-hover */
+  --color-accent:         var(--brand-primary);        /* text-accent, bg-accent, border-accent */
+  --color-accent-light:   var(--brand-primary-hover);  /* text-accent-light, hover:bg-accent-light */
+  --color-warm:           var(--brand-accent);         /* text-warm, bg-warm */
+  --color-warm-light:     var(--brand-accent-hover);   /* hover:text-warm-light */
+  --color-text:           var(--text-primary);         /* text-text */
+  --color-text-muted:     var(--text-secondary);       /* text-text-muted — use secondary (5.3:1 AA) */
+  --color-border:         var(--border);               /* border-border */
+
+  /* ---------- Fonts: 3 families (display + body + mono) ---------- */
+  --font-display: var(--font-display);
+  --font-sans:    var(--font-body);   /* body → font-sans maps to Inter */
+  --font-mono:    var(--font-mono);
 }
 
 html {
@@ -22,14 +60,23 @@ html {
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headlines use Space Grotesk per Deep Signal spec. */
+h1, h2, h3, h4,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 ::selection {
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  background-color: var(--brand-primary);
+  color: var(--bg-base);
 }
 
 /* Scroll-triggered fade-in animation */
@@ -52,7 +99,7 @@ body {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-/* Typing cursor animation */
+/* Typing cursor animation — follows brand primary via shim alias */
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -61,16 +108,16 @@ body {
 .typing-cursor::after {
   content: "|";
   animation: blink 1s step-end infinite;
-  color: var(--color-accent);
+  color: var(--brand-primary-hover);  /* #2DD4BF — AA at small size */
 }
 
-/* Card hover glow */
+/* Card hover glow — uses teal shadow token */
 .card-glow {
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
 }
 .card-glow:hover {
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
-  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow);
+  border-color: var(--brand-primary);
 }
 
 /* Timeline line draw */
