@@ -36,6 +36,7 @@ export const certifications = [
 ] as const;
 
 export const skills = [
+  'AI Engineering',
   'Distributed Systems',
   'Kubernetes',
   'AWS Cloud',

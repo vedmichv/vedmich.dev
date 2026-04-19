@@ -21,7 +21,7 @@ const posts = allPosts
 <section id="blog" class="py-20 sm:py-28 bg-surface/30">
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     <div class="flex items-center justify-between mb-12">
-      <h2 class="text-3xl font-bold animate-on-scroll">{i.blog.title}</h2>
+      <h2 class="font-display text-3xl font-bold animate-on-scroll">{i.blog.title}</h2>
       {posts.length > 0 && (
         <a
           href={getLocalizedPath('/blog', locale)}

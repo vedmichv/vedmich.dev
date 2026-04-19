@@ -12,12 +12,12 @@
     "greeting": "Hi, I'm",
     "name": "Viktor Vedmich",
     "role": "Senior Solutions Architect @ AWS",
-    "tagline": "Distributed Systems \u00b7 Kubernetes \u00b7 Cloud Architecture",
+    "tagline": "Distributed Systems \u00b7 Kubernetes \u00b7 AI Engineer",
     "cta": "Get in touch"
   },
   "about": {
     "title": "About Me",
-    "bio": "Solutions Architect with 15+ years of experience designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and real-time data platforms. CNCF Kubernaut and author of \"Cracking the Kubernetes Interview\".",
+    "bio": "Solutions Architect and AI Engineer with 15+ years designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and GenAI / agentic platforms. CNCF Kubernaut and author of \"Cracking the Kubernetes Interview\".",
     "skills_title": "Expertise",
     "certs_title": "Certifications"
   },

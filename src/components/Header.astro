@@ -23,8 +23,11 @@ const navItems = [
 <header class="fixed top-0 left-0 right-0 z-50 border-b border-border/50 backdrop-blur-md bg-bg/80" id="site-header">
   <nav class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
     <!-- Logo -->
-    <a href={getLocalizedPath('/', locale)} class="font-mono font-medium text-accent hover:text-accent-light transition-colors text-sm">
-      vedmich.dev
+    <a href={getLocalizedPath('/', locale)} class="flex items-center gap-2 group">
+      <img src="/favicon.svg" alt="VV" width="28" height="28" class="rounded-md shrink-0" />
+      <span class="font-display font-semibold text-sm text-text group-hover:text-accent-light transition-colors tracking-tight">
+        vedmich.dev
+      </span>
     </a>
 
     <!-- Desktop nav -->

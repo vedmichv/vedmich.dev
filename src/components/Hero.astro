@@ -10,20 +10,20 @@ const { locale } = Astro.props;
 const i = t(locale);
 ---
 
-<section class="relative min-h-[90vh] flex items-center pt-16">
+<section class="hero-deep-signal noise-overlay relative min-h-[90vh] flex items-center pt-16 overflow-hidden">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 w-full">
     <div class="max-w-3xl">
       <!-- Terminal-style greeting -->
       <div class="font-mono text-sm text-text-muted mb-4 flex items-center gap-2">
-        <span class="text-accent">$</span>
+        <span class="text-accent-light">~/vedmich.dev $</span>
         <span class="typing-cursor">{i.hero.greeting}</span>
       </div>
 
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight">
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight">
         {i.hero.name}
       </h1>
 
-      <p class="text-xl sm:text-2xl text-accent font-medium mb-3">
+      <p class="font-mono text-xl sm:text-2xl text-warm-light font-medium mb-3">
         {i.hero.role}
       </p>
 
@@ -74,6 +74,10 @@ const i = t(locale);
     </div>
   </div>
 
-  <!-- Decorative gradient -->
-  <div class="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none bg-gradient-to-l from-accent/10 via-transparent to-transparent"></div>
 </section>
+
+<style>
+  .hero-deep-signal {
+    background: var(--grad-hero-soft);
+  }
+</style>
