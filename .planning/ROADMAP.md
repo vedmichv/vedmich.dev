@@ -26,14 +26,20 @@
 
 ## Phase 3 — Section order + About: match reference
 
-**Requirements:** REQ-008 (upgraded), NEW REQ-009 (section order)
-**Files:** `src/pages/en/index.astro`, `src/pages/ru/index.astro`, `src/components/About.astro`
+**Requirements:** REQ-008 (upgraded), NEW REQ-009 (section order), NEW REQ-010 (Book before Speaking)
+**Files:** `src/pages/en/index.astro`, `src/pages/ru/index.astro`, `src/components/Header.astro`, `src/components/About.astro`, `src/i18n/en.json`, `src/i18n/ru.json`
 **Change:**
 - Reorder sections: Hero → About → Podcasts → **Book** → Speaking → Presentations → Blog → Contact (Book moves up, before Speaking)
-- About: 2-col grid (`1.4fr 1fr`), bio left with teal-highlighted `"Cracking the Kubernetes Interview"`, skill pills right under "Expertise" overline
-- Drop the duplicate cert cards from About (they're in Hero)
+- Reorder Header `navItems` to match (`about · podcasts · book · speaking · presentations · blog · contact`)
+- About: 2-col grid (`1.4fr 1fr`), bio left with teal-highlighted `«Cracking the Kubernetes Interview»`, skill pills right under "Expertise" overline
+- Drop the duplicate cert cards (and CNCF callout) from About — they are in the Hero cert bar
+- Split `about.bio` i18n key into `bio_before` / `bio_accent` / `bio_after` (D-01); remove `about.certs_title` (D-03)
+**Plans:** 3 plans (Wave 1: 03-01, 03-02 in parallel; Wave 2: 03-03)
+- [ ] 03-01-i18n-keys-PLAN.md — split `about.bio` into three keys in both en.json and ru.json; remove `about.certs_title`
+- [ ] 03-02-section-order-and-nav-PLAN.md — reorder `<Book />` above `<Speaking />` in both locale index pages; reorder `navItems` array in Header.astro to match
+- [ ] 03-03-about-rewrite-PLAN.md — full rewrite of About.astro to match reference `app.jsx:400-421` (grid + bio with teal accent + overline + pills, no cert cards)
 **Est. effort:** 25 min
-**Verification:** Sections in reference order; About layout matches ref screenshot.
+**Verification:** Sections in reference order; About layout matches ref screenshot; both locales render identically; no hardcoded hex colors; `npm run build` passes.
 
 ---
 
