@@ -109,7 +109,7 @@ Migration from Electric Horizon (cyan) → Deep Signal (teal + amber) completed 
 ## Homepage Sections
 
 1. **Hero** — terminal-style greeting, name, role, cert badges, social links, CTA
-2. **About** — bio, skill pills, certifications (CNCF Kubernaut + all 5 K8s certs)
+2. **About** — bio, skill pills, certifications (CNCF Kubestronaut + all 5 K8s certs)
 3. **Podcasts** — DKT (91+ eps, 10K+ subs) + AWS RU Podcast (65+ eps, 70K+ listens)
 4. **Speaking** — timeline by year: re:Invent, Summits, Code Europe, Community Days
 5. **Book** — "Cracking the Kubernetes Interview" + Amazon link

@@ -12,7 +12,7 @@ interface Props {
   path?: string;
 }
 
-const { title, description = 'Viktor Vedmich — Senior Solutions Architect @ AWS, CNCF Kubernaut, Author, Speaker', locale, path = '' } = Astro.props;
+const { title, description = 'Viktor Vedmich — Senior Solutions Architect @ AWS, CNCF Kubestronaut, Author, Speaker', locale, path = '' } = Astro.props;
 const altLocale = getAlternateLocale(locale);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const altURL = new URL(getLocalizedPath(path, altLocale), Astro.site);

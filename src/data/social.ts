@@ -27,7 +27,7 @@ export const socialLinks = [
 ] as const;
 
 export const certifications = [
-  { name: 'CNCF Kubernaut', badge: 'kubernaut' },
+  { name: 'CNCF Kubestronaut', badge: 'kubestronaut' },
   { name: 'CKA', badge: 'cka' },
   { name: 'CKS', badge: 'cks' },
   { name: 'CKAD', badge: 'ckad' },
