@@ -1,8 +1,8 @@
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 2 (Blog)
-**Status:** Ready for `/gsd-plan-phase 2`
+**Current phase:** 2 (Search palette — ⌘K command palette)
+**Status:** Context captured — ready for `/gsd-plan-phase 2`
 **Last updated:** 2026-04-19
 
 ## Completed phases
@@ -12,19 +12,23 @@
 ## Active context
 
 - Hero phase already shipped ahead of GSD setup (commit `ac3a8fd`). Do NOT include Hero in current milestone — it's done.
-- Reference artifact: `/Users/viktor/Downloads/vedmich.html` (1.2MB). Extracted text: `ref-content.json`. Visual: `reference-1440-full.png`.
-- Working tree has uncommitted changes in `.design-handoff/`, `public/favicon.svg`, `.mcp.json` — these will be touched naturally by Phase 7 (logo refresh). Leave alone for now.
+- Reference artifact: `/Users/viktor/.claude/skills/viktor-vedmich-design/ui_kits/vedmich-dev/app.jsx`. Visual: `reference-1440-full.png`.
+- Working tree has uncommitted changes in `.design-handoff/`, `public/favicon.svg`, `.mcp.json` — these will be touched naturally by Phase 10 (logo refresh). Leave alone for now.
 
 ## Pending todos
 
-- [x] Phase 1: Header rewrite ✓ (commit `71e38e9`)
-- [ ] Phase 2: Blog × 3 posts
-- [ ] Phase 3: Speaking → arrows
-- [ ] Phase 4: Podcasts monogram badges
-- [ ] Phase 5: Book PACKT + emboss
-- [ ] Phase 6: Contact letter badges
-- [ ] Phase 7: Logo + favicon refresh
-- [ ] Phase 8: About cleanup
+- [x] Phase 1 — Header search pill ✓ (commit `71e38e9`)
+- [ ] Phase 2 — Search palette (⌘K modal + fuzzy search)
+- [ ] Phase 3 — Section order + About: match reference
+- [ ] Phase 4 — Podcasts: DKT teal + AWS RU amber badges
+- [ ] Phase 5 — Book: PACKT cover + V. Vedmich emboss
+- [ ] Phase 6 — Speaking: timeline + arrows + inline city
+- [ ] Phase 7 — Presentations: match card format
+- [ ] Phase 8 — Blog: 3 posts with correct card format
+- [ ] Phase 9 — Contact: letter badges + working form
+- [ ] Phase 10 — Logo + favicon refresh
+- [ ] Phase 11 — Hero background gradient polish
+- [ ] Phase 12 — Footer match
 
 ## Blockers
 
@@ -33,5 +37,6 @@ None.
 ## Notes
 
 - User prefers sequential execution with visual verification on live after each phase.
-- Playwright-cli skill is active. `playwright-cli attach --extension` requires Playwright MCP Bridge extension installed in Chrome (not done yet). For now use `playwright-cli open https://vedmich.dev/...` for fresh headed Chrome.
+- Playwright-cli skill is active. `playwright-cli attach --extension` requires Playwright MCP Bridge extension installed in Chrome. For headed Chrome use `playwright-cli open https://vedmich.dev/...`.
 - `gh run list --branch main --limit 3` shows deploy status; typical deploy ~60-90s after push.
+- GSD interactive questions are asked in Russian; artifacts are written in English (see CLAUDE.md).
