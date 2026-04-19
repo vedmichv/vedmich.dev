@@ -59,6 +59,14 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Sticky-header offset for anchor navigation (Phase 4 Claude's Discretion #3).
+   All <section id="..."> gets 80px top breathing room when scrolled to via
+   hash link. Pairs with scroll-behavior: smooth and Header.astro's ~61px
+   sticky height. */
+section[id] {
+  scroll-margin-top: 80px;
+}
+
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);

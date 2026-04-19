@@ -171,3 +171,37 @@ const navItems = [
   searchTriggerDesktop?.addEventListener('click', openSearch);
   searchTriggerMobile?.addEventListener('click', openSearch);
 </script>
+
+<script>
+  // Nav active-state highlight via IntersectionObserver (Phase 4 D-09).
+  // Observes every <section id="..."> on the page and toggles `.is-active`
+  // on the matching header anchor. Single observer, no framework, extends
+  // Zero-JS baseline by one per D-10.
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = Array.from(document.querySelectorAll('header a[href^="#"]'));
+  const linkByHref = new Map(navLinks.map((a) => [a.getAttribute('href'), a]));
+
+  const obs = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const link = linkByHref.get('#' + (e.target as HTMLElement).id);
+        if (!link) continue;
+        if (e.isIntersecting) {
+          navLinks.forEach((a) => a.classList.remove('is-active'));
+          link.classList.add('is-active');
+        }
+      }
+    },
+    { threshold: 0.5, rootMargin: '-80px 0px -50% 0px' }
+  );
+
+  sections.forEach((s) => obs.observe(s));
+</script>
+
+<style>
+  /* Nav active-state visual: teal underline + full-contrast text (Phase 4 D-09). */
+  header a.is-active {
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--brand-primary);
+  }
+</style>
