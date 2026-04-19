@@ -79,9 +79,9 @@
 **Plans:** 3 plans across 2 waves
 
 Plans:
-- [ ] 04-01-i18n-kubestronaut-PLAN.md — Wave 1: 3-key hero.tagline split in both locales + Kubernaut→Kubestronaut fix in about.bio_before (bilingual).
-- [ ] 04-02-hero-rewrite-PLAN.md — Wave 2 (depends 04-01): Add --grad-hero-flat token + full Hero.astro rewrite (4-pill authority strip, clamp h1, inline _ cursor, flat gradient) + remove .typing-cursor from global.css + build gate.
-- [ ] 04-03-rename-observer-gate-PLAN.md — Wave 2 (depends 04-02): Kubestronaut rename in social.ts/BaseLayout/CLAUDE.md + Header.astro nav-active observer + scroll-margin-top global + inline REQ-011/013/014 into REQUIREMENTS.md + user visual checkpoint for REQ-013/014 acceptance.
+- [x] 04-01-i18n-kubestronaut-PLAN.md — Wave 1: 3-key hero.tagline split in both locales + Kubernaut→Kubestronaut fix in about.bio_before (bilingual).
+- [x] 04-02-hero-rewrite-PLAN.md — Wave 2 (depends 04-01): Add --grad-hero-flat token + full Hero.astro rewrite (4-pill authority strip, clamp h1, inline _ cursor, flat gradient) + remove .typing-cursor from global.css + build gate.
+- [x] 04-03-rename-observer-gate-PLAN.md — Wave 2 (depends 04-02): Kubestronaut rename in social.ts/BaseLayout/CLAUDE.md + Header.astro nav-active observer + scroll-margin-top global + inline REQ-011/013/014 into REQUIREMENTS.md + user visual checkpoint for REQ-013/014 acceptance.
 
 **Est. effort:** 45 min (grew from Phase 11's original 15 min based on audit depth).
 

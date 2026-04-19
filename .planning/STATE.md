@@ -2,24 +2,22 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 4 (Hero — match reference pixel-for-pixel)
-status: context-gathered
-last_updated: "2026-04-19T22:30:00.000Z"
-stopped_at: "Phase 4 context gathered — Hero reframed as primary pitch with 4 authority pills + Kubestronaut rename"
-resume_file: ".planning/phases/04-hero-reference-match/04-CONTEXT.md"
+current_phase: --phase
+status: milestone_complete
+last_updated: "2026-04-19T21:00:17.625Z"
 progress:
-  total_phases: 12
-  completed_phases: 3
+  total_phases: 4
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 7
-  percent: 58
+  completed_plans: 3
+  percent: 50
 ---
 
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 4 (Hero — match reference pixel-for-pixel — **CONTEXT GATHERED**)
-**Status:** Phase 4 context captured — Hero reframed as the site's primary pitch. 4 authority pills (re:Invent & Keynote Speaker, CNCF Kubestronaut, Author, Host · DKT + AWS RU) replace the 6 cert pills. Project-wide `Kubernaut → Kubestronaut` rename in scope. IntersectionObserver nav highlight also in-scope. Ready for /gsd-plan-phase 4.
+**Current phase:** 04
+**Status:** Milestone complete
 **Last updated:** 2026-04-19
 
 ## Completed phases
@@ -60,3 +58,5 @@ None.
 - Playwright-cli skill is active. `playwright-cli attach --extension` requires Playwright MCP Bridge extension installed in Chrome. For headed Chrome use `playwright-cli open https://vedmich.dev/...`.
 - `gh run list --branch main --limit 3` shows deploy status; typical deploy ~60-90s after push.
 - GSD interactive questions are asked in Russian; artifacts are written in English (see CLAUDE.md).
+
+**Planned Phase:** 4 (Hero — match reference pixel-for-pixel) — 3 plans — 2026-04-19T20:58:01.098Z
