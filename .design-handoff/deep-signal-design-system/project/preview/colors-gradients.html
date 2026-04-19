@@ -1,0 +1,203 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Gradients</title><style>
+.section-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.14em; text-transform: uppercase; margin: 22px 0 12px; }
+.section-label:first-child { margin-top: 0; }
+
+/* Softer, barely-there borders on all gradient tiles */
+.grads { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.g { height: 110px; border-radius: 12px; padding: 14px;
+  border: 1px solid rgba(148,163,184,0.08);
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden; }
+.g .name { color: #fff; font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,.5); position: relative; z-index: 2; }
+.g .spec { color: rgba(255,255,255,0.85); font-family: var(--font-mono); font-size: 10px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.5); position: relative; z-index: 2; line-height: 1.4; }
+.g.light { border-color: rgba(15,23,42,0.08); }
+.g.light .name { color: #0F172A; text-shadow: none; }
+.g.light .spec { color: var(--text-muted); text-shadow: none; }
+
+.slidev-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.slidev { height: 210px; border-radius: 12px; padding: 16px;
+  border: 1px solid rgba(148,163,184,0.08);
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden; }
+.slidev .tag { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  background: rgba(0,0,0,0.32); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.10);
+  color: #fff; font-family: var(--font-mono); font-size: 10px; padding: 4px 8px; border-radius: 4px;
+  letter-spacing: 0.1em; position: relative; z-index: 3; }
+.slidev .title { color: #fff; font-family: var(--font-display); font-size: 19px; font-weight: 600;
+  letter-spacing: -0.01em; position: relative; z-index: 3; line-height: 1.2; }
+.slidev .sub { color: rgba(226,232,240,0.78); font-family: var(--font-mono); font-size: 10px;
+  position: relative; z-index: 3; margin-top: 4px; }
+
+/* Noise overlay */
+.noise::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+  mix-blend-mode: overlay;
+  opacity: 0.48;
+}
+.noise.coarse::after { opacity: 0.58; mix-blend-mode: soft-light; }
+
+/* Core — 4 */
+.bg-mesh {
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 15%, rgba(20,184,166,0.35), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 20%, rgba(245,158,11,0.18), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 75% 90%, rgba(13,148,136,0.40), transparent 65%),
+    linear-gradient(135deg, #0B1220 0%, #0F172A 50%, #0D3B36 100%);
+}
+.bg-signal {
+  background:
+    linear-gradient(135deg, rgba(20,184,166,0.18) 0%, transparent 40%),
+    linear-gradient(225deg, rgba(245,158,11,0.12) 0%, transparent 35%),
+    radial-gradient(circle at 50% 120%, rgba(20,184,166,0.35), transparent 55%),
+    linear-gradient(180deg, #0F172A 0%, #0B1220 100%);
+}
+.bg-burst {
+  background:
+    radial-gradient(ellipse 50% 50% at 75% 25%, rgba(245,158,11,0.42), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 20% 80%, rgba(217,119,6,0.32), transparent 60%),
+    linear-gradient(135deg, #1C1408 0%, #0F172A 100%);
+}
+.bg-ocean {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(20,184,166,0.22), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 90%, rgba(14,165,233,0.30), transparent 60%),
+    linear-gradient(180deg, #042F2E 0%, #0F172A 50%, #0C4A6E 100%);
+}
+/* Extended — 4 */
+.bg-ember {
+  background:
+    radial-gradient(circle at 50% 120%, rgba(239,68,68,0.42), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(245,158,11,0.32), transparent 60%),
+    linear-gradient(170deg, #1F0D05 0%, #2D1508 40%, #450A0A 100%);
+}
+.bg-forest {
+  background:
+    radial-gradient(ellipse 50% 40% at 30% 20%, rgba(74,222,128,0.26), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 85%, rgba(20,184,166,0.32), transparent 60%),
+    linear-gradient(150deg, #052E16 0%, #0B3B1F 50%, #134E4A 100%);
+}
+.bg-graphite {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(148,163,184,0.12), transparent 65%),
+    radial-gradient(ellipse 40% 30% at 20% 80%, rgba(20,184,166,0.18), transparent 60%),
+    linear-gradient(180deg, #111827 0%, #1F2937 50%, #0B0F17 100%);
+}
+.bg-arctic {
+  background:
+    radial-gradient(ellipse 60% 50% at 25% 20%, rgba(165,243,252,0.16), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(96,165,250,0.24), transparent 60%),
+    linear-gradient(170deg, #0C1B2E 0%, #0F172A 40%, #0E2E4F 100%);
+}
+
+.note { font-family: var(--font-body); font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
+.note code { font-family: var(--font-mono); color: #E2E8F0; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; }
+</style></head><body>
+<div class="card">
+
+  <div class="section-label">Basic · 2-stop linear · 4 tokens</div>
+  <div class="grads">
+    <div class="g" style="background:linear-gradient(135deg,#14B8A6,#0D9488)">
+      <span class="name">brand</span>
+      <span class="spec">linear 135° · #14B8A6 → #0D9488</span>
+    </div>
+    <div class="g" style="background:linear-gradient(135deg,#F59E0B,#D97706)">
+      <span class="name">accent</span>
+      <span class="spec">linear 135° · #F59E0B → #D97706</span>
+    </div>
+    <div class="g" style="background:linear-gradient(160deg,#0F172A,#134E4A)">
+      <span class="name">subtle dark</span>
+      <span class="spec">linear 160° · #0F172A → #134E4A</span>
+    </div>
+    <div class="g light" style="background:linear-gradient(160deg,#F0FDFA,#FFFFFF)">
+      <span class="name">subtle light</span>
+      <span class="spec">linear 160° · #F0FDFA → #FFFFFF</span>
+    </div>
+  </div>
+
+  <div class="section-label">Slidev · core · 4 tokens</div>
+  <div class="slidev-grid">
+    <div class="slidev bg-mesh noise">
+      <span class="tag">MESH DEEP</span>
+      <div>
+        <div class="title">Title · hero</div>
+        <div class="sub">teal + amber + deep-teal · noise 0.48</div>
+      </div>
+    </div>
+    <div class="slidev bg-signal noise">
+      <span class="tag">SIGNAL</span>
+      <div>
+        <div class="title">Section dividers</div>
+        <div class="sub">bottom-center teal glow · noise 0.48</div>
+      </div>
+    </div>
+    <div class="slidev bg-burst noise">
+      <span class="tag">ACCENT BURST</span>
+      <div>
+        <div class="title">Thanks · CTA</div>
+        <div class="sub">amber-dominant · warm base · noise 0.48</div>
+      </div>
+    </div>
+    <div class="slidev bg-ocean noise">
+      <span class="tag">OCEAN</span>
+      <div>
+        <div class="title">Data · deep-dives</div>
+        <div class="sub">deep teal + sky radial · noise 0.48</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Slidev · extended · 4 tokens</div>
+  <div class="slidev-grid">
+    <div class="slidev bg-ember noise coarse">
+      <span class="tag">EMBER</span>
+      <div>
+        <div class="title">Security · incidents</div>
+        <div class="sub">red + amber + maroon · noise 0.58</div>
+      </div>
+    </div>
+    <div class="slidev bg-forest noise">
+      <span class="tag">FOREST</span>
+      <div>
+        <div class="title">Growth · results</div>
+        <div class="sub">green + teal over forest · noise 0.48</div>
+      </div>
+    </div>
+    <div class="slidev bg-graphite noise">
+      <span class="tag">GRAPHITE</span>
+      <div>
+        <div class="title">Neutral · reports</div>
+        <div class="sub">near-neutral + teal hint · noise 0.48</div>
+      </div>
+    </div>
+    <div class="slidev bg-arctic noise">
+      <span class="tag">ARCTIC</span>
+      <div>
+        <div class="title">Cold · focus</div>
+        <div class="sub">cyan + blue · deep navy · noise 0.48</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong style="color:#E2E8F0">12 tokens · 3 groups of 4.</strong> Basic <code>brand · accent · subtle-dark · subtle-light</code>. Core <code>mesh-deep · signal · accent-burst · ocean</code>. Extended <code>ember · forest · graphite · arctic</code>.
+    <br><br>
+    <strong style="color:#E2E8F0">Borders.</strong> Reduced to <code>rgba(148,163,184,0.08)</code> on dark tiles (from <code>#334155</code>) — present for shape, nearly invisible. Light tile uses <code>rgba(15,23,42,0.08)</code>.
+    <br><br>
+    <strong style="color:#E2E8F0">Noise.</strong> Every Slidev token ships with <code>fractalNoise 0.85</code> overlay (opacity 0.48 default / 0.58 coarse via <code>soft-light</code>). Kills banding on projectors.
+    <br><br>
+    <strong style="color:#E2E8F0">Rule.</strong> One gradient per slide. Never stack two. Noise stays on — it's part of the token.
+  </div>
+
+  <div class="a11y-row">
+    <span class="a11y-title">Text-over-gradient ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>White title + shadow <b>≥7:1</b> AAA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Tag bg rgba(0,0,0,.32) + blur <b>≥6:1</b> AA</span>
+    <span class="a11y a11y-info"><span class="dot"></span>Pair gradient with shadow or scrim for text ≥14px</span>
+  </div>
+
+</div>
+</body></html>

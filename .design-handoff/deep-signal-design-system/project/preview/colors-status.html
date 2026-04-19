@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Status colors</title><style>
+.pills { display: flex; gap: 10px; flex-wrap: wrap; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 9999px; font-size: 13px; font-weight: 500; border: 1px solid; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+</style></head><body>
+<div class="card">
+  <div class="pills">
+    <span class="pill" style="background:rgba(74,222,128,.14);color:#4ADE80;border-color:rgba(74,222,128,.3)"><span class="dot" style="background:#4ADE80"></span>Success · #4ADE80</span>
+    <span class="pill" style="background:rgba(251,191,36,.14);color:#FBBF24;border-color:rgba(251,191,36,.3)"><span class="dot" style="background:#FBBF24"></span>Warning · #FBBF24</span>
+    <span class="pill" style="background:rgba(251,113,133,.14);color:#FB7185;border-color:rgba(251,113,133,.3)"><span class="dot" style="background:#FB7185"></span>Error · #FB7185</span>
+    <span class="pill" style="background:rgba(96,165,250,.14);color:#60A5FA;border-color:rgba(96,165,250,.3)"><span class="dot" style="background:#60A5FA"></span>Info · #60A5FA</span>
+  </div>
+  <div class="a11y-row">
+    <span class="a11y-title">Contrast on #1E293B ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Success <b>8.9:1</b> AAA</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Warning <b>11.4:1</b> AAA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Error <b>6.5:1</b> AA+</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Info <b>7.3:1</b> AAA</span>
+  </div>
+  <div class="mono" style="color:var(--text-muted)">Note: migrated from 500-shades (which were ~4.5:1 borderline) to 400-shades for consistent on-dark legibility.</div>
+</div>
+</body></html>

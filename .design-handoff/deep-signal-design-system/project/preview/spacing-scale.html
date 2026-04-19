@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Spacing</title><style>
+.rows { display: flex; flex-direction: column; gap: 6px; }
+.r { display: grid; grid-template-columns: 80px 60px 1fr; align-items: center; gap: 10px; }
+.tok { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+.px { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.bar { height: 10px; background: var(--brand-primary); border-radius: 2px; }
+</style></head><body>
+<div class="card">
+  <div class="rows">
+    <div class="r"><span class="tok">--space-1</span><span class="px">4px</span><div class="bar" style="width:4px"></div></div>
+    <div class="r"><span class="tok">--space-2</span><span class="px">8px</span><div class="bar" style="width:8px"></div></div>
+    <div class="r"><span class="tok">--space-3</span><span class="px">12px</span><div class="bar" style="width:12px"></div></div>
+    <div class="r"><span class="tok">--space-4</span><span class="px">16px</span><div class="bar" style="width:16px"></div></div>
+    <div class="r"><span class="tok">--space-6</span><span class="px">24px</span><div class="bar" style="width:24px"></div></div>
+    <div class="r"><span class="tok">--space-8</span><span class="px">32px</span><div class="bar" style="width:32px"></div></div>
+    <div class="r"><span class="tok">--space-12</span><span class="px">48px</span><div class="bar" style="width:48px"></div></div>
+    <div class="r"><span class="tok">--space-16</span><span class="px">64px</span><div class="bar" style="width:64px"></div></div>
+  </div>
+  <div class="a11y-row">
+    <span class="a11y-title">A11y ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>8px base grid · WCAG 1.4.10 reflow-safe</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Min tap target 44px · use --space-12+ for touch</span>
+  </div>
+</div>
+</body></html>

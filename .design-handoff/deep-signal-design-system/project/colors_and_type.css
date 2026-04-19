@@ -1,0 +1,333 @@
+/* ============================================================
+   Deep Signal — Viktor Vedmich
+   Core color + typography tokens. Dark mode is default.
+
+   All three families are self-hosted from /fonts/ (see @font-face below).
+   No Google Fonts or external CDN required.
+   ============================================================ */
+
+/* -- Self-hosted Inter (latin subset) -- */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/inter-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/inter-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/inter-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/inter-latin-700-normal.woff2') format('woff2');
+}
+
+/* -- Self-hosted Space Grotesk -- */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/space-grotesk-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/space-grotesk-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/space-grotesk-latin-700-normal.woff2') format('woff2');
+}
+
+/* -- Self-hosted JetBrains Mono -- */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2');
+}
+
+:root {
+  /* -- Brand -- */
+  --brand-primary: #14B8A6;
+  --brand-primary-hover: #2DD4BF;
+  --brand-primary-deep: #0D9488;
+  --brand-primary-soft: #134E4A;
+  --brand-accent: #F59E0B;
+  --brand-accent-hover: #FBBF24;
+  --brand-accent-soft: #451A03;
+
+  /* -- Surfaces (dark default) -- */
+  --bg-base: #0F172A;
+  --bg-surface: #1E293B;
+  --bg-elevated: #334155;
+  --bg-code: #0D1117;
+
+  /* -- Text -- */
+  --text-primary: #E2E8F0;
+  --text-secondary: #94A3B8;
+  --text-muted: #78909C;
+  --text-on-primary: #0F172A;
+  --text-on-accent: #0F172A;
+
+  /* -- Borders -- */
+  --border: #334155;
+  --border-strong: #475569;
+
+  /* -- Status -- */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+
+  /* -- Topic accents (content categorization) -- */
+  --topic-k8s: #3B82F6;
+  --topic-architecture: #818CF8;
+  --topic-opinion: #F43F5E;
+  --topic-tutorial: #22C55E;
+
+  /* -- Gradients -- */
+  --grad-brand: linear-gradient(135deg, #14B8A6, #0D9488);
+  --grad-accent: linear-gradient(135deg, #F59E0B, #D97706);
+  --grad-subtle-dark: linear-gradient(160deg, #0F172A, #134E4A);
+  --grad-subtle-light: linear-gradient(160deg, #F0FDFA, #FFFFFF);
+
+  /* -- Complex / layered gradients (multi-stop, multi-layer) --
+     Use these on hero sections, title slides, and "wow" backdrops.
+     They stack radials + conics over a base color. */
+  --grad-mesh-deep:
+    radial-gradient(ellipse 60% 50% at 15% 15%, rgba(20,184,166,0.35), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 20%, rgba(245,158,11,0.18), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 75% 90%, rgba(13,148,136,0.40), transparent 65%),
+    radial-gradient(ellipse 40% 35% at 25% 85%, rgba(129,140,248,0.14), transparent 60%),
+    linear-gradient(135deg, #0B1220 0%, #0F172A 50%, #0D3B36 100%);
+
+  --grad-aurora:
+    radial-gradient(ellipse at top left, rgba(20,184,166,0.25), transparent 45%),
+    radial-gradient(ellipse at bottom right, rgba(245,158,11,0.18), transparent 50%),
+    conic-gradient(from 210deg at 50% 50%, #0F172A, #134E4A, #0D9488, #0F172A);
+
+  --grad-signal:
+    linear-gradient(135deg, rgba(20,184,166,0.15) 0%, transparent 40%),
+    linear-gradient(225deg, rgba(245,158,11,0.10) 0%, transparent 35%),
+    radial-gradient(circle at 50% 120%, rgba(20,184,166,0.30), transparent 55%),
+    linear-gradient(180deg, #0F172A 0%, #0B1220 100%);
+
+  --grad-code-glow:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(20,184,166,0.18), transparent 60%),
+    linear-gradient(180deg, #0D1117 0%, #0A0E14 100%);
+
+  --grad-accent-burst:
+    radial-gradient(ellipse 50% 50% at 75% 25%, rgba(245,158,11,0.45), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 20% 80%, rgba(217,119,6,0.35), transparent 60%),
+    linear-gradient(135deg, #1C1408 0%, #0F172A 100%);
+
+  --grad-grid-overlay:
+    linear-gradient(rgba(20,184,166,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20,184,166,0.06) 1px, transparent 1px);
+  --grad-grid-size: 40px 40px;
+
+  /* -- Additional Slidev gradients -- */
+  --grad-nebula:
+    radial-gradient(ellipse 40% 30% at 25% 30%, rgba(20,184,166,0.55), transparent 55%),
+    radial-gradient(ellipse 35% 25% at 75% 65%, rgba(129,140,248,0.38), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(13,148,136,0.35), transparent 60%),
+    linear-gradient(150deg, #0A0E1A 0%, #0F172A 40%, #1E1B4B 100%);
+
+  --grad-dusk:
+    radial-gradient(ellipse 80% 60% at 50% 110%, rgba(245,158,11,0.30), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(244,63,94,0.20), transparent 55%),
+    linear-gradient(180deg, #0B1220 0%, #1E1B4B 55%, #7C2D12 100%);
+
+  --grad-ocean:
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(20,184,166,0.22), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 90%, rgba(14,165,233,0.30), transparent 60%),
+    linear-gradient(180deg, #042F2E 0%, #0F172A 50%, #0C4A6E 100%);
+
+  /* -- Noise overlay (SVG fractalNoise, ~1KB inline) --
+     Apply as ::after on any gradient element to kill banding and add grain.
+     Usage: element { background: var(--grad-mesh-deep); position: relative; }
+            element::after { content:''; position:absolute; inset:0;
+              background-image: var(--noise-texture); background-size: 240px;
+              mix-blend-mode: overlay; opacity: 0.45; pointer-events: none; } */
+  --noise-texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+  /* -- Type families -- */
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* -- Type scale -- */
+  --text-display-size: 48px; --text-display-lh: 1.1;  --text-display-weight: 700;
+  --text-h1-size: 36px;      --text-h1-lh: 1.2;       --text-h1-weight: 600;
+  --text-h2-size: 28px;      --text-h2-lh: 1.3;       --text-h2-weight: 600;
+  --text-h3-size: 22px;      --text-h3-lh: 1.4;       --text-h3-weight: 500;
+  --text-h4-size: 18px;      --text-h4-lh: 1.4;       --text-h4-weight: 600;
+  --text-body-size: 18px;    --text-body-lh: 1.6;     --text-body-weight: 400;
+  --text-small-size: 16px;   --text-small-lh: 1.5;    --text-small-weight: 400;
+  --text-caption-size: 14px; --text-caption-lh: 1.4;  --text-caption-weight: 400;
+  --text-code-size: 16px;    --text-code-lh: 1.5;     --text-code-weight: 400;
+  --text-overline-size: 12px;--text-overline-lh: 1.4; --text-overline-weight: 600;
+
+  /* -- Spacing (4px base) -- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* -- Radius -- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* -- Shadows (dark) -- */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(20,184,166,0.15);
+
+  /* -- Motion -- */
+  --transition-fast: 150ms ease-out;
+  --transition-normal: 250ms ease-out;
+  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* -- Code syntax (dark) -- */
+  --code-fn: #14B8A6;
+  --code-keyword: #F59E0B;
+  --code-comment: #6B7F8E;
+  --code-text: #E2E8F0;
+  --code-bg: #0D1117;
+}
+
+/* Light mode override — add class="light" to <html> or <body> */
+.light, [data-theme="light"] {
+  --brand-primary: #0F766E;
+  --brand-primary-hover: #0F766E;
+  --brand-primary-soft: #CCFBF1;
+  --brand-accent: #B45309;
+  --brand-accent-hover: #92400E;
+  --brand-accent-soft: #FEF3C7;
+
+  --bg-base: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F1F5F9;
+  --bg-code: #F1F5F9;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-on-primary: #FFFFFF;
+  --text-on-accent: #FFFFFF;
+
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 20px rgba(13,148,136,0.1);
+
+  --code-fn: #0F766E;
+  --code-keyword: #B45309;
+  --code-comment: #94A3B8;
+  --code-text: #0F172A;
+  --code-bg: #F1F5F9;
+}
+
+/* ============================================================
+   Semantic element styles
+   ============================================================ */
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, .display {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.display { font-size: var(--text-display-size); line-height: var(--text-display-lh); font-weight: var(--text-display-weight); letter-spacing: -0.02em; }
+h1, .h1 { font-size: var(--text-h1-size); line-height: var(--text-h1-lh); font-weight: var(--text-h1-weight); }
+h2, .h2 { font-size: var(--text-h2-size); line-height: var(--text-h2-lh); font-weight: var(--text-h2-weight); }
+h3, .h3 { font-size: var(--text-h3-size); line-height: var(--text-h3-lh); font-weight: var(--text-h3-weight); }
+h4, .h4 { font-size: var(--text-h4-size); line-height: var(--text-h4-lh); font-weight: var(--text-h4-weight); }
+
+p, .body { font-size: var(--text-body-size); line-height: var(--text-body-lh); font-weight: var(--text-body-weight); color: var(--text-primary); margin: 0; }
+.small { font-size: var(--text-small-size); line-height: var(--text-small-lh); color: var(--text-secondary); }
+.caption { font-size: var(--text-caption-size); line-height: var(--text-caption-lh); color: var(--text-muted); }
+.overline { font-size: var(--text-overline-size); line-height: var(--text-overline-lh); font-weight: var(--text-overline-weight); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); }
+
+code, pre, kbd, .mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-code-size);
+}
+code {
+  background: var(--bg-code);
+  color: var(--code-text);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  border: 1px solid var(--border);
+}
+
+a {
+  color: var(--brand-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--brand-primary-hover); }
+
+::selection { background: var(--brand-primary); color: var(--bg-base); }

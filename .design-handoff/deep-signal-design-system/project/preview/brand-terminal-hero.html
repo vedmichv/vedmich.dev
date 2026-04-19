@@ -1,0 +1,55 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Terminal hero</title><style>
+.hero {
+  /* Softer, larger, lower-opacity orbs that fade to transparent at 90-95% so the
+     edges of each ellipse disappear into the base instead of forming visible
+     seams. Base is a flatter two-stop linear to avoid a competing diagonal. */
+  background:
+    radial-gradient(ellipse 90% 80% at 12% 10%, rgba(20,184,166,0.18), transparent 92%),
+    radial-gradient(ellipse 80% 70% at 88% 15%, rgba(245,158,11,0.06), transparent 92%),
+    radial-gradient(ellipse 95% 85% at 78% 95%, rgba(13,148,136,0.22), transparent 95%),
+    linear-gradient(160deg, #0B1220 0%, #0E1A2C 100%);
+  border: 1px solid rgba(51,65,85,0.35);
+  border-radius: 12px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+/* SVG fractalNoise overlay — slightly stronger to mask any remaining banding.
+   Matches slidev --noise-texture token. */
+.hero::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  border-radius: 12px;
+}
+.hero > * { position: relative; z-index: 2; }
+
+.prompt { font-family: var(--font-mono); font-size: 14px; color: #2DD4BF; margin-bottom: 10px; }
+.greet { font-family: var(--font-mono); font-size: 15px; color: #94A3B8; margin-bottom: 6px; }
+.name { font-family: var(--font-display); font-size: 42px; font-weight: 700; letter-spacing: -0.02em; color: #E2E8F0; line-height: 1.1; }
+.role { font-family: var(--font-mono); font-size: 14px; color: #FBBF24; margin-top: 6px; }
+.tag { font-family: var(--font-body); font-size: 14px; color: #94A3B8; margin-top: 10px; }
+.cursor { color: #2DD4BF; animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+</style></head><body>
+<div class="card">
+  <div class="hero">
+    <div class="prompt">~/vedmich.dev $ whoami</div>
+    <div class="greet">Hi, I'm</div>
+    <div class="name">Viktor Vedmich<span class="cursor">_</span></div>
+    <div class="role">Senior Solutions Architect @ AWS</div>
+    <div class="tag">Distributed Systems · Kubernetes · Cloud Architecture</div>
+  </div>
+  <div class="mono" style="color:var(--text-muted)">bg: softer orbs (90–95% falloff, opacity 0.06–0.22) · border reduced to rgba(51,65,85,0.35) · noise: <code style="color:#E2E8F0">fractalNoise 0.85, overlay 0.55</code></div>
+  <div class="a11y-row">
+    <span class="a11y-title">WCAG on mesh base ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Name <b>12.0:1</b> AAA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Greet/tag muted <b>5.3:1</b> AA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Prompt teal <b>6.4:1</b> AA</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Role amber <b>10.1:1</b> AAA</span>
+  </div>
+  <div class="mono" style="color:var(--text-muted)">Prompt and cursor upgraded from #14B8A6 (3.9:1 AA-large) to #2DD4BF (6.4:1 AA). Role amber upgraded from #F59E0B (7.8:1) to #FBBF24 (10.1:1). Noise overlay improves AA further by breaking banding.</div>
+</div>
+</body></html>

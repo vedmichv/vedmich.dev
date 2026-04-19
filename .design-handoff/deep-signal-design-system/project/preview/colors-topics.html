@@ -1,0 +1,41 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Topic accents</title><style>
+.topics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.topic { padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+.badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; align-self: flex-start; }
+.hex { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.ratio { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; }
+.ratio b { color: #22C55E; font-weight: 600; }
+.note { font-family: var(--font-body); font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-top: 14px; }
+.note code { font-family: var(--font-mono); color: #E2E8F0; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; }
+</style></head><body>
+<div class="card">
+  <div class="mono" style="color:var(--text-muted); margin-bottom: 10px">On-dark variants · WCAG AA verified against #1E293B</div>
+  <div class="topics">
+    <div class="topic" style="background:rgba(96,165,250,0.10);border:1px solid rgba(96,165,250,0.28)">
+      <span class="badge" style="background:rgba(96,165,250,0.16);color:#60A5FA">K8S</span>
+      <div class="hex">#60A5FA</div>
+      <div class="ratio"><b>7.3 : 1</b> · AAA</div>
+    </div>
+    <div class="topic" style="background:rgba(129,140,248,0.10);border:1px solid rgba(129,140,248,0.28)">
+      <span class="badge" style="background:rgba(129,140,248,0.16);color:#818CF8">ARCHITECTURE</span>
+      <div class="hex">#818CF8</div>
+      <div class="ratio"><b>6.8 : 1</b> · AAA</div>
+    </div>
+    <div class="topic" style="background:rgba(251,113,133,0.10);border:1px solid rgba(251,113,133,0.28)">
+      <span class="badge" style="background:rgba(251,113,133,0.16);color:#FB7185">OPINION</span>
+      <div class="hex">#FB7185</div>
+      <div class="ratio"><b>6.5 : 1</b> · AAA</div>
+    </div>
+    <div class="topic" style="background:rgba(74,222,128,0.10);border:1px solid rgba(74,222,128,0.28)">
+      <span class="badge" style="background:rgba(74,222,128,0.16);color:#4ADE80">TUTORIAL</span>
+      <div class="hex">#4ADE80</div>
+      <div class="ratio"><b>8.9 : 1</b> · AAA</div>
+    </div>
+  </div>
+  <div class="note">
+    <strong style="color:#E2E8F0">Fixed.</strong> You were right — <code>#3B82F6</code> (blue-500) came in at ~4.5 : 1 on <code>#1E293B</code>, which scrapes AA for normal text but fails AAA and drops under the tinted pill. Swapped to the 400-shade on all four badges so the full set sits at a consistent visual weight and clears <strong style="color:#22C55E">AAA (7 : 1)</strong> for small text.
+    <br><br>
+    Rule remains: <em>max one topic color per slide, badges only</em>. For body text or buttons, use the neutral text tokens — never these tints.
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,42 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Badges</title><style>
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid; font-family: var(--font-body); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 9999px; font-size: 13px; font-weight: 500; border: 1px solid; font-family: var(--font-body); }
+.dot { width: 6px; height: 6px; border-radius: 50%; }
+</style></head><body>
+<div class="card">
+  <div>
+    <div class="label">Topic badges (content categorization)</div>
+    <div class="row">
+      <span class="badge" style="background:rgba(45,212,191,.12);color:#2DD4BF;border-color:rgba(45,212,191,.28)">Deep Signal</span>
+      <span class="badge" style="background:rgba(96,165,250,.12);color:#60A5FA;border-color:rgba(96,165,250,.28)">K8S</span>
+      <span class="badge" style="background:rgba(129,140,248,.12);color:#818CF8;border-color:rgba(129,140,248,.28)">Architecture</span>
+      <span class="badge" style="background:rgba(74,222,128,.12);color:#4ADE80;border-color:rgba(74,222,128,.28)">Tutorial</span>
+      <span class="badge" style="background:rgba(251,113,133,.12);color:#FB7185;border-color:rgba(251,113,133,.28)">Opinion</span>
+    </div>
+  </div>
+  <div>
+    <div class="label">Skill / cert pills</div>
+    <div class="row">
+      <span class="pill" style="background:#1E293B;color:#E2E8F0;border-color:#334155">Kubernetes</span>
+      <span class="pill" style="background:#1E293B;color:#E2E8F0;border-color:#334155">AWS Cloud</span>
+      <span class="pill" style="background:rgba(45,212,191,.12);color:#2DD4BF;border-color:rgba(45,212,191,.3)"><span class="dot" style="background:#2DD4BF"></span>CKA</span>
+      <span class="pill" style="background:rgba(45,212,191,.12);color:#2DD4BF;border-color:rgba(45,212,191,.3)"><span class="dot" style="background:#2DD4BF"></span>CNCF Kubernaut</span>
+    </div>
+  </div>
+  <div class="a11y-row">
+    <span class="a11y-title">Topic badges ·</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Deep Signal <b>5.4:1</b> AA</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>K8S <b>7.3:1</b> AAA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Architecture <b>6.8:1</b> AA+</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Tutorial <b>8.9:1</b> AAA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Opinion <b>6.5:1</b> AA+</span>
+  </div>
+  <div class="a11y-row">
+    <span class="a11y-title">Pills ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Neutral <b>12.0:1</b> AAA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Brand cert <b>5.4:1</b> AA</span>
+  </div>
+  <div class="mono" style="color:var(--text-muted)">Migrated to 400-shades on-dark variants. Deep Signal uses #2DD4BF (primary-hover) instead of #14B8A6 to clear small-text AA.</div>
+</div>
+</body></html>

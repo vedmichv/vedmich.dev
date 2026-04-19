@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Neutral + surface colors</title><style>
+.swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.sw { display: flex; flex-direction: column; gap: 6px; }
+.sw .chip { height: 68px; border-radius: 10px; border: 1px solid var(--border); }
+.sw .name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.sw .hex { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.pair-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+.pair { padding: 14px; border-radius: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+.pair .sample { font-family: var(--font-body); font-size: 14px; }
+.pair .meta { font-family: var(--font-mono); font-size: 10px; opacity: 0.7; }
+</style></head><body>
+<div class="card">
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#0F172A"></div><div class="name">Base</div><div class="hex">#0F172A</div></div>
+    <div class="sw"><div class="chip" style="background:#1E293B"></div><div class="name">Surface</div><div class="hex">#1E293B</div></div>
+    <div class="sw"><div class="chip" style="background:#334155"></div><div class="name">Elevated</div><div class="hex">#334155</div></div>
+    <div class="sw"><div class="chip" style="background:#0D1117"></div><div class="name">Code bg</div><div class="hex">#0D1117</div></div>
+    <div class="sw"><div class="chip" style="background:#475569"></div><div class="name">Border strong</div><div class="hex">#475569</div></div>
+    <div class="sw"><div class="chip" style="background:#E2E8F0"></div><div class="name" style="color:var(--text-primary)">Text primary</div><div class="hex">#E2E8F0</div></div>
+  </div>
+
+  <div class="label" style="margin-top: 6px">Text-on-surface pairings</div>
+  <div class="pair-grid">
+    <div class="pair" style="background:#0F172A;color:#E2E8F0">
+      <span class="sample">Primary text on Base</span>
+      <span class="meta">#E2E8F0 / #0F172A — 14.5:1</span>
+    </div>
+    <div class="pair" style="background:#1E293B;color:#E2E8F0">
+      <span class="sample">Primary text on Surface</span>
+      <span class="meta">#E2E8F0 / #1E293B — 12.0:1</span>
+    </div>
+    <div class="pair" style="background:#1E293B;color:#94A3B8">
+      <span class="sample">Muted text on Surface</span>
+      <span class="meta">#94A3B8 / #1E293B — 5.3:1</span>
+    </div>
+  </div>
+
+  <div class="a11y-row">
+    <span class="a11y-title">Text pairings ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Primary on Base <b>14.5:1</b> AAA</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Primary on Surface <b>12.0:1</b> AAA</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Muted on Surface <b>5.3:1</b> AA</span>
+    <span class="a11y a11y-info"><span class="dot"></span>Surfaces — bg only, ratings N/A</span>
+  </div>
+</div>
+</body></html>

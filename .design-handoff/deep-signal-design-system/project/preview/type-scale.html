@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Type scale</title><style>
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+th { color: var(--text-secondary); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+td.mono { font-family: var(--font-mono); color: var(--text-muted); font-size: 12px; }
+td.sp { font-family: var(--font-display); font-weight: 600; }
+</style></head><body>
+<div class="card">
+  <table>
+    <tr><th>Token</th><th>Font</th><th>Size / LH</th><th>Wt</th><th>Sample</th></tr>
+    <tr><td class="mono">--text-display</td><td class="mono">Space Grotesk</td><td class="mono">48 / 1.1</td><td class="mono">700</td><td class="sp" style="font-size:20px">Aa</td></tr>
+    <tr><td class="mono">--text-h1</td><td class="mono">Space Grotesk</td><td class="mono">36 / 1.2</td><td class="mono">600</td><td class="sp" style="font-size:18px">Aa</td></tr>
+    <tr><td class="mono">--text-h2</td><td class="mono">Space Grotesk</td><td class="mono">28 / 1.3</td><td class="mono">600</td><td class="sp" style="font-size:16px">Aa</td></tr>
+    <tr><td class="mono">--text-body</td><td class="mono">Inter</td><td class="mono">18 / 1.6</td><td class="mono">400</td><td style="font-size:15px">Aa</td></tr>
+    <tr><td class="mono">--text-small</td><td class="mono">Inter</td><td class="mono">16 / 1.5</td><td class="mono">400</td><td style="font-size:13px">Aa</td></tr>
+    <tr><td class="mono">--text-caption</td><td class="mono">Inter</td><td class="mono">14 / 1.4</td><td class="mono">400</td><td style="font-size:12px">Aa</td></tr>
+    <tr><td class="mono">--text-code</td><td class="mono">JetBrains Mono</td><td class="mono">16 / 1.5</td><td class="mono">400</td><td class="mono" style="font-size:14px;color:var(--text-primary)">Aa</td></tr>
+  </table>
+  <div class="a11y-row">
+    <span class="a11y-title">Min sizes ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>All scales ≥14px · WCAG 1.4.4 pass</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Line-height ≥1.4 · WCAG 1.4.12 pass</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>All tokens use primary #E2E8F0 <b>12-14.5:1</b> AAA</span>
+  </div>
+</div>
+</body></html>

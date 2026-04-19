@@ -1,0 +1,176 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Logo lockups</title><style>
+.hero-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; }
+.hero-dark, .hero-light, .hero-gradient {
+  border-radius: 12px; padding: 32px; display: flex; align-items: center; gap: 22px;
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.hero-dark { background: #0F172A; }
+.hero-light { background: #F8FAFC; border-color: #E2E8F0; }
+.hero-gradient {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(20,184,166,0.30), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 80%, rgba(13,148,136,0.35), transparent 60%),
+    linear-gradient(135deg, #0B1220 0%, #0F172A 50%, #0D3B36 100%);
+}
+.hero-big { width: 120px; height: 120px; border-radius: 22px; flex-shrink: 0;
+  box-shadow: 0 20px 60px rgba(20,184,166,0.35), 0 0 0 1px rgba(20,184,166,0.15); }
+.hero-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hero-copy .wm { font-family: var(--font-display); font-size: 24px; font-weight: 700;
+  letter-spacing: -0.02em; color: #E2E8F0; line-height: 1.15; }
+.hero-copy .sub { font-family: var(--font-mono); font-size: 12px; color: #94A3B8; letter-spacing: 0.04em; }
+.hero-light .wm { color: #0F172A; }
+.hero-light .sub { color: #475569; }
+.hero-gradient .wm { color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+.hero-gradient .sub { color: #A7F3D0; }
+
+.sizes { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px 22px; display: flex; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
+.size { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.size img { border-radius: 6px; }
+.size img.r16 { border-radius: 4px; }
+.size img.r32 { border-radius: 6px; }
+.size img.r48 { border-radius: 8px; }
+.size img.r64 { border-radius: 10px; }
+.size img.r96 { border-radius: 16px; }
+.size .meta { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; }
+.size .meta b { color: #E2E8F0; font-weight: 600; }
+
+.ctx-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.ctx { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.ctx .label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);
+  letter-spacing: 0.1em; text-transform: uppercase; margin: 0; }
+
+/* Avatar circle (social) */
+.avatar { display: flex; align-items: center; gap: 12px; }
+.avatar img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+  border: 2px solid #334155; }
+.avatar .n { font-family: var(--font-body); font-size: 14px; font-weight: 600; color: #E2E8F0; }
+.avatar .h { font-family: var(--font-mono); font-size: 11px; color: #94A3B8; }
+
+/* Browser tab mock */
+.tab-row { display: flex; gap: 2px; }
+.tab { display: flex; align-items: center; gap: 6px; background: #0F172A;
+  border: 1px solid #334155; border-radius: 8px 8px 0 0; padding: 6px 10px;
+  font-family: var(--font-body); font-size: 11px; color: #E2E8F0; }
+.tab img { width: 14px; height: 14px; border-radius: 3px; }
+
+/* Slide corner mock */
+.slide-mock { background: #0F172A; border: 1px solid #334155; border-radius: 8px;
+  padding: 14px; height: 80px; position: relative; }
+.slide-mock::before { content: ''; position: absolute; inset: 0; border-radius: 8px;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 15%, rgba(20,184,166,0.22), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 20%, rgba(245,158,11,0.10), transparent 60%);
+}
+.slide-mock .corner { position: absolute; bottom: 10px; left: 14px; display: flex;
+  align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; color: #94A3B8; }
+.slide-mock .corner img { width: 20px; height: 20px; border-radius: 4px; }
+
+.note { font-family: var(--font-body); font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+.note code { font-family: var(--font-mono); color: #E2E8F0; background: rgba(255,255,255,0.06);
+  padding: 1px 5px; border-radius: 3px; }
+</style></head><body>
+<div class="card">
+
+  <div class="label">Primary mark · use everywhere</div>
+  <div class="hero-row">
+    <div class="hero-dark">
+      <img class="hero-big" src="../assets/vv-logo-hero.png" alt="Viktor Vedmich logo">
+      <div class="hero-copy">
+        <div class="wm">Viktor Vedmich</div>
+        <div class="sub">vedmich.dev · s.vedmich.dev</div>
+      </div>
+    </div>
+    <div class="hero-light">
+      <img class="hero-big" src="../assets/vv-logo-hero.png" alt="Viktor Vedmich logo" style="box-shadow: 0 12px 40px rgba(15,23,42,0.15), 0 0 0 1px rgba(15,23,42,0.08);">
+      <div class="hero-copy">
+        <div class="wm">Viktor Vedmich</div>
+        <div class="sub">On light surface</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-gradient" style="margin-top: -2px">
+    <img class="hero-big" src="../assets/vv-logo-hero.png" alt="Viktor Vedmich logo">
+    <div class="hero-copy">
+      <div class="wm">On brand gradient</div>
+      <div class="sub">mesh-deep · works over every slidev background</div>
+    </div>
+  </div>
+
+  <div class="label" style="margin-top: 4px">Size &amp; radius guide</div>
+  <div class="sizes">
+    <div class="size">
+      <img src="../assets/vv-logo-hero.png" class="r16" width="16" height="16" alt="16px">
+      <div class="meta"><b>16</b> · favicon tab</div>
+    </div>
+    <div class="size">
+      <img src="../assets/vv-logo-hero.png" class="r32" width="32" height="32" alt="32px">
+      <div class="meta"><b>32</b> · favicon hi-dpi</div>
+    </div>
+    <div class="size">
+      <img src="../assets/vv-logo-hero.png" class="r32" width="48" height="48" alt="48px">
+      <div class="meta"><b>48</b> · avatar</div>
+    </div>
+    <div class="size">
+      <img src="../assets/vv-logo-hero.png" class="r48" width="64" height="64" alt="64px">
+      <div class="meta"><b>64</b> · nav logo</div>
+    </div>
+    <div class="size">
+      <img src="../assets/vv-logo-hero.png" class="r64" width="96" height="96" alt="96px">
+      <div class="meta"><b>96</b> · card</div>
+    </div>
+    <div class="size">
+      <img src="../assets/vv-logo-hero.png" class="r96" width="128" height="128" alt="128px">
+      <div class="meta"><b>128</b> · slide title</div>
+    </div>
+    <div class="size">
+      <img src="../assets/vv-logo-hero.png" class="r96" width="160" height="160" alt="160px" style="border-radius:20px">
+      <div class="meta"><b>160</b> · hero</div>
+    </div>
+  </div>
+
+  <div class="label" style="margin-top: 4px">In context</div>
+  <div class="ctx-grid">
+    <div class="ctx">
+      <div class="label">Browser tab</div>
+      <div class="tab-row">
+        <div class="tab"><img src="../assets/vv-logo-hero.png" alt="">vedmich.dev</div>
+      </div>
+    </div>
+    <div class="ctx">
+      <div class="label">Social avatar</div>
+      <div class="avatar">
+        <img src="../assets/vv-logo-hero.png" alt="Viktor">
+        <div>
+          <div class="n">Viktor Vedmich</div>
+          <div class="h">@vedmichv</div>
+        </div>
+      </div>
+    </div>
+    <div class="ctx">
+      <div class="label">Slide corner</div>
+      <div class="slide-mock">
+        <div class="corner">
+          <img src="../assets/vv-logo-hero.png" alt="">vedmich.dev
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong style="color:#E2E8F0">One mark, one file.</strong> <code>vv-logo-hero.png</code> is the only logo — the same 2048×2048 artwork scales from 16px favicon to 200px slide title, and works on dark, light, and gradient surfaces without modification. No flat / inverse / favicon variants — those added inconsistency. If a context needs a mono or inverted mark, we cut it from Hero rather than ship a separate file.
+    <br><br>
+    <strong style="color:#E2E8F0">Radius rule.</strong> Scale radius with size: 16→4px · 32→6px · 48→6px · 64→8px · 96→16px · 128+→20–24px. Always sit the mark on its own surface — never directly on photography.
+  </div>
+
+  <div class="a11y-row">
+    <span class="a11y-title">A11y ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Single asset · consistent recognition</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Alt text required on every instance</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Min display size 16px · favicons rasterized hi-dpi</span>
+    <span class="a11y a11y-info"><span class="dot"></span>PNG 2048² source → crisp at all scales; convert to ICO/WebP at build</span>
+  </div>
+
+</div>
+</body></html>

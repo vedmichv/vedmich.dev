@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Code block</title><style>
+.terminal { background: #0D1117; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.dots { display: flex; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.dots span { width: 10px; height: 10px; border-radius: 50%; }
+pre.code { margin: 0; padding: 16px; font-family: var(--font-mono); font-size: 14px; line-height: 1.55; color: #E2E8F0; }
+.k { color: #F59E0B; }
+.fn { color: #14B8A6; }
+.cm { color: #6B7F8E; }
+</style></head><body>
+<div class="card">
+  <div class="terminal">
+    <div class="dots"><span style="background:#EF4444"></span><span style="background:#F59E0B"></span><span style="background:#22C55E"></span></div>
+<pre class="code"><span class="cm">// MCP server config</span>
+<span class="k">const</span> <span class="fn">createMCPServer</span> = () =&gt; ({
+  <span class="fn">name</span>: <span class="k">"tool-gateway"</span>,
+  <span class="fn">tools</span>: [<span class="k">"search"</span>, <span class="k">"exec"</span>],
+});</pre>
+  </div>
+  <div class="a11y-row">
+    <span class="a11y-title">Syntax colors on #0D1117 ·</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Text <b>15.5:1</b> AAA</span>
+    <span class="a11y a11y-aaa"><span class="dot"></span>Keyword #F59E0B <b>9.4:1</b> AAA</span>
+    <span class="a11y a11y-aalg"><span class="dot"></span>Function #14B8A6 <b>4.6:1</b> AA-only</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Comment #6B7F8E <b>4.1:1</b> AA-large</span>
+  </div>
+  <div class="mono" style="color:var(--text-muted)">Function color #14B8A6 passes AA for 14px code (normal), fails AAA. Consider #2DD4BF (6.4:1) for tighter syntax themes.</div>
+</div>
+</body></html>

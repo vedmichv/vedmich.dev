@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><title>Shadows</title><style>
+.shd { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px 8px; }
+.s { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; height: 74px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.s .n { font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.s .v { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+</style></head><body>
+<div class="card">
+  <div class="shd">
+    <div class="s" style="box-shadow:0 1px 2px rgba(0,0,0,.3)"><div class="n">sm</div><div class="v">1px / 2px</div></div>
+    <div class="s" style="box-shadow:0 4px 12px rgba(0,0,0,.4)"><div class="n">md</div><div class="v">4px / 12px</div></div>
+    <div class="s" style="box-shadow:0 8px 24px rgba(0,0,0,.5)"><div class="n">lg</div><div class="v">8px / 24px</div></div>
+    <div class="s" style="box-shadow:0 0 20px rgba(20,184,166,.3);border-color:#14B8A6"><div class="n">glow</div><div class="v">teal 20px</div></div>
+  </div>
+  <div class="a11y-row">
+    <span class="a11y-title">A11y ·</span>
+    <span class="a11y a11y-info"><span class="dot"></span>Decorative — no contrast requirement</span>
+    <span class="a11y a11y-aa"><span class="dot"></span>Never rely on shadow alone for state · use border+color</span>
+  </div>
+</div>
+</body></html>
