@@ -2,23 +2,23 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: --phase
-status: milestone_complete
-last_updated: "2026-04-19T21:00:17.625Z"
+current_phase: 05
+status: context_gathered
+last_updated: "2026-04-20T19:50:00.000Z"
 progress:
-  total_phases: 4
-  completed_phases: 2
+  total_phases: 5
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 3
-  percent: 50
+  completed_plans: 10
+  percent: 80
 ---
 
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 04
-**Status:** Milestone complete
-**Last updated:** 2026-04-19
+**Current phase:** 05
+**Status:** Phase 5 context gathered — ready for /gsd-plan-phase
+**Last updated:** 2026-04-20
 
 ## Completed phases
 
@@ -38,8 +38,8 @@ progress:
 - [x] Phase 1 — Header search pill ✓ (commit `71e38e9`)
 - [x] Phase 2 — Search palette ⌘K ✓ (commits `965eac9`/`6f0fb7b`/`e8361e4`/`4bc642b`)
 - [x] Phase 3 — Section order + About + Header tokens ✓ (commits `f21655f`/`381e0d9`)
-- [ ] Phase 4 — **Hero: match reference pixel-for-pixel** ← next (promoted from old Phase 11 on 2026-04-19 after user audit flagged drift)
-- [ ] Phase 5 — Podcasts: DKT teal + AWS RU amber badges
+- [x] Phase 4 — Hero: match reference pixel-for-pixel ✓ (3 plans completed 2026-04-19)
+- [ ] Phase 5 — **Podcasts: DKT teal + AWS RU amber badges** ← next (context gathered 2026-04-20, commit `c698991`)
 - [ ] Phase 6 — Book: PACKT cover + V. Vedmich emboss
 - [ ] Phase 7 — Speaking: timeline + arrows + inline city
 - [ ] Phase 8 — Presentations: match card format
@@ -60,3 +60,4 @@ None.
 - GSD interactive questions are asked in Russian; artifacts are written in English (see CLAUDE.md).
 
 **Planned Phase:** 4 (Hero — match reference pixel-for-pixel) — 3 plans — 2026-04-19T20:58:01.098Z
+**Context gathered:** 5 (Podcasts — DKT teal + AWS RU amber badges) — 2026-04-20T19:50:00Z — `.planning/phases/05-podcasts-badges/05-CONTEXT.md`
