@@ -102,9 +102,13 @@ Plans:
 
 **Requirements:** REQ-004
 **Files:** `src/components/Podcasts.astro`
-**Change:** Replace music-note SVG with `<Badge color="teal">DKT</Badge>` and `<Badge color="amber">AWS RU</Badge>` (per `app.jsx:125-129`). Badge = text overline with colored border + 10% opacity background.
+**Change:** Rewrite Podcasts.astro to match reference `app.jsx:423-453`: vertical stack per card (badge/logo → h3 → desc → stats → Listen footer); DKT card keeps existing PNG logo with white chrome (D-01 — brand asset over 3-letter text badge); AWS RU card replaces music-note SVG with inline `AWS RU` amber text badge per `Badge` primitive `app.jsx:125-129`; stats become mono muted without color tint (D-08); whole-card anchor preserved.
 **Est. effort:** 20 min
-**Verification:** DKT teal badge, AWS RU amber badge, no music-note icon.
+**Plans:** 1 plan
+**Verification:** DKT logo in badge slot, AWS RU amber badge, no music-note icon, both locales render identically.
+
+Plans:
+- [ ] 05-01-podcasts-rewrite-PLAN.md — Wave 1: Full rewrite of `src/components/Podcasts.astro` to two explicit card blocks (DKT logo + AWS RU amber text badge), vertical stack, mono muted stats + token/hex hygiene + build gate.
 
 ---
 
