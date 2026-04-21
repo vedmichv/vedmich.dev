@@ -66,6 +66,7 @@ None.
 **Context gathered:** 5 (Podcasts — DKT teal + AWS RU amber badges) — 2026-04-20T19:50:00Z — `.planning/phases/05-podcasts-badges/05-CONTEXT.md`
 **Context gathered:** 6 (Book — PACKT cover + V. Vedmich emboss) — 2026-04-21T04:32:00Z — `.planning/phases/06-book-packt-cover/06-CONTEXT.md`
 **Plan executed:** 06-01 (Book rewrite — full-bleed amber band + rating row) — 2026-04-21T07:36:57Z — `.planning/phases/06-book-packt-cover/06-01-book-rewrite-SUMMARY.md` — commit `97c6e89` — 7 min 9 sec — `npm run build` green (7 pages, 837ms), DOM shape verified both locales
+**UI-SPEC approved:** 7 (Speaking Portfolio) — 2026-04-21 — `.planning/phases/07-speaking-portfolio/07-UI-SPEC.md` — 6/6 dimensions PASS, 1 revision (6px→8px spacing fix)
 
 ## Key decisions — Phase 6 Plan 1
 
