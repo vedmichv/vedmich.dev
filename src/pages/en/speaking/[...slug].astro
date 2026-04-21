@@ -1,0 +1,97 @@
+---
+import { getCollection, render } from 'astro:content';
+import { YouTube } from '@astro-community/astro-embed-youtube';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { t } from '../../../i18n/utils';
+
+export async function getStaticPaths() {
+  const talks = await getCollection('speaking', ({ id }) => id.startsWith('en/'));
+  return talks.map((talk) => ({
+    params: { slug: talk.id.replace('en/', '') },
+    props: { talk },
+  }));
+}
+
+const { talk } = Astro.props;
+const { Content } = await render(talk);
+const locale = 'en';
+const i = t(locale);
+---
+
+<BaseLayout
+  title={`${talk.data.title} — Viktor Vedmich`}
+  description={`Talk at ${talk.data.event} — ${talk.data.city}`}
+  locale={locale}
+  path={`/speaking/${talk.id.replace('en/', '')}`}
+>
+  <article class="max-w-3xl mx-auto px-6 py-20 sm:py-28">
+    <a href={`/${locale}/speaking`} class="text-sm text-brand-primary hover:text-brand-primary-hover transition-colors mb-4 inline-block">
+      ← {i.speaking.back_link}
+    </a>
+
+    <h1 class="font-display text-4xl font-bold text-text-primary mb-4">{talk.data.title}</h1>
+
+    <p class="text-base font-medium text-text-secondary mb-6">
+      {talk.data.event} · {talk.data.city} · {talk.data.date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}
+    </p>
+
+    {talk.data.tags && talk.data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-1.5 mb-8" role="list">
+        {talk.data.tags.map((tag) => (
+          <span
+            class="text-sm font-medium px-3 py-1 rounded-full bg-brand-primary-soft border border-brand-primary text-brand-primary"
+            role="listitem"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+
+    {talk.data.video && (
+      <div class="mb-8">
+        <YouTube id={talk.data.video} />
+      </div>
+    )}
+
+    {(talk.data.video || talk.data.slides) && (
+      <div class="flex gap-3 mb-8">
+        {talk.data.video && (
+          <a
+            href={talk.data.video}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-accent text-bg-base hover:bg-brand-accent-hover transition-colors font-semibold"
+            aria-label={`${i.speaking.watch_video} (opens in new tab)`}
+          >
+            {i.speaking.watch_video}
+          </a>
+        )}
+        {talk.data.slides && (
+          <a
+            href={talk.data.slides}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-brand-primary text-brand-primary hover:bg-brand-primary-soft transition-colors font-semibold"
+            aria-label={`${i.speaking.view_slides} (opens in new tab)`}
+          >
+            {i.speaking.view_slides}
+          </a>
+        )}
+      </div>
+    )}
+
+    <div class="prose prose-invert prose-lg max-w-none
+      prose-headings:font-display prose-headings:font-semibold
+      prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline
+      prose-code:font-mono prose-code:text-brand-primary-hover
+      prose-pre:bg-bg-code prose-pre:border prose-pre:border-border
+    ">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
