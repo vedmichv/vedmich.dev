@@ -48,7 +48,11 @@
   },
   "speaking": {
     "title": "Speaking",
-    "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5\u20134.7/5.0"
+    "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5\u20134.7/5.0",
+    "back_link": "Back to Speaking",
+    "watch_video": "Watch on YouTube",
+    "view_slides": "View Slides",
+    "all_talks": "All talks"
   },
   "book": {
     "title": "Book",
