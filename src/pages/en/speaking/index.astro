@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { t } from '../../../i18n/utils';
+
+const locale = 'en';
+const i = t(locale);
+
+// Query all speaking entries for current locale
+const allTalks = await getCollection('speaking', ({ data, id }) => {
+  return id.startsWith(`${locale}/`) && !data.draft;
+});
+
+// Sort by date descending
+const talks = allTalks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Group by year
+const talksByYear = talks.reduce((acc, talk) => {
+  const year = talk.data.date.getFullYear().toString();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(talk);
+  return acc;
+}, {} as Record<string, typeof talks>);
+---
+
+<BaseLayout
+  title="Speaking — Viktor Vedmich"
+  description="Conference talks and presentations on Kubernetes, AWS, and cloud architecture"
+  locale={locale}
+  path="/speaking"
+>
+  <div class="py-20 sm:py-28">
+    <div class="max-w-[1120px] mx-auto px-6">
+      <h1 class="font-display text-4xl font-bold mb-2 animate-on-scroll">{i.speaking.title}</h1>
+      <p class="text-text-muted mb-12 animate-on-scroll">{i.speaking.subtitle}</p>
+
+      <div class="flex flex-col gap-8">
+        {Object.entries(talksByYear).sort((a, b) => Number(b[0]) - Number(a[0])).map(([year, yearTalks]) => (
+          <div class="grid grid-cols-[100px_1fr] gap-6 animate-on-scroll">
+            <div class="font-display text-4xl font-bold text-brand-primary tracking-[-0.02em]">
+              {year}
+            </div>
+
+            <div class="flex flex-col gap-4">
+              {yearTalks.map((talk) => (
+                <div class="border-l-2 border-border pl-5">
+                  <div class="font-display text-lg font-semibold text-text-primary">
+                    {talk.data.event} <span class="font-normal text-text-muted">· {talk.data.city}</span>
+                  </div>
+                  <a
+                    href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}`}
+                    class="font-body text-sm text-text-muted mt-2 block hover:text-brand-primary transition-colors"
+                  >
+                    <span class="text-brand-primary">→</span> {talk.data.title}
+                  </a>
+                  {talk.data.highlight && (
+                    <div class="font-mono text-xs text-warm mt-2">★ {talk.data.highlight}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
