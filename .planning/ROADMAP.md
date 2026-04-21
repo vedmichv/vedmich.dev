@@ -136,7 +136,7 @@ Plans:
 **Verification:** Individual talk pages at `/{locale}/speaking/{slug}` render with YouTube embeds, homepage shows talks from collection in reference grid, full archive at `/{locale}/speaking/`, `→` arrows per talk, city inline dimmed, 2023 re:Invent highlight, speakingEvents removed from social.ts.
 
 Plans:
-- [ ] 07-01-PLAN.md — Wave 1: Register speaking collection in content.config.ts with Zod schema (10 fields per D-06), add 4 i18n keys per locale (back_link, watch_video, view_slides, all_talks), install @astro-community/astro-embed-youtube package.
+- [x] 07-01-PLAN.md ✓ (commits `8096e60`, `8048466`, `071ae22`, 2026-04-21, 2 min 47 sec) — Wave 1: Register speaking collection in content.config.ts with Zod schema (10 fields per D-06), add 4 i18n keys per locale (back_link, watch_video, view_slides, all_talks), install @astro-community/astro-embed-youtube package v0.5.10. All verifications passed; `npm run build` green (7 pages, 769ms).
 - [ ] 07-02-PLAN.md — Wave 1 (parallel): Create 12 markdown files (6 EN + 6 RU) from speakingEvents data, frontmatter per schema, minimal body text, matching slugs, 2023 re:Invent has highlight field.
 - [ ] 07-03-PLAN.md — Wave 2 (depends 07-01, 07-02): Create slug pages (2 files) with YouTube embeds, create portfolio index pages (2 files), rewrite Speaking.astro to query collection with reference grid layout, remove speakingEvents from social.ts.
 

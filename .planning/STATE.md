@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 07 (Speaking Portfolio — 3 plans ready to execute)
-status: Ready to execute
-last_updated: "2026-04-21T15:30:38.867Z"
+current_phase: 07 (Speaking Portfolio — 2 plans remaining)
+status: In progress
+last_updated: "2026-04-21T18:33:00Z"
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 12
-  completed_plans: 8
-  percent: 67
+  completed_plans: 9
+  percent: 75
 ---
 
 # STATE.md
@@ -68,6 +68,13 @@ None.
 **Plan executed:** 06-01 (Book rewrite — full-bleed amber band + rating row) — 2026-04-21T07:36:57Z — `.planning/phases/06-book-packt-cover/06-01-book-rewrite-SUMMARY.md` — commit `97c6e89` — 7 min 9 sec — `npm run build` green (7 pages, 837ms), DOM shape verified both locales
 **UI-SPEC approved:** 7 (Speaking Portfolio) — 2026-04-21 — `.planning/phases/07-speaking-portfolio/07-UI-SPEC.md` — 6/6 dimensions PASS, 1 revision (6px→8px spacing fix)
 **Planned Phase:** 07 (Speaking Portfolio) — 3 plans in 2 waves — 2026-04-21T18:00:00Z — research HIGH confidence, pattern map 11/11 analogs, checker VERIFICATION PASSED all dimensions
+**Plan executed:** 07-01 (Speaking Portfolio — Data Layer) — 2026-04-21T18:33:00Z — `.planning/phases/07-speaking-portfolio/07-01-SUMMARY.md` — commits `8096e60`, `8048466`, `071ae22` — 2 min 47 sec — Speaking collection registered, i18n keys added, YouTube embed package installed
+
+## Key decisions — Phase 7 Plan 1
+
+- tags field is required array (no .optional()) per D-06 frontmatter schema — differs from blog collection where tags are optional
+- video and slides fields use z.string().url().optional() for URL validation at build time
+- YouTube embed uses @astro-community/astro-embed-youtube wrapper over lite-youtube-embed for Astro-native API
 
 ## Key decisions — Phase 6 Plan 1
 
