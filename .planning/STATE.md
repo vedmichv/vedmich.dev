@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 07 (Speaking Portfolio — 2 plans remaining)
+current_phase: 07 (Speaking Portfolio — 1 plan remaining)
 status: In progress
-last_updated: "2026-04-21T18:33:00Z"
+last_updated: "2026-04-21T18:36:57Z"
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 12
-  completed_plans: 9
-  percent: 75
+  completed_plans: 10
+  percent: 83
 ---
 
 # STATE.md
@@ -69,12 +69,21 @@ None.
 **UI-SPEC approved:** 7 (Speaking Portfolio) — 2026-04-21 — `.planning/phases/07-speaking-portfolio/07-UI-SPEC.md` — 6/6 dimensions PASS, 1 revision (6px→8px spacing fix)
 **Planned Phase:** 07 (Speaking Portfolio) — 3 plans in 2 waves — 2026-04-21T18:00:00Z — research HIGH confidence, pattern map 11/11 analogs, checker VERIFICATION PASSED all dimensions
 **Plan executed:** 07-01 (Speaking Portfolio — Data Layer) — 2026-04-21T18:33:00Z — `.planning/phases/07-speaking-portfolio/07-01-SUMMARY.md` — commits `8096e60`, `8048466`, `071ae22` — 2 min 47 sec — Speaking collection registered, i18n keys added, YouTube embed package installed
+**Plan executed:** 07-02 (Speaking Portfolio — Content Migration) — 2026-04-21T18:36:57Z — `.planning/phases/07-speaking-portfolio/07-02-SUMMARY.md` — commits `92ab775`, `0c27d99` — 1 min 23 sec — 14 markdown files created (7 EN + 7 RU), all talks migrated from social.ts
 
 ## Key decisions — Phase 7 Plan 1
 
 - tags field is required array (no .optional()) per D-06 frontmatter schema — differs from blog collection where tags are optional
 - video and slides fields use z.string().url().optional() for URL validation at build time
 - YouTube embed uses @astro-community/astro-embed-youtube wrapper over lite-youtube-embed for Astro-native API
+
+## Key decisions — Phase 7 Plan 2
+
+- video and slides fields omitted from frontmatter when no URLs available — prevents z.string().url().optional() validation failure on empty strings
+- Filenames use YYYY-slug.md pattern for chronological sorting
+- Tags remain in English in both locales (topic keywords, not UI strings)
+- Event and city names remain in English (proper nouns)
+- Found 7 talks in speakingEvents (not 6 as plan stated) — created all 7 files
 
 ## Key decisions — Phase 6 Plan 1
 
