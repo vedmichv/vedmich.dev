@@ -1,7 +1,8 @@
 ---
 phase: 7
 slug: speaking-portfolio
-status: draft
+status: approved
+reviewed_at: 2026-04-21
 shadcn_initialized: false
 preset: none
 created: 2026-04-21
