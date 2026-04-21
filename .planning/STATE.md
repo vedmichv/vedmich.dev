@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 07 (Speaking Portfolio — complete)
-status: In progress
-last_updated: "2026-04-21T18:42:37Z"
+current_phase: 08 (Presentations — match card format)
+status: Ready to plan
+last_updated: "2026-04-21T18:50:00Z"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 12
-  completed_plans: 11
-  percent: 92
+  completed_plans: 12
+  percent: 100
 ---
 
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 07 (Speaking Portfolio — 3 plans ready to execute)
-**Status:** Ready to execute
+**Current phase:** 08 (Presentations — match card format)
+**Status:** Ready to plan
 **Last updated:** 2026-04-21
 
 ## Completed phases
@@ -45,8 +45,8 @@ progress:
 - [x] Phase 4 — Hero: match reference pixel-for-pixel ✓ (3 plans completed 2026-04-19)
 - [x] Phase 5 — Podcasts: DKT teal + AWS RU amber badges ✓ (completed 2026-04-21, commit `de2e43d`)
 - [x] Phase 6 — Book: PACKT cover + V. Vedmich emboss ✓ (Plan 1 complete 2026-04-21, commit `97c6e89` — awaiting visual verify + push to main)
-- [ ] Phase 7 — Speaking: timeline + arrows + inline city ← next
-- [ ] Phase 8 — Presentations: match card format
+- [x] Phase 7 — Speaking: timeline + arrows + inline city ✓ (3 plans, 2026-04-21)
+- [ ] Phase 8 — Presentations: match card format ← next
 - [ ] Phase 9 — Blog: 3 posts with correct card format
 - [ ] Phase 10 — Contact: letter badges + working form
 - [ ] Phase 11 — Logo + favicon refresh

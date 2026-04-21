@@ -126,14 +126,15 @@ Plans:
 
 ---
 
-## Phase 7 — Speaking: timeline + arrows + inline city
+## Phase 7 — Speaking: timeline + arrows + inline city ✅
 
+**Status:** Complete (2026-04-21, 3 plans across 2 waves, ~7 min total execution)
 **Requirements:** REQ-003
 **Files:** Content Collection migration + component rewrite + 4 new pages
-**Change:** Full speaking portfolio with Content Collection — migrate 6 talks from `social.ts` to markdown files, create individual talk pages at `/{locale}/speaking/{slug}`, rewrite Speaking.astro to query collection with reference grid layout (`app.jsx:456-486`), add full portfolio index pages. Layout: year `100px | events 1fr` grid, year in display-36 teal, events as left-border blocks with `Event · City` (city muted) and talks prefixed with `→` arrow. YouTube embeds on individual pages. Remove speakingEvents from social.ts after migration.
+**Change:** Full speaking portfolio with Content Collection — migrate 7 talks from `social.ts` to markdown files, create individual talk pages at `/{locale}/speaking/{slug}`, rewrite Speaking.astro to query collection with reference grid layout (`app.jsx:456-486`), add full portfolio index pages. Layout: year `100px | events 1fr` grid, year in display-36 teal, events as left-border blocks with `Event · City` (city muted) and talks prefixed with `→` arrow. YouTube embeds on individual pages. Remove speakingEvents from social.ts after migration.
 **Est. effort:** 3-4 hours (expanded from original 35 min — now includes full portfolio architecture)
 **Plans:** 3 plans across 2 waves
-**Verification:** Individual talk pages at `/{locale}/speaking/{slug}` render with YouTube embeds, homepage shows talks from collection in reference grid, full archive at `/{locale}/speaking/`, `→` arrows per talk, city inline dimmed, 2023 re:Invent highlight, speakingEvents removed from social.ts.
+**Verification:** 10/10 must-haves passed. 23 pages built (834ms). Individual talk pages render, homepage grid layout matches reference, speakingEvents removed, no hardcoded hex.
 
 Plans:
 - [x] 07-01-PLAN.md ✓ (commits `8096e60`, `8048466`, `071ae22`, 2026-04-21, 2 min 47 sec) — Wave 1: Register speaking collection in content.config.ts with Zod schema (10 fields per D-06), add 4 i18n keys per locale (back_link, watch_video, view_slides, all_talks), install @astro-community/astro-embed-youtube package v0.5.10. All verifications passed; `npm run build` green (7 pages, 769ms).
