@@ -33,8 +33,7 @@ Declared values (all multiples of 4):
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| 1.5 (6px) | 6px | Talk lines margin-top |
-| 2 (8px) | 8px | n/a |
+| 2 (8px) | 8px | Talk lines margin-top |
 | 3 (12px) | 12px | Highlight margin-top |
 | 4 (16px) | 16px | n/a |
 | 5 (20px) | 20px | Event padding-left (border offset) |
@@ -349,7 +348,7 @@ Markdown body text = talk description, key takeaways, notes. Optional — some t
 | 5 | Event name | `fontSize: 18, fontWeight: 600, color: VV.text` | `font-display text-lg font-semibold text-text-primary` |
 | 6 | City inline | `color: VV.mute, fontWeight: 400` after event name | `text-text-muted font-normal` inline via `<span>` |
 | 7 | Talk arrow | `→` prefix, `color: VV.teal` | `text-brand-primary` inline before talk text |
-| 8 | Talk text | `fontSize: 14, color: VV.mute, marginTop: 6` | `font-body text-sm text-text-muted mt-1.5` |
+| 8 | Talk text | `fontSize: 14, color: VV.mute, marginTop: 8` | `font-body text-sm text-text-muted mt-2` |
 | 9 | Highlight | `★ ` prefix, `fontSize: 12, color: VV.amber, marginTop: 8` | `font-mono text-xs text-warm mt-2` |
 | 10 | Year group gap | `gap: 32` between year groups | `gap-8` wrapper |
 
@@ -402,7 +401,7 @@ Markdown body text = talk description, key takeaways, notes. Optional — some t
 | Migration | D-10, D-11 | Migrate from `social.ts`, remove export after |
 | Section title | D-12 | "Speaking" + existing subtitle i18n key |
 | Event format | D-13 | `Event · City` — city muted, separator middot |
-| Talk format | D-14 | `→ Talk title` — arrow teal, talk muted, 6px margin-top |
+| Talk format | D-14 | `→ Talk title` — arrow teal, talk muted, 8px margin-top |
 | Highlight format | D-15 | `★ highlight` — mono 12px amber |
 | Year gap | D-16 | 32px (`gap-8`) |
 | Container | D-17 | `max-w-[1120px] mx-auto` |
