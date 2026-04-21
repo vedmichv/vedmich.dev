@@ -116,9 +116,13 @@ Plans:
 
 **Requirements:** REQ-005
 **Files:** `src/components/Book.astro`
-**Change:** Render book cover as 140×200 card with `linear-gradient(160deg,#134E4A,#0F172A)` + teal border + radius 8. Inside: `PACKT` amber mono label top, book title display bottom, `V. Vedmich` teal mono subtitle. Layout: `140px | 1fr | auto` grid with title/desc column and "Get on Amazon" accent (amber) button right.
+**Change:** Rewrite Book.astro per reference `app.jsx:488-519` with user-locked deviations from `06-CONTEXT.md`: (1) retain real `/images/book-cover-3d.jpg` 3D render which already has PACKT + V. Vedmich baked in (D-01 — real brand asset over CSS faux cover, same stance as Phase 5 DKT logo); (2) first full-bleed amber band in the site — section `bg-brand-accent-soft border-y border-brand-accent/30` with inner `max-w-[1120px] mx-auto` container (D-04); (3) promote current 2-col flex to 3-col desktop grid `grid-cols-[140px_1fr_auto] gap-7 items-center` with mobile `flex flex-col gap-6` stack (D-08, D-09); (4) add Amazon rating row under h3 — `★★★★★ 4.8 · Amazon`, hardcoded `const rating = 4.8`, full ARIA annotations (D-15, D-17, D-19); (5) solid amber CTA `bg-brand-accent text-bg-base hover:bg-brand-accent-hover px-5 py-2.5 rounded-lg` per ref Button variant=accent (D-13); drop `max-w-3xl` (D-10), drop `bg-surface/30` (D-06). Preserve existing `.book-cover` CSS block (D-03), whole-card anchor (D-11), arrow SVG (D-14), `.card-glow` + `.animate-on-scroll` (D-24, D-25). No i18n edits, no CSS faux cover, no extra PACKT/V.Vedmich HTML labels, no new tokens, no `social.ts` changes.
 **Est. effort:** 30 min
-**Verification:** Book card matches reference visually.
+**Plans:** 1 plan
+**Verification:** Book card matches reference visually — full-bleed amber band edge-to-edge, 3-col desktop grid / mobile stack, rating row renders 5 amber stars + 4.8 + Amazon label, solid amber CTA contrast verified, both locales identical structurally, `npm run build` passes, no horizontal-scroll regression at 1440px or 375px.
+
+Plans:
+- [ ] 06-01-book-rewrite-PLAN.md — Wave 1: Full rewrite of `src/components/Book.astro` to full-bleed amber band section wrapper, 3-col desktop grid with mobile stack, JPG cover retained, NEW Amazon rating row with hardcoded 4.8 + 5 stars + ARIA, solid amber CTA per D-13 + token/hex hygiene + build gate.
 
 ---
 
