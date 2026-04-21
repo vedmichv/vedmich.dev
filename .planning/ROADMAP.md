@@ -129,13 +129,18 @@ Plans:
 ## Phase 7 — Speaking: timeline + arrows + inline city
 
 **Requirements:** REQ-003
-**Files:** `src/components/Speaking.astro`
-**Change:** Per `app.jsx:456-486`. Layout: year `100px | events 1fr` grid per year, year in display-36 teal; events as left-border-separated blocks with `Event name · City` (city dimmed) and bullet talks prefixed with `→`. Amber star + highlight for 2023 re:Invent.
-**Est. effort:** 35 min (data structure stays in `social.ts`)
-**Verification:** `→` arrows per talk, city inline dimmed, 2023 rating highlight.
+**Files:** Content Collection migration + component rewrite + 4 new pages
+**Change:** Full speaking portfolio with Content Collection — migrate 6 talks from `social.ts` to markdown files, create individual talk pages at `/{locale}/speaking/{slug}`, rewrite Speaking.astro to query collection with reference grid layout (`app.jsx:456-486`), add full portfolio index pages. Layout: year `100px | events 1fr` grid, year in display-36 teal, events as left-border blocks with `Event · City` (city muted) and talks prefixed with `→` arrow. YouTube embeds on individual pages. Remove speakingEvents from social.ts after migration.
+**Est. effort:** 3-4 hours (expanded from original 35 min — now includes full portfolio architecture)
+**Plans:** 3 plans across 2 waves
+**Verification:** Individual talk pages at `/{locale}/speaking/{slug}` render with YouTube embeds, homepage shows talks from collection in reference grid, full archive at `/{locale}/speaking/`, `→` arrows per talk, city inline dimmed, 2023 re:Invent highlight, speakingEvents removed from social.ts.
+
+Plans:
+- [ ] 07-01-PLAN.md — Wave 1: Register speaking collection in content.config.ts with Zod schema (10 fields per D-06), add 4 i18n keys per locale (back_link, watch_video, view_slides, all_talks), install @astro-community/astro-embed-youtube package.
+- [ ] 07-02-PLAN.md — Wave 1 (parallel): Create 12 markdown files (6 EN + 6 RU) from speakingEvents data, frontmatter per schema, minimal body text, matching slugs, 2023 re:Invent has highlight field.
+- [ ] 07-03-PLAN.md — Wave 2 (depends 07-01, 07-02): Create slug pages (2 files) with YouTube embeds, create portfolio index pages (2 files), rewrite Speaking.astro to query collection with reference grid layout, remove speakingEvents from social.ts.
 
 ---
-
 ## Phase 8 — Presentations: match card format
 
 **Requirements:** NEW REQ-010 (presentations polish)
