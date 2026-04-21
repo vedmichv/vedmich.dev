@@ -61,5 +61,11 @@ const talksByYear = talks.reduce((acc, talk) => {
         </div>
       ))}
     </div>
+
+    <div class="mt-10 animate-on-scroll">
+      <a href={`/${locale}/speaking`} class="font-body text-sm text-brand-primary hover:text-brand-primary-hover transition-colors">
+        {i.speaking.all_talks} →
+      </a>
+    </div>
   </div>
 </section>
