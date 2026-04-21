@@ -122,7 +122,7 @@ Plans:
 **Verification:** Book card matches reference visually — full-bleed amber band edge-to-edge, 3-col desktop grid / mobile stack, rating row renders 5 amber stars + 4.8 + Amazon label, solid amber CTA contrast verified, both locales identical structurally, `npm run build` passes, no horizontal-scroll regression at 1440px or 375px.
 
 Plans:
-- [ ] 06-01-book-rewrite-PLAN.md — Wave 1: Full rewrite of `src/components/Book.astro` to full-bleed amber band section wrapper, 3-col desktop grid with mobile stack, JPG cover retained, NEW Amazon rating row with hardcoded 4.8 + 5 stars + ARIA, solid amber CTA per D-13 + token/hex hygiene + build gate.
+- [x] 06-01-book-rewrite-PLAN.md ✓ (commit `97c6e89`, 2026-04-21, 7 min 9 sec) — Full rewrite of `src/components/Book.astro` to full-bleed amber band section wrapper, 3-col desktop grid with mobile stack, JPG cover retained, NEW Amazon rating row with hardcoded 4.8 + 5 stars + ARIA, solid amber CTA per D-13 + token/hex hygiene + build gate. All 13 verification checks passed; `npm run build` green (7 pages, 837ms); DOM shape verified in both `dist/en/index.html` and `dist/ru/index.html`.
 
 ---
 
@@ -193,7 +193,8 @@ Plans:
 - [x] Phase 3 complete
 - [x] Phase 4 complete
 - [x] Phase 5 complete
-- [ ] Phases 6-12 remaining — **next: Phase 6 (Book)**
+- [x] Phase 6 complete (Plan 1 implementation done, awaiting user visual verify + push to main)
+- [ ] Phases 7-12 remaining — **next: Phase 7 (Speaking)**
 - [ ] Live vedmich.dev visually matches `app.jsx` rendering of reference UI kit
 - [ ] Both /en/ and /ru/ render without regression at 1440px + 375px
 - [ ] ⌘K search works on live
