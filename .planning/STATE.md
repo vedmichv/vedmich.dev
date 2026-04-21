@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 07 (Speaking Portfolio — 1 plan remaining)
+current_phase: 07 (Speaking Portfolio — complete)
 status: In progress
-last_updated: "2026-04-21T18:36:57Z"
+last_updated: "2026-04-21T18:42:37Z"
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_plans: 11
+  percent: 92
 ---
 
 # STATE.md
@@ -28,6 +28,7 @@ progress:
 - ✅ Phase 4 — Hero: match reference pixel-for-pixel (3 plans, 2026-04-19)
 - ✅ Phase 5 — Podcasts: DKT teal + AWS RU amber badges (commit `de2e43d`, 2026-04-21)
 - ⏳ Phase 6 — Book: PACKT cover + V. Vedmich emboss (Plan 1 implementation complete, commit `97c6e89`, 2026-04-21 — awaiting visual verify + push)
+- ✅ Phase 7 — Speaking Portfolio: full collection + reference grid layout (commits `2ea5cae`, `82ed3b9`, `d2b856c`, `259b948`, `f457667`, 2026-04-21)
 
 ## Active context
 
@@ -70,6 +71,7 @@ None.
 **Planned Phase:** 07 (Speaking Portfolio) — 3 plans in 2 waves — 2026-04-21T18:00:00Z — research HIGH confidence, pattern map 11/11 analogs, checker VERIFICATION PASSED all dimensions
 **Plan executed:** 07-01 (Speaking Portfolio — Data Layer) — 2026-04-21T18:33:00Z — `.planning/phases/07-speaking-portfolio/07-01-SUMMARY.md` — commits `8096e60`, `8048466`, `071ae22` — 2 min 47 sec — Speaking collection registered, i18n keys added, YouTube embed package installed
 **Plan executed:** 07-02 (Speaking Portfolio — Content Migration) — 2026-04-21T18:36:57Z — `.planning/phases/07-speaking-portfolio/07-02-SUMMARY.md` — commits `92ab775`, `0c27d99` — 1 min 23 sec — 14 markdown files created (7 EN + 7 RU), all talks migrated from social.ts
+**Plan executed:** 07-03 (Speaking Portfolio — Pages and Components) — 2026-04-21T18:42:37Z — `.planning/phases/07-speaking-portfolio/07-03-SUMMARY.md` — commits `2ea5cae`, `82ed3b9`, `d2b856c`, `259b948`, `f457667` — 2 min 41 sec — 4 pages created (slug + index × 2 locales), Speaking.astro rewritten with reference grid layout, speakingEvents removed from social.ts
 
 ## Key decisions — Phase 7 Plan 1
 

@@ -138,7 +138,7 @@ Plans:
 Plans:
 - [x] 07-01-PLAN.md ✓ (commits `8096e60`, `8048466`, `071ae22`, 2026-04-21, 2 min 47 sec) — Wave 1: Register speaking collection in content.config.ts with Zod schema (10 fields per D-06), add 4 i18n keys per locale (back_link, watch_video, view_slides, all_talks), install @astro-community/astro-embed-youtube package v0.5.10. All verifications passed; `npm run build` green (7 pages, 769ms).
 - [x] 07-02-PLAN.md ✓ (commits `92ab775`, `0c27d99`, 2026-04-21, 1 min 23 sec) — Wave 1 (parallel): Created 14 markdown files (7 EN + 7 RU) from speakingEvents data, frontmatter per schema, minimal body text, matching slugs, 2023 re:Invent has highlight field. Found 7 talks (not 6 as planned). video/slides fields omitted (will add when URLs available). `npm run build` green (7 pages, 814ms).
-- [ ] 07-03-PLAN.md — Wave 2 (depends 07-01, 07-02): Create slug pages (2 files) with YouTube embeds, create portfolio index pages (2 files), rewrite Speaking.astro to query collection with reference grid layout, remove speakingEvents from social.ts.
+- [x] 07-03-PLAN.md ✓ (commits `2ea5cae`, `82ed3b9`, `d2b856c`, `259b948`, `f457667`, 2026-04-21, 2 min 41 sec) — Wave 2: Created 4 pages (EN/RU slug + EN/RU index), rewritten Speaking.astro with reference grid layout (100px|1fr, border-l, → arrows, inline city muted), speakingEvents removed from social.ts. Build generates 16 new speaking pages (7 talks × 2 locales + 2 index). `npm run build` green (23 pages, 836ms).
 
 ---
 ## Phase 8 — Presentations: match card format
@@ -199,7 +199,8 @@ Plans:
 - [x] Phase 4 complete
 - [x] Phase 5 complete
 - [x] Phase 6 complete (Plan 1 implementation done, awaiting user visual verify + push to main)
-- [ ] Phases 7-12 remaining — **next: Phase 7 (Speaking)**
+- [x] Phase 7 complete (3 plans, commits `8096e60`→`f457667`, 2026-04-21)
+- [ ] Phases 8-12 remaining — **next: Phase 8 (Presentations)**
 - [ ] Live vedmich.dev visually matches `app.jsx` rendering of reference UI kit
 - [ ] Both /en/ and /ru/ render without regression at 1440px + 375px
 - [ ] ⌘K search works on live
