@@ -108,7 +108,7 @@ Plans:
 **Verification:** DKT logo in badge slot, AWS RU amber badge, no music-note icon, both locales render identically.
 
 Plans:
-- [ ] 05-01-podcasts-rewrite-PLAN.md — Wave 1: Full rewrite of `src/components/Podcasts.astro` to two explicit card blocks (DKT logo + AWS RU amber text badge), vertical stack, mono muted stats + token/hex hygiene + build gate.
+- [x] 05-01-podcasts-rewrite-PLAN.md — Wave 1: Full rewrite of `src/components/Podcasts.astro` to two explicit card blocks (DKT logo + AWS RU amber text badge), vertical stack, mono muted stats + token/hex hygiene + build gate.
 
 ---
 
@@ -188,8 +188,8 @@ Plans:
 - [x] Phase 2 complete
 - [x] Phase 3 complete
 - [x] Phase 4 complete
-- [ ] Phase 5 (Podcasts) — **next**
-- [ ] Phases 6-12 remaining
+- [x] Phase 5 complete
+- [ ] Phases 6-12 remaining — **next: Phase 6 (Book)**
 - [ ] Live vedmich.dev visually matches `app.jsx` rendering of reference UI kit
 - [ ] Both /en/ and /ru/ render without regression at 1440px + 375px
 - [ ] ⌘K search works on live
