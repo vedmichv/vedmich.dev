@@ -7,34 +7,6 @@ interface Props {
 
 const { locale } = Astro.props;
 const i = t(locale);
-
-type PodcastIcon = 'dkt-logo' | 'headphones';
-
-const podcasts: Array<{
-  name: string;
-  desc: string;
-  stats: string;
-  url: string;
-  color: 'accent' | 'warm';
-  icon: PodcastIcon;
-}> = [
-  {
-    name: i.podcasts.dkt_name,
-    desc: i.podcasts.dkt_desc,
-    stats: i.podcasts.dkt_stats,
-    url: 'https://www.youtube.com/c/DevOpsKitchenTalks',
-    color: 'accent',
-    icon: 'dkt-logo',
-  },
-  {
-    name: i.podcasts.aws_name,
-    desc: i.podcasts.aws_desc,
-    stats: i.podcasts.aws_stats,
-    url: 'https://podcasters.spotify.com/pod/show/awsnarusskom',
-    color: 'warm',
-    icon: 'headphones',
-  },
-];
 ---
 
 <section id="podcasts" class="py-20 sm:py-28 bg-surface/30">
@@ -42,53 +14,67 @@ const podcasts: Array<{
     <h2 class="font-display text-3xl font-bold mb-12 animate-on-scroll">{i.podcasts.title}</h2>
 
     <div class="grid md:grid-cols-2 gap-6">
-      {podcasts.map((podcast) => (
-        <a
-          href={podcast.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="group block p-6 rounded-xl bg-bg border border-border card-glow animate-on-scroll"
-        >
-          <div class="flex items-start gap-4">
-            {podcast.icon === 'dkt-logo' ? (
-              <div class="w-14 h-14 shrink-0 rounded-xl bg-white/95 p-1 flex items-center justify-center ring-1 ring-border">
-                <img
-                  src="/images/dkt-logo.png"
-                  alt="DevOps Kitchen Talks logo"
-                  width="48"
-                  height="48"
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full h-full object-contain"
-                />
-              </div>
-            ) : (
-              <div class={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${podcast.color === 'accent' ? 'bg-accent/10 text-accent' : 'bg-warm/10 text-warm'}`}>
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                </svg>
-              </div>
-            )}
-            <div>
-              <h3 class="text-xl font-semibold mb-1 group-hover:text-accent transition-colors">
-                {podcast.name}
-              </h3>
-              <p class={`text-sm font-medium mb-3 ${podcast.color === 'accent' ? 'text-accent/70' : 'text-warm/70'}`}>
-                {podcast.stats}
-              </p>
-              <p class="text-text-muted text-sm leading-relaxed">
-                {podcast.desc}
-              </p>
-            </div>
-          </div>
-          <div class="mt-4 flex items-center gap-1 text-sm text-text-muted group-hover:text-accent transition-colors">
-            {i.podcasts.listen}
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </a>
-      ))}
+      <!-- DKT card — PNG logo in badge slot per D-01, D-15 -->
+      <a
+        href="https://www.youtube.com/c/DevOpsKitchenTalks"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group block p-6 rounded-xl bg-bg border border-border card-glow animate-on-scroll"
+      >
+        <div class="w-14 h-14 shrink-0 rounded-xl bg-white/95 p-1 flex items-center justify-center ring-1 ring-border">
+          <img
+            src="/images/dkt-logo.png"
+            alt="DevOps Kitchen Talks logo"
+            width="48"
+            height="48"
+            loading="lazy"
+            decoding="async"
+            class="w-full h-full object-contain"
+          />
+        </div>
+        <h3 class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
+          {i.podcasts.dkt_name}
+        </h3>
+        <p class="font-body text-[15px] text-text-muted leading-relaxed">
+          {i.podcasts.dkt_desc}
+        </p>
+        <div class="font-mono text-xs text-text-muted mt-4">
+          {i.podcasts.dkt_stats}
+        </div>
+        <div class="mt-4 inline-flex items-center gap-1 text-sm text-text-muted group-hover:text-brand-primary-hover transition-colors">
+          {i.podcasts.listen}
+          <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </a>
+
+      <!-- AWS RU card — inline amber text badge per D-02, D-06, D-14 -->
+      <a
+        href="https://podcasters.spotify.com/pod/show/awsnarusskom"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group block p-6 rounded-xl bg-bg border border-border card-glow animate-on-scroll"
+      >
+        <span class="inline-block font-body text-[11px] font-semibold uppercase tracking-[0.08em] px-2 py-1 rounded text-brand-accent bg-brand-accent-soft border border-brand-accent/40">
+          AWS RU
+        </span>
+        <h3 class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
+          {i.podcasts.aws_name}
+        </h3>
+        <p class="font-body text-[15px] text-text-muted leading-relaxed">
+          {i.podcasts.aws_desc}
+        </p>
+        <div class="font-mono text-xs text-text-muted mt-4">
+          {i.podcasts.aws_stats}
+        </div>
+        <div class="mt-4 inline-flex items-center gap-1 text-sm text-text-muted group-hover:text-brand-primary-hover transition-colors">
+          {i.podcasts.listen}
+          <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </a>
     </div>
   </div>
 </section>
