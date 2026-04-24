@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 08 (Presentations — match card format)
+current_phase: 08 (Presentations — match card format + portfolio migration)
 status: Ready to plan
-last_updated: "2026-04-21T18:50:00Z"
+last_updated: "2026-04-24T00:00:00Z"
 progress:
   total_phases: 7
   completed_phases: 6
@@ -16,9 +16,9 @@ progress:
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 08 (Presentations — match card format)
+**Current phase:** 08 (Presentations — match card format + portfolio migration)
 **Status:** Ready to plan
-**Last updated:** 2026-04-21
+**Last updated:** 2026-04-24
 
 ## Completed phases
 
@@ -72,6 +72,7 @@ None.
 **Plan executed:** 07-01 (Speaking Portfolio — Data Layer) — 2026-04-21T18:33:00Z — `.planning/phases/07-speaking-portfolio/07-01-SUMMARY.md` — commits `8096e60`, `8048466`, `071ae22` — 2 min 47 sec — Speaking collection registered, i18n keys added, YouTube embed package installed
 **Plan executed:** 07-02 (Speaking Portfolio — Content Migration) — 2026-04-21T18:36:57Z — `.planning/phases/07-speaking-portfolio/07-02-SUMMARY.md` — commits `92ab775`, `0c27d99` — 1 min 23 sec — 14 markdown files created (7 EN + 7 RU), all talks migrated from social.ts
 **Plan executed:** 07-03 (Speaking Portfolio — Pages and Components) — 2026-04-21T18:42:37Z — `.planning/phases/07-speaking-portfolio/07-03-SUMMARY.md` — commits `2ea5cae`, `82ed3b9`, `d2b856c`, `259b948`, `f457667` — 2 min 41 sec — 4 pages created (slug + index × 2 locales), Speaking.astro rewritten with reference grid layout, speakingEvents removed from social.ts
+**Context gathered:** 8 (Presentations — match card format + portfolio migration) — 2026-04-24 — `.planning/phases/08-presentations-match-card-format/08-CONTEXT.md` — commit `217d7bf` — scope expanded from 25 min card rewrite to Content Collection migration (mirror Phase 7 Speaking pattern); individual deck pages deferred to future Unified Slides milestone v0.5
 
 ## Key decisions — Phase 7 Plan 1
 
