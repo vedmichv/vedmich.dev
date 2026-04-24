@@ -234,6 +234,38 @@ Cursor MUST be an inline `<span>_</span>` with `cursor-blink` CSS animation, not
 
 ---
 
+## REQ-010 — Presentations: match card format + portfolio migration ✅
+
+**Type:** Component rewrite + Content Collection migration
+**Priority:** P1
+**Maps to:** Phase 8
+**Status:** Validated 2026-04-24 — 10/10 must-haves verified in `08-VERIFICATION.md`
+
+The Presentations homepage section MUST match reference `app.jsx:522-551` visual format AND the underlying data MUST live in an Astro Content Collection (mirror Phase 7 Speaking pattern):
+
+- Homepage section: `bg-surface` (zebra-rhythm), container `max-w-[1120px]`, 3-col responsive grid, `gap-5` (20px).
+- Each card (5-row structure): mono date+event+city overline, display-18 title, body excerpt description, mono teal SOLID slug URL (no alpha), teal tag badges (Tailwind 4 alpha via `bg-brand-primary-soft/30` + `border-brand-primary/40`), card padding `p-6` (24px).
+- Card anchor is whole-card external link to `https://s.vedmich.dev/{slug}/` (target=_blank, rel=noopener noreferrer).
+- "All decks →" header link target changed from external `s.vedmich.dev` to INTERNAL `/{locale}/presentations` portfolio index page.
+- Subtitle interpolates total deck count via `{N}` placeholder replacement.
+- New `/{locale}/presentations` index pages render ALL decks (flat date-desc grid, no year grouping, no pagination) with teal back-link using new `back_to_home` i18n key.
+- Data source migrated from `src/data/social.ts presentations` array to `src/content/presentations/{en,ru}/*.md` (Content Collection with Zod schema: `city` nullable, `description` required, `tags` required array, `slides`/`video` URL-validated optional).
+- `search-index.ts` queries the collection directly (legacy `locale_urls` override and `as any` cast removed).
+- `presentations` export removed from `social.ts` (clean break, no backward-compat shim).
+
+**Acceptance:**
+- `src/content.config.ts` exports `presentations` collection with 9-field Zod schema.
+- 12 markdown files exist (6 EN + 6 RU); 3 files per locale have `city: null` (Slurm × 2 + DKT).
+- `src/components/PresentationCard.astro` exists with typed `CollectionEntry<'presentations'>` props.
+- `src/components/Presentations.astro` queries collection, uses `bg-surface` + `max-w-[1120px]`, internal `/{locale}/presentations` "All decks" link, subtitle interpolation.
+- `src/pages/{en,ru}/presentations/index.astro` render with BaseLayout + back-link.
+- `src/data/search-index.ts` uses `getCollection('presentations', ...)`; no `as any`, no social import.
+- `src/data/social.ts` has exactly 3 exports (socialLinks, certifications, skills).
+- `npm run build` exits 0 with 25 pages (23 baseline + 2 new index pages).
+- Zero hardcoded hex in all Phase 8 files (PresentationCard, Presentations, `/presentations/` pages).
+
+---
+
 ## REQ-014 — Hero: section height ≤ 540px on 1440×900
 
 **Type:** Component layout constraint

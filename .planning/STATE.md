@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
-current_phase: 08 (Presentations — match card format + portfolio migration)
-status: executing
-last_updated: "2026-04-24T18:46:20.362Z"
+current_phase: 09 (Blog — 3 posts with correct card format)
+status: phase-complete
+last_updated: "2026-04-24T21:10:00.000Z"
 progress:
-  total_phases: 8
-  completed_phases: 5
-  total_plans: 18
-  completed_plans: 11
-  percent: 61
+  total_phases: 12
+  completed_phases: 6
+  total_plans: 21
+  completed_plans: 14
+  percent: 67
 ---
 
 # STATE.md
 
 **Current milestone:** v0.4 — Reference Design Audit
-**Current phase:** 08 (Presentations — match card format + portfolio migration)
-**Status:** Ready to execute
+**Current phase:** 09 (Blog — 3 posts with correct card format)
+**Status:** Phase 8 complete — ready to plan Phase 9
 **Last updated:** 2026-04-24
 
 ## Completed phases
@@ -29,6 +29,7 @@ progress:
 - ✅ Phase 5 — Podcasts: DKT teal + AWS RU amber badges (commit `de2e43d`, 2026-04-21)
 - ⏳ Phase 6 — Book: PACKT cover + V. Vedmich emboss (Plan 1 implementation complete, commit `97c6e89`, 2026-04-21 — awaiting visual verify + push)
 - ✅ Phase 7 — Speaking Portfolio: full collection + reference grid layout (commits `2ea5cae`, `82ed3b9`, `d2b856c`, `259b948`, `f457667`, 2026-04-21)
+- ✅ Phase 8 — Presentations: card format + Content Collection migration (commits `895ef22`, `e2c62a6`, `757ed8e`, 2026-04-24 — 25 pages build, 10/10 must-haves verified)
 
 ## Active context
 
@@ -46,8 +47,8 @@ progress:
 - [x] Phase 5 — Podcasts: DKT teal + AWS RU amber badges ✓ (completed 2026-04-21, commit `de2e43d`)
 - [x] Phase 6 — Book: PACKT cover + V. Vedmich emboss ✓ (Plan 1 complete 2026-04-21, commit `97c6e89` — awaiting visual verify + push to main)
 - [x] Phase 7 — Speaking: timeline + arrows + inline city ✓ (3 plans, 2026-04-21)
-- [ ] Phase 8 — Presentations: match card format ← next
-- [ ] Phase 9 — Blog: 3 posts with correct card format
+- [x] Phase 8 — Presentations: card format + Content Collection migration ✓ (3 plans, 2026-04-24)
+- [ ] Phase 9 — Blog: 3 posts with correct card format ← next
 - [ ] Phase 10 — Contact: letter badges + working form
 - [ ] Phase 11 — Logo + favicon refresh
 - [ ] Phase 12 — Footer match
