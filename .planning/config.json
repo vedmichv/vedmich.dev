@@ -9,7 +9,8 @@
     "research_per_phase": true,
     "plan_checker": true,
     "verifier": true,
-    "text_mode": false
+    "text_mode": false,
+    "_auto_chain_active": false
   },
   "models": {
     "researcher": "sonnet",
