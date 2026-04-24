@@ -1,13 +1,12 @@
 import { getCollection } from 'astro:content';
 import type { Locale } from '../i18n/utils';
-import { presentations } from './social';
 
 export type SearchItem = {
   kind: 'slides' | 'post';
   title: string;
   sub: string;
   url: string;
-  tags: readonly string[];
+  tags: string[];
   body: string;
   date: string;
 };
@@ -24,17 +23,21 @@ export function fuzzyScore(q: string, item: SearchItem): number {
 }
 
 export async function buildSearchIndex(locale: Locale): Promise<SearchItem[]> {
-  const slideItems: SearchItem[] = presentations.map((p) => {
-    const override = (p as any).locale_urls?.[locale] as string | undefined;
-    const url = override ?? `https://s.vedmich.dev/${p.slug}`;
+  const decks = await getCollection('presentations', ({ id, data }) => {
+    return !data.draft && id.startsWith(`${locale}/`);
+  });
+
+  const slideItems: SearchItem[] = decks.map((entry) => {
+    const slug = entry.id.replace(new RegExp(`^${locale}/`), '');
+    const dateStr = entry.data.date.toISOString().slice(0, 10);
     return {
       kind: 'slides',
-      title: p.title,
-      sub: `${p.date} · ${p.event}`,
-      url,
-      tags: p.tags,
-      body: p.description,
-      date: p.date,
+      title: entry.data.title,
+      sub: `${dateStr} · ${entry.data.event}`,
+      url: `https://s.vedmich.dev/${slug}`,
+      tags: entry.data.tags,
+      body: entry.data.description,
+      date: dateStr,
     };
   });
 

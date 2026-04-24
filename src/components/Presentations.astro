@@ -1,6 +1,7 @@
 ---
+import { getCollection } from 'astro:content';
 import { t, type Locale } from '../i18n/utils';
-import { presentations } from '../data/social';
+import PresentationCard from './PresentationCard.astro';
 
 interface Props {
   locale: Locale;
@@ -8,55 +9,35 @@ interface Props {
 
 const { locale } = Astro.props;
 const i = t(locale);
-const slidesBase = 'https://s.vedmich.dev';
+
+const allDecks = await getCollection('presentations', ({ data, id }) => {
+  return id.startsWith(`${locale}/`) && !data.draft;
+});
+
+const sortedDecks = allDecks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const totalCount = sortedDecks.length;
+const homepageDecks = sortedDecks.slice(0, 6);
+
+const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
 ---
 
-<section id="presentations" class="py-20 sm:py-28">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+<section id="presentations" class="py-20 sm:py-28 bg-surface">
+  <div class="max-w-[1120px] mx-auto px-6">
     <div class="flex items-baseline justify-between gap-6 mb-2 animate-on-scroll">
       <h2 class="font-display text-3xl font-bold">{i.presentations.title}</h2>
       <a
-        href={slidesBase}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={`/${locale}/presentations`}
         class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
       >
         {i.presentations.all_decks} →
       </a>
     </div>
-    <p class="text-text-muted mb-12 animate-on-scroll">{i.presentations.subtitle}</p>
+    <p class="text-text-muted mb-12 animate-on-scroll">{subtitle}</p>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {presentations.map((pres) => {
-        const metaParts = [pres.date, pres.event, pres.location].filter(Boolean);
-        const deckUrl = `${slidesBase}/${pres.slug}`;
-        return (
-          <a
-            href={`${deckUrl}/`}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group flex flex-col p-5 rounded-xl bg-surface border border-border card-glow animate-on-scroll"
-          >
-            <div class="font-mono text-xs text-text-muted mb-3">
-              {metaParts.join(' · ')}
-            </div>
-            <h3 class="font-display text-lg font-semibold mb-2 group-hover:text-brand-primary transition-colors">
-              {pres.title}
-            </h3>
-            <p class="text-sm text-text-secondary mb-4 flex-1">{pres.description}</p>
-            <div class="font-mono text-xs text-brand-primary/80 group-hover:text-brand-primary transition-colors mb-3 truncate">
-              {deckUrl.replace(/^https?:\/\//, '')}
-            </div>
-            <div class="flex flex-wrap gap-1.5">
-              {pres.tags.map((tag) => (
-                <span class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-bg border border-border text-text-muted">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </a>
-        );
-      })}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {homepageDecks.map((deck) => (
+        <PresentationCard deck={deck} />
+      ))}
     </div>
   </div>
 </section>

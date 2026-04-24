@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  deck: CollectionEntry<'presentations'>;
+}
+
+const { deck } = Astro.props;
+const { data, id } = deck;
+
+const slug = id.replace(/^(en|ru)\//, '');
+const deckUrl = `https://s.vedmich.dev/${slug}/`;
+const displayUrl = `s.vedmich.dev/${slug}`;
+
+const dateStr = data.date.toISOString().slice(0, 10);
+
+const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
+---
+
+<a
+  href={deckUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="group flex flex-col p-6 rounded-xl bg-surface border border-border card-glow animate-on-scroll"
+>
+  <!-- Row 1: Overline -->
+  <div class="font-mono text-xs text-text-muted mb-2">
+    {overlineParts.join(' · ')}
+  </div>
+
+  <!-- Row 2: Title -->
+  <h3 class="font-display text-lg font-semibold leading-snug mt-0 text-text-primary group-hover:text-brand-primary transition-colors">
+    {data.title}
+  </h3>
+
+  <!-- Row 3: Description -->
+  <p class="font-body text-sm text-text-secondary my-2.5 leading-relaxed flex-1">
+    {data.description}
+  </p>
+
+  <!-- Row 4: Slug URL -->
+  <div class="font-mono text-[11px] text-brand-primary tracking-[0.06em] mt-2 mb-2.5 truncate">
+    {displayUrl}
+  </div>
+
+  <!-- Row 5: Tags -->
+  <div class="flex flex-wrap gap-1.5" role="list">
+    {data.tags.map((tag) => (
+      <span
+        role="listitem"
+        class="font-mono text-[11px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded text-brand-primary bg-brand-primary-soft/30 border border-brand-primary/40"
+      >
+        {tag}
+      </span>
+    ))}
+  </div>
+</a>

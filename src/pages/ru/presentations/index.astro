@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { t } from '../../../i18n/utils';
+import PresentationCard from '../../../components/PresentationCard.astro';
+
+const locale = 'ru';
+const i = t(locale);
+
+const allDecks = await getCollection('presentations', ({ data, id }) => {
+  return id.startsWith(`${locale}/`) && !data.draft;
+});
+
+const decks = allDecks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const totalCount = decks.length;
+const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
+---
+
+<BaseLayout
+  title={`${i.presentations.title} — Viktor Vedmich`}
+  description="Conference presentations and Slidev decks on Kubernetes, AWS, MCP, and AI for DevOps"
+  locale={locale}
+  path="/presentations"
+>
+  <div class="py-20 sm:py-28">
+    <div class="max-w-[1120px] mx-auto px-6">
+      <a
+        href={`/${locale}/`}
+        class="font-body text-sm text-brand-primary hover:text-brand-primary-hover transition-colors mb-6 inline-block"
+      >
+        ← {i.back_to_home}
+      </a>
+
+      <h1 class="font-display text-4xl font-bold mb-2 animate-on-scroll">{i.presentations.title}</h1>
+      <p class="text-text-muted mb-12 animate-on-scroll">{subtitle}</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {decks.map((deck) => (
+          <PresentationCard deck={deck} />
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
