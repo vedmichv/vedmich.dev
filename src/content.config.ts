@@ -28,4 +28,19 @@ const speaking = defineCollection({
   }),
 });
 
-export const collections = { blog, speaking };
+const presentations = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/presentations' }),
+  schema: z.object({
+    title: z.string(),
+    event: z.string(),
+    city: z.string().nullable(),
+    date: z.coerce.date(),
+    description: z.string(),
+    tags: z.array(z.string()),
+    slides: z.string().url().optional(),
+    video: z.string().url().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { blog, speaking, presentations };

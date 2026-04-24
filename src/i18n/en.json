@@ -8,11 +8,11 @@
     "blog": "Blog",
     "contact": "Contact",
     "search_label": "Open search",
-    "search_placeholder": "Search\u2026"
+    "search_placeholder": "Search…"
   },
   "search": {
-    "placeholder": "Search slides, posts, tags\u2026",
-    "empty_hint": "Start typing to search. Try: \u201ckarpenter\u201d, \u201cmcp\u201d, \u201ckubernetes\u201d.",
+    "placeholder": "Search slides, posts, tags…",
+    "empty_hint": "Start typing to search. Try: “karpenter”, “mcp”, “kubernetes”.",
     "no_results": "No matches for",
     "footer_move": "move",
     "footer_open": "open",
@@ -23,7 +23,7 @@
     "greeting": "Hi, I'm",
     "name": "Viktor Vedmich",
     "role": "Senior Solutions Architect @ AWS",
-    "tagline_before": "Distributed Systems \u00b7 Kubernetes \u00b7 ",
+    "tagline_before": "Distributed Systems · Kubernetes · ",
     "tagline_accent": "AI Engineer",
     "tagline_after": "",
     "cta": "Get in touch",
@@ -40,15 +40,15 @@
     "title": "Podcasts",
     "dkt_name": "DevOps Kitchen Talks",
     "dkt_desc": "Technical deep-dives into DevOps, Kubernetes, and infrastructure. Interviews with industry experts, mock interviews, and hands-on topics.",
-    "dkt_stats": "91+ episodes \u00b7 10K+ subscribers",
-    "aws_name": "AWS \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u043e\u043c",
-    "aws_desc": "AWS services, architectural patterns, AI applications, and IT careers \u2014 all in Russian. Vendor-agnostic perspective from inside AWS.",
-    "aws_stats": "65+ episodes \u00b7 70K+ listens",
+    "dkt_stats": "91+ episodes · 10K+ subscribers",
+    "aws_name": "AWS на русском",
+    "aws_desc": "AWS services, architectural patterns, AI applications, and IT careers — all in Russian. Vendor-agnostic perspective from inside AWS.",
+    "aws_stats": "65+ episodes · 70K+ listens",
     "listen": "Listen"
   },
   "speaking": {
     "title": "Speaking",
-    "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5\u20134.7/5.0",
+    "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5–4.7/5.0",
     "back_link": "Back to Speaking",
     "watch_video": "Watch on YouTube",
     "view_slides": "View Slides",
@@ -62,7 +62,7 @@
   },
   "presentations": {
     "title": "Recent decks",
-    "subtitle": "6 talks \u00b7 all slides at s.vedmich.dev",
+    "subtitle": "{N} talks · all slides at s.vedmich.dev",
     "all_decks": "All decks"
   },
   "blog": {
@@ -76,6 +76,7 @@
   },
   "footer": {
     "built_with": "Built with Astro",
-    "copyright": "\u00a9 {year} Viktor Vedmich"
-  }
+    "copyright": "© {year} Viktor Vedmich"
+  },
+  "back_to_home": "Back to Home"
 }

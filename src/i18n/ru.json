@@ -1,81 +1,82 @@
 {
   "nav": {
-    "about": "\u041e\u0431\u043e \u043c\u043d\u0435",
-    "podcasts": "\u041f\u043e\u0434\u043a\u0430\u0441\u0442\u044b",
-    "speaking": "\u0412\u044b\u0441\u0442\u0443\u043f\u043b\u0435\u043d\u0438\u044f",
-    "book": "\u041a\u043d\u0438\u0433\u0430",
-    "presentations": "\u0421\u043b\u0430\u0439\u0434\u044b",
-    "blog": "\u0411\u043b\u043e\u0433",
-    "contact": "\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u044b",
-    "search_label": "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043f\u043e\u0438\u0441\u043a",
-    "search_placeholder": "\u041f\u043e\u0438\u0441\u043a\u2026"
+    "about": "Обо мне",
+    "podcasts": "Подкасты",
+    "speaking": "Выступления",
+    "book": "Книга",
+    "presentations": "Слайды",
+    "blog": "Блог",
+    "contact": "Контакты",
+    "search_label": "Открыть поиск",
+    "search_placeholder": "Поиск…"
   },
   "search": {
-    "placeholder": "\u041f\u043e\u0438\u0441\u043a \u043f\u043e \u0441\u043b\u0430\u0439\u0434\u0430\u043c, \u043f\u043e\u0441\u0442\u0430\u043c, \u0442\u0435\u0433\u0430\u043c\u2026",
-    "empty_hint": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u0432\u0432\u043e\u0434\u0438\u0442\u044c \u0437\u0430\u043f\u0440\u043e\u0441. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435: \u00abkarpenter\u00bb, \u00abmcp\u00bb, \u00abkubernetes\u00bb.",
-    "no_results": "\u041d\u0438\u0447\u0435\u0433\u043e \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e \u0434\u043b\u044f",
-    "footer_move": "\u043d\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044f",
-    "footer_open": "\u043e\u0442\u043a\u0440\u044b\u0442\u044c",
-    "kind_slides": "\u0421\u043b\u0430\u0439\u0434\u044b",
-    "kind_post": "\u041f\u043e\u0441\u0442"
+    "placeholder": "Поиск по слайдам, постам, тегам…",
+    "empty_hint": "Начните вводить запрос. Попробуйте: «karpenter», «mcp», «kubernetes».",
+    "no_results": "Ничего не найдено для",
+    "footer_move": "навигация",
+    "footer_open": "открыть",
+    "kind_slides": "Слайды",
+    "kind_post": "Пост"
   },
   "hero": {
-    "greeting": "\u041f\u0440\u0438\u0432\u0435\u0442, \u044f",
-    "name": "\u0412\u0438\u043a\u0442\u043e\u0440 \u0412\u0435\u0434\u043c\u0438\u0447",
+    "greeting": "Привет, я",
+    "name": "Виктор Ведмич",
     "role": "Senior Solutions Architect @ AWS",
-    "tagline_before": "\u0420\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0451\u043d\u043d\u044b\u0435 \u0441\u0438\u0441\u0442\u0435\u043c\u044b \u00b7 Kubernetes \u00b7 ",
+    "tagline_before": "Распределённые системы · Kubernetes · ",
     "tagline_accent": "AI Engineer",
     "tagline_after": "",
-    "cta": "\u0421\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f",
-    "cta_secondary": "\u041f\u043e\u0434\u0440\u043e\u0431\u043d\u0435\u0435"
+    "cta": "Связаться",
+    "cta_secondary": "Подробнее"
   },
   "about": {
-    "title": "\u041e\u0431\u043e \u043c\u043d\u0435",
-    "bio_before": "Solutions Architect \u0438 AI Engineer \u0441 15+ \u0433\u043e\u0434\u0430\u043c\u0438 \u043e\u043f\u044b\u0442\u0430 \u0432 \u043f\u0440\u043e\u0435\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0438 \u0440\u0430\u0441\u043f\u0440\u0435\u0434\u0435\u043b\u0451\u043d\u043d\u044b\u0445 \u0441\u0438\u0441\u0442\u0435\u043c. \u0420\u0430\u0431\u043e\u0442\u0430\u044e \u0432 AWS, \u0432\u0435\u0434\u0443 \u0441\u043a\u0432\u043e\u0437\u043d\u0443\u044e \u0430\u0440\u0445\u0438\u0442\u0435\u043a\u0442\u0443\u0440\u0443 \u0434\u043b\u044f enterprise-\u043a\u043b\u0438\u0435\u043d\u0442\u043e\u0432: hybrid cloud, Kubernetes, GenAI \u0438 agentic-\u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u044b. CNCF Kubestronaut \u0438 \u0430\u0432\u0442\u043e\u0440 \u043a\u043d\u0438\u0433\u0438 ",
+    "title": "Обо мне",
+    "bio_before": "Solutions Architect и AI Engineer с 15+ годами опыта в проектировании распределённых систем. Работаю в AWS, веду сквозную архитектуру для enterprise-клиентов: hybrid cloud, Kubernetes, GenAI и agentic-платформы. CNCF Kubestronaut и автор книги ",
     "bio_accent": "«Cracking the Kubernetes Interview»",
     "bio_after": ".",
-    "skills_title": "\u042d\u043a\u0441\u043f\u0435\u0440\u0442\u0438\u0437\u0430"
+    "skills_title": "Экспертиза"
   },
   "podcasts": {
-    "title": "\u041f\u043e\u0434\u043a\u0430\u0441\u0442\u044b",
+    "title": "Подкасты",
     "dkt_name": "DevOps Kitchen Talks",
-    "dkt_desc": "\u0422\u0435\u0445\u043d\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0433\u043b\u0443\u0431\u043e\u043a\u0438\u0435 \u043f\u043e\u0433\u0440\u0443\u0436\u0435\u043d\u0438\u044f \u0432 DevOps, Kubernetes \u0438 \u0438\u043d\u0444\u0440\u0430\u0441\u0442\u0440\u0443\u043a\u0442\u0443\u0440\u0443. \u0418\u043d\u0442\u0435\u0440\u0432\u044c\u044e \u0441 \u044d\u043a\u0441\u043f\u0435\u0440\u0442\u0430\u043c\u0438, \u043c\u043e\u043a-\u0438\u043d\u0442\u0435\u0440\u0432\u044c\u044e \u0438 \u043f\u0440\u0430\u043a\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0442\u0435\u043c\u044b.",
-    "dkt_stats": "91+ \u0432\u044b\u043f\u0443\u0441\u043a\u043e\u0432 \u00b7 10K+ \u043f\u043e\u0434\u043f\u0438\u0441\u0447\u0438\u043a\u043e\u0432",
-    "aws_name": "AWS \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u043e\u043c",
-    "aws_desc": "\u0421\u0435\u0440\u0432\u0438\u0441\u044b AWS, \u0430\u0440\u0445\u0438\u0442\u0435\u043a\u0442\u0443\u0440\u043d\u044b\u0435 \u043f\u0430\u0442\u0442\u0435\u0440\u043d\u044b, \u043f\u0440\u0438\u043c\u0435\u043d\u0435\u043d\u0438\u0435 AI \u0438 IT-\u043a\u0430\u0440\u044c\u0435\u0440\u0430 \u2014 \u0432\u0441\u0451 \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u043e\u043c. \u041d\u0435\u0437\u0430\u0432\u0438\u0441\u0438\u043c\u044b\u0439 \u0432\u0437\u0433\u043b\u044f\u0434 \u0438\u0437\u043d\u0443\u0442\u0440\u0438 AWS.",
-    "aws_stats": "65+ \u0432\u044b\u043f\u0443\u0441\u043a\u043e\u0432 \u00b7 70K+ \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0439",
-    "listen": "\u0421\u043b\u0443\u0448\u0430\u0442\u044c"
+    "dkt_desc": "Технические глубокие погружения в DevOps, Kubernetes и инфраструктуру. Интервью с экспертами, мок-интервью и практические темы.",
+    "dkt_stats": "91+ выпусков · 10K+ подписчиков",
+    "aws_name": "AWS на русском",
+    "aws_desc": "Сервисы AWS, архитектурные паттерны, применение AI и IT-карьера — всё на русском. Независимый взгляд изнутри AWS.",
+    "aws_stats": "65+ выпусков · 70K+ прослушиваний",
+    "listen": "Слушать"
   },
   "speaking": {
-    "title": "\u0412\u044b\u0441\u0442\u0443\u043f\u043b\u0435\u043d\u0438\u044f",
-    "subtitle": "30+ \u0442\u0435\u0445\u043d\u0438\u0447\u0435\u0441\u043a\u0438\u0445 \u0434\u043e\u043a\u043b\u0430\u0434\u043e\u0432 \u0432 \u0433\u043e\u0434. \u0420\u0435\u0439\u0442\u0438\u043d\u0433 \u0441\u043f\u0438\u043a\u0435\u0440\u0430: 4.5\u20134.7/5.0",
+    "title": "Выступления",
+    "subtitle": "30+ технических докладов в год. Рейтинг спикера: 4.5–4.7/5.0",
     "back_link": "Назад к выступлениям",
     "watch_video": "Смотреть на YouTube",
     "view_slides": "Посмотреть слайды",
     "all_talks": "Все выступления"
   },
   "book": {
-    "title": "\u041a\u043d\u0438\u0433\u0430",
+    "title": "Книга",
     "name": "Cracking the Kubernetes Interview",
-    "desc": "\u041f\u043e\u043b\u043d\u043e\u0435 \u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0441\u0442\u0432\u043e \u043f\u043e \u043a\u043e\u043d\u0446\u0435\u043f\u0446\u0438\u044f\u043c, \u0430\u0440\u0445\u0438\u0442\u0435\u043a\u0442\u0443\u0440\u0435, \u0441\u0435\u0442\u044f\u043c, \u0431\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u043e\u0441\u0442\u0438 Kubernetes \u0438 \u0440\u0435\u0430\u043b\u044c\u043d\u044b\u043c \u0441\u0446\u0435\u043d\u0430\u0440\u0438\u044f\u043c \u0434\u043b\u044f \u043f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0438 \u043a \u0441\u043e\u0431\u0435\u0441\u0435\u0434\u043e\u0432\u0430\u043d\u0438\u044e.",
-    "cta": "\u041a\u0443\u043f\u0438\u0442\u044c \u043d\u0430 Amazon"
+    "desc": "Полное руководство по концепциям, архитектуре, сетям, безопасности Kubernetes и реальным сценариям для подготовки к собеседованию.",
+    "cta": "Купить на Amazon"
   },
   "presentations": {
-    "title": "\u0421\u0432\u0435\u0436\u0438\u0435 \u0434\u043e\u043a\u043b\u0430\u0434\u044b",
-    "subtitle": "6 \u0434\u043e\u043a\u043b\u0430\u0434\u043e\u0432 \u00b7 \u0432\u0441\u0435 \u0441\u043b\u0430\u0439\u0434\u044b \u043d\u0430 s.vedmich.dev",
-    "all_decks": "\u0412\u0441\u0435 \u0434\u043e\u043a\u043b\u0430\u0434\u044b"
+    "title": "Свежие доклады",
+    "subtitle": "{N} докладов · все слайды на s.vedmich.dev",
+    "all_decks": "Все доклады"
   },
   "blog": {
-    "title": "\u0411\u043b\u043e\u0433",
-    "read_more": "\u0427\u0438\u0442\u0430\u0442\u044c \u0434\u0430\u043b\u044c\u0448\u0435",
-    "all_posts": "\u0412\u0441\u0435 \u043f\u043e\u0441\u0442\u044b"
+    "title": "Блог",
+    "read_more": "Читать дальше",
+    "all_posts": "Все посты"
   },
   "contact": {
-    "title": "\u0421\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f",
-    "subtitle": "\u041d\u0430\u0439\u0434\u0438\u0442\u0435 \u043c\u0435\u043d\u044f \u043d\u0430 \u044d\u0442\u0438\u0445 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0430\u0445"
+    "title": "Связаться",
+    "subtitle": "Найдите меня на этих платформах"
   },
   "footer": {
-    "built_with": "\u0421\u043e\u0437\u0434\u0430\u043d\u043e \u043d\u0430 Astro",
-    "copyright": "\u00a9 {year} \u0412\u0438\u043a\u0442\u043e\u0440 \u0412\u0435\u0434\u043c\u0438\u0447"
-  }
+    "built_with": "Создано на Astro",
+    "copyright": "© {year} Виктор Ведмич"
+  },
+  "back_to_home": "Назад на главную"
 }
