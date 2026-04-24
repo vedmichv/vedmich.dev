@@ -3,8 +3,9 @@ gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
 current_phase: 08 (Presentations — match card format + portfolio migration)
-status: Ready to plan
-last_updated: "2026-04-24T00:00:00Z"
+status: UI-SPEC approved — ready to plan
+last_updated: "2026-04-24T12:00:00Z"
+resume_file: ".planning/phases/08-presentations-match-card-format/08-UI-SPEC.md"
 progress:
   total_phases: 7
   completed_phases: 6
@@ -17,7 +18,7 @@ progress:
 
 **Current milestone:** v0.4 — Reference Design Audit
 **Current phase:** 08 (Presentations — match card format + portfolio migration)
-**Status:** Ready to plan
+**Status:** UI-SPEC approved (commit `c83f38f` + `f683eb5`, 2026-04-24) — ready to plan
 **Last updated:** 2026-04-24
 
 ## Completed phases
