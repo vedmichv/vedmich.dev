@@ -142,13 +142,21 @@ Plans:
 - [x] 07-03-PLAN.md ✓ (commits `2ea5cae`, `82ed3b9`, `d2b856c`, `259b948`, `f457667`, 2026-04-21, 2 min 41 sec) — Wave 2: Created 4 pages (EN/RU slug + EN/RU index), rewritten Speaking.astro with reference grid layout (100px|1fr, border-l, → arrows, inline city muted), speakingEvents removed from social.ts. Build generates 16 new speaking pages (7 talks × 2 locales + 2 index). `npm run build` green (23 pages, 836ms).
 
 ---
-## Phase 8 — Presentations: match card format
+
+## Phase 8 — Presentations: match card format + portfolio migration
 
 **Requirements:** NEW REQ-010 (presentations polish)
-**Files:** `src/components/Presentations.astro`
-**Change:** Per `app.jsx:522-551`. 3-col grid, each card: mono date+event overline, display-18 title, body excerpt, mono teal slug URL, teal tag badges at bottom. Footer "All decks →" ghost button.
-**Est. effort:** 25 min
-**Verification:** Cards have the 5-row structure (date/title/excerpt/url/tags).
+**Goal:** Rewrite homepage Presentations section to match reference `app.jsx:522-551` visual format AND migrate `presentations` data from `src/data/social.ts` to an Astro Content Collection (mirror Phase 7 Speaking pattern). Add new full portfolio index pages at `/{locale}/presentations`. Extract reusable `<PresentationCard>` component. Update `search-index.ts` to query the collection. Keep decks as external links to `s.vedmich.dev/{slug}/` (individual deck pages deferred to future Unified Slides milestone v0.5).
+**Files:** `src/content.config.ts` (schema), `src/content/presentations/{en,ru}/*.md` (12 new files), `src/components/PresentationCard.astro` (new), `src/components/Presentations.astro` (rewrite), `src/pages/{en,ru}/presentations/index.astro` (2 new), `src/data/search-index.ts` (update), `src/data/social.ts` (remove presentations export), `src/i18n/{en,ru}.json` (subtitle {N} interpolation + back_to_home key)
+**Change:** Per `app.jsx:522-551`. 3-col grid, each card: mono date+event overline, display-18 title, body excerpt, mono teal SOLID slug URL (no /80 alpha), teal tag badges (Badge primitive alpha style per D-01). Container `max-w-[1120px]`, section `bg-surface` (zebra-rhythm D-17). Card padding `p-6` (24px D-21), grid gap `gap-5` (20px D-20). "All decks →" header link stays inline (consistency with Speaking Phase 7 per D-04) but target changes from external `s.vedmich.dev` to internal `/{locale}/presentations` index page (D-05). Subtitle interpolates total deck count via `{N}` placeholder (D-13). Whole-card anchor preserved (D-23). All 28 UI decisions locked in `08-CONTEXT.md`, visual contract approved in `08-UI-SPEC.md` (commits `c83f38f`, `f683eb5`).
+**Est. effort:** 3-4 hours (expanded from original 25 min — now includes Content Collection migration mirroring Phase 7 Speaking pattern)
+**Plans:** 3 plans across 2 waves
+**Verification:** 5-row card structure per card (overline/title/description/slug/tags), teal tag badges with visible alpha on bg-surface (fallback to `bg-brand-primary/10` if `/30` on soft token renders too dark), internal "All decks →" link, 2 new index pages generated (total 25 pages), subtitle interpolates total count, no hardcoded hex colors, both locales render identically.
+
+Plans:
+- [ ] 08-01-PLAN.md — Wave 1: Register presentations collection in `content.config.ts` with Zod schema (9 fields, `city: z.string().nullable()` for Slurm/DKT null-city decks, `description` required, `tags` required array, `slides`/`video` optional with URL validation). Update both i18n files — replace hardcoded `6` in `presentations.subtitle` with `{N}` placeholder; add new top-level `back_to_home` key in both locales.
+- [ ] 08-02-PLAN.md — Wave 1 (parallel): Create 12 markdown files (6 EN + 6 RU) from presentations array data. RU files translate `title` and `description` only; `event`, `city`, `tags`, `slides`, `date`, `draft` identical to EN. 3 files per locale have `city: null` (slurm-prompt-engineering, slurm-ai-demo, dkt-workflow — the last normalizes source `location: 'online'` to null). Slides URLs populated with trailing slash `https://s.vedmich.dev/{slug}/`. `video` field omitted per Phase 7 Plan 2 convention (z.string().url() fails on empty string).
+- [ ] 08-03-PLAN.md — Wave 2 (depends 08-01 + 08-02): Create `PresentationCard.astro` reusable component (5-row structure, teal tag Badge per D-01 with Tailwind 4 alpha verification + fallback). Rewrite `Presentations.astro` to query collection, slice top 6, render via `<PresentationCard>`, change container to `max-w-[1120px]`, add `bg-surface`, change "All decks →" target to internal `/{locale}/presentations`, interpolate subtitle count. Create EN + RU `/presentations/` index pages with back-link using new `back_to_home` i18n key. Update `search-index.ts` to query collection (drop dead `locale_urls` logic, widen tags type to `string[]`). Remove `presentations` export from `social.ts`. Build gate verifies 25 pages total and no hardcoded hex.
 
 ---
 
