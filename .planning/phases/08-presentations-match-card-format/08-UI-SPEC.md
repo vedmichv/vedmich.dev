@@ -1,7 +1,8 @@
 ---
 phase: 8
 slug: presentations-match-card-format
-status: draft
+status: approved
+reviewed_at: 2026-04-24
 shadcn_initialized: false
 preset: none
 created: 2026-04-24
