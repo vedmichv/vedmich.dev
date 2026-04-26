@@ -68,7 +68,8 @@
   "blog": {
     "title": "Blog",
     "read_more": "Read more",
-    "all_posts": "All posts"
+    "all_posts": "All posts",
+    "min_read": "min read"
   },
   "contact": {
     "title": "Let's Connect",

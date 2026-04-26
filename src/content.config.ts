@@ -7,8 +7,11 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     date: z.coerce.date(),
-    tags: z.array(z.string()).optional(),
+    tags: z.array(z.string()),
     draft: z.boolean().default(false),
+    author: z.string().default('Viktor Vedmich'),
+    reading_time: z.number().optional(),
+    cover_image: z.string().optional(),
   }),
 });
 
