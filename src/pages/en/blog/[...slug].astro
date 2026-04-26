@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { t } from '../../../i18n/utils';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
@@ -11,8 +12,11 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, remarkPluginFrontmatter } = await render(post);
 const locale = 'en';
+const i = t(locale);
+
+const readingTime = post.data.reading_time ?? remarkPluginFrontmatter.minutesRead;
 ---
 
 <BaseLayout
@@ -26,24 +30,28 @@ const locale = 'en';
       <a href="/en/blog" class="text-sm text-accent hover:text-accent-light transition-colors mb-4 inline-block">
         &larr; Back to blog
       </a>
-      <time class="block text-sm text-text-muted mb-2">
+      <time class="font-mono text-xs text-text-muted mb-2 block">
         {post.data.date.toLocaleDateString('en-US', {
           year: 'numeric',
-          month: 'long',
+          month: 'short',
           day: 'numeric',
         })}
       </time>
-      <h1 class="font-display text-3xl sm:text-4xl font-bold mb-4">{post.data.title}</h1>
+      <h1 class="font-display text-4xl sm:text-5xl font-bold tracking-[-0.02em] mb-4">{post.data.title}</h1>
       <p class="text-lg text-text-muted">{post.data.description}</p>
-      {post.data.tags && (
-        <div class="flex flex-wrap gap-1.5 mt-4">
-          {post.data.tags.map((tag) => (
-            <span class="text-xs px-2 py-0.5 rounded bg-surface border border-border text-text-muted">
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
+      <p class="text-sm text-text-muted mt-3">
+        {post.data.author} · {readingTime} {i.blog.min_read}
+      </p>
+      <div class="flex flex-wrap gap-1.5 mt-4" role="list">
+        {post.data.tags.map((tag) => (
+          <span
+            role="listitem"
+            class="font-mono text-[11px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded text-brand-primary bg-brand-primary-soft/30 border border-brand-primary/40"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
     </header>
 
     <div class="prose prose-invert max-w-none
