@@ -25,4 +25,21 @@ pnpm-debug.log*
 
 # Playwright MCP temp snapshots
 .playwright-mcp/
+.playwright-cli/
 after-*.png
+
+# Claude Code worktrees + user-level skill copies (vv-blog-from-vault stays tracked)
+.claude/worktrees/
+.claude/skills/playwright-cli/
+.claude/settings.local.json
+
+# Visual verification screenshots (live/local/ref captures)
+live-*.png
+local-*.png
+phase*.png
+ref-*.png
+reference-*.png
+
+# Throwaway content dumps from reference captures
+current-content.json
+ref-content.json
