@@ -2,54 +2,42 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { t } from '../../../i18n/utils';
+import BlogCard from '../../../components/BlogCard.astro';
 
 const locale = 'ru';
 const i = t(locale);
 
 const posts = (await getCollection('blog', ({ data, id }) => {
-  return id.startsWith('ru/') && !data.draft;
+  return id.startsWith(`${locale}/`) && !data.draft;
 })).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<BaseLayout title={`${i.blog.title} — Виктор Ведмич`} locale={locale} path="/blog">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20">
-    <h1 class="text-3xl font-bold mb-10">{i.blog.title}</h1>
+<BaseLayout
+  title={`${i.blog.title} — Виктор Ведмич`}
+  description="Заметки по архитектуре, Kubernetes и AI для DevOps — от Виктора Ведмича, Senior SA в AWS."
+  locale={locale}
+  path="/blog"
+>
+  <div class="py-20 sm:py-28">
+    <div class="max-w-[1120px] mx-auto px-6">
+      <a
+        href={`/${locale}/`}
+        class="font-body text-sm text-brand-primary hover:text-brand-primary-hover transition-colors mb-6 inline-block"
+      >
+        ← {i.back_to_home}
+      </a>
 
-    {posts.length > 0 ? (
-      <div class="space-y-6">
-        {posts.map((post) => {
-          const slug = post.id.replace('ru/', '');
-          return (
-            <a
-              href={`/ru/blog/${slug}`}
-              class="group block p-5 rounded-xl bg-surface border border-border card-glow"
-            >
-              <time class="text-xs text-text-muted">
-                {post.data.date.toLocaleDateString('ru-RU', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </time>
-              <h2 class="text-xl font-semibold mt-1 mb-2 group-hover:text-accent transition-colors">
-                {post.data.title}
-              </h2>
-              <p class="text-text-muted">{post.data.description}</p>
-              {post.data.tags && (
-                <div class="flex flex-wrap gap-1.5 mt-3">
-                  {post.data.tags.map((tag) => (
-                    <span class="text-xs px-2 py-0.5 rounded bg-bg border border-border text-text-muted">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </a>
-          );
-        })}
-      </div>
-    ) : (
-      <p class="text-text-muted">Посты появятся скоро...</p>
-    )}
+      <h1 class="font-display text-4xl font-bold mb-12 animate-on-scroll">{i.blog.title}</h1>
+
+      {posts.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {posts.map((post) => (
+            <BlogCard post={post} locale={locale} />
+          ))}
+        </div>
+      ) : (
+        <p class="text-text-muted">Посты появятся скоро...</p>
+      )}
+    </div>
   </div>
 </BaseLayout>
