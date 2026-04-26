@@ -9,14 +9,22 @@ const { locale } = Astro.props;
 const i = t(locale);
 const altLocale = getAlternateLocale(locale);
 
+// Anchor nav targets live on the homepage. When rendered on a subpage
+// (e.g. /en/blog/<slug>/), bare `#anchor` hrefs stay on that subpage —
+// so prefix with the localized home path to route back to the section.
+const homePath = getLocalizedPath('/', locale);
+const currentPath = Astro.url.pathname;
+const isHome = currentPath === homePath || currentPath === `${homePath}index.html`;
+const anchorPrefix = isHome ? '' : homePath;
+
 const navItems = [
-  { href: '#about', label: i.nav.about },
-  { href: '#podcasts', label: i.nav.podcasts },
-  { href: '#book', label: i.nav.book },
-  { href: '#speaking', label: i.nav.speaking },
-  { href: '#presentations', label: i.nav.presentations },
-  { href: '#blog', label: i.nav.blog },
-  { href: '#contact', label: i.nav.contact },
+  { href: `${anchorPrefix}#about`, label: i.nav.about },
+  { href: `${anchorPrefix}#podcasts`, label: i.nav.podcasts },
+  { href: `${anchorPrefix}#book`, label: i.nav.book },
+  { href: `${anchorPrefix}#speaking`, label: i.nav.speaking },
+  { href: `${anchorPrefix}#presentations`, label: i.nav.presentations },
+  { href: `${anchorPrefix}#blog`, label: i.nav.blog },
+  { href: `${anchorPrefix}#contact`, label: i.nav.contact },
 ];
 ---
 
