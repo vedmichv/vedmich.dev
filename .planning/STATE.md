@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
 current_phase: 09 (Blog — 3 posts with correct card format)
-status: phase-complete
-last_updated: "2026-04-24T21:10:00.000Z"
+status: phase-context-gathered
+last_updated: "2026-04-26T19:30:00.000Z"
 progress:
   total_phases: 12
   completed_phases: 6
@@ -17,8 +17,8 @@ progress:
 
 **Current milestone:** v0.4 — Reference Design Audit
 **Current phase:** 09 (Blog — 3 posts with correct card format)
-**Status:** Phase 8 complete — ready to plan Phase 9
-**Last updated:** 2026-04-24
+**Status:** Phase 9 context gathered — ready to plan (scope expanded to 3 waves: card format + skill + content)
+**Last updated:** 2026-04-26
 
 ## Completed phases
 
@@ -74,6 +74,7 @@ None.
 **Plan executed:** 07-02 (Speaking Portfolio — Content Migration) — 2026-04-21T18:36:57Z — `.planning/phases/07-speaking-portfolio/07-02-SUMMARY.md` — commits `92ab775`, `0c27d99` — 1 min 23 sec — 14 markdown files created (7 EN + 7 RU), all talks migrated from social.ts
 **Plan executed:** 07-03 (Speaking Portfolio — Pages and Components) — 2026-04-21T18:42:37Z — `.planning/phases/07-speaking-portfolio/07-03-SUMMARY.md` — commits `2ea5cae`, `82ed3b9`, `d2b856c`, `259b948`, `f457667` — 2 min 41 sec — 4 pages created (slug + index × 2 locales), Speaking.astro rewritten with reference grid layout, speakingEvents removed from social.ts
 **Context gathered:** 8 (Presentations — match card format + portfolio migration) — 2026-04-24 — `.planning/phases/08-presentations-match-card-format/08-CONTEXT.md` — commit `217d7bf` — scope expanded from 25 min card rewrite to Content Collection migration (mirror Phase 7 Speaking pattern); individual deck pages deferred to future Unified Slides milestone v0.5
+**Context gathered:** 9 (Blog — 3 posts with correct card format) — 2026-04-26 — `.planning/phases/09-blog-3-posts-card-format/09-CONTEXT.md` — scope expanded to 3 waves: (1) card rewrite + BlogCard component + index/slug unification + schema tighten (tags required + add author/reading_time/cover_image), (2) create `.claude/skills/vv-blog-from-vault/` project-local skill (vault search + session-recall + draft gen EN+RU + companion links + visuals routing + verify+push), (3) use skill to write 3 posts (karpenter/mcp/manifests) × 2 locales = 6 files. Est. 6-8 hours total. Voice: tech-expert first-person. Vault sources identified per post (karpenter carousel, MCP Warsaw talk, manifests via session recall).
 
 ## Key decisions — Phase 7 Plan 1
 
