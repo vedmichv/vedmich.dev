@@ -166,12 +166,26 @@ Plans:
 ## Phase 9 — Blog: 3 posts with correct card format
 
 **Requirements:** REQ-002
-**Files:** `src/content/blog/{en,ru}/*.md` (6 new files), `src/components/BlogPreview.astro`
+**Goal:** Ship the blog card format matching reference `app.jsx:553-574` AND author 3 vault-grounded posts (EN + RU) using a new reusable project-local skill. Three sequential waves in one phase: (1) UI — extract `<BlogCard>`, rewrite `BlogPreview`, unify `/blog/` index + slug pages, tighten schema, wire reading-time remark plugin; (2) Skill — create `.claude/skills/vv-blog-from-vault/` that delegates to `mermaid-pro`/`excalidraw`/`art`/`viktor-vedmich-design`/`recall`/`episodic-memory`, hard-excludes confidential vault paths, and drives the CLAUDE.md publish flow; (3) Content — use the skill to write karpenter/mcp/manifests posts × 2 locales = 6 markdown files + copy 4 karpenter carousel PNGs to `public/blog-assets/`.
+**Files:**
+- Wave 1: `src/components/BlogCard.astro` (new), `src/components/BlogPreview.astro` (rewrite), `src/pages/{en,ru}/blog/index.astro` (rewrite), `src/pages/{en,ru}/blog/[...slug].astro` (update), `src/content.config.ts` (tighten + 3 new fields), `src/data/search-index.ts` (cleanup), `src/i18n/{en,ru}.json` (add `blog.min_read`), `astro.config.mjs` (remark plugin), `remark-reading-time.mjs` (new), `package.json` (reading-time + mdast-util-to-string dev deps)
+- Wave 2: `.claude/skills/vv-blog-from-vault/SKILL.md` + `scripts/{vault-search.py,session-recall.py,deploy-post.sh}` + `references/{voice-guide,translation-rules,frontmatter-schema,visuals-routing,companion-sources}.md` + `workflows/{new-post,update-post}.md`
+- Wave 3: `src/content/blog/{en,ru}/2026-03-20-karpenter-right-sizing.md` + `src/content/blog/{en,ru}/2026-03-02-mcp-servers-plainly-explained.md` + `src/content/blog/{en,ru}/2026-02-10-why-i-write-kubernetes-manifests-by-hand.md` + `public/blog-assets/2026-03-20-karpenter-right-sizing/*.png` (4 carousel PNGs)
 **Change:**
-- Add 3 posts: karpenter-right-sizing (2026-03-20), mcp-servers-plainly-explained (2026-03-02), why-i-write-kubernetes-manifests-by-hand (2026-02-10). EN + RU (QMD-sourced where possible).
-- BlogPreview card format per `app.jsx:553-574`: mono date overline, display title, body excerpt, teal tag badges. 3-col grid.
-**Est. effort:** 90 min
-**Verification:** 3 cards on homepage match ref format; `/blog/<slug>` renders.
+- BlogCard matches ref `app.jsx:553-574` — 4-row structure (mono date overline / display title / body excerpt / teal tag badges), mirrors `PresentationCard.astro` minus row 4 (slug URL). Section transparent (D-15) so `bg-bg-base` shows through. Container `max-w-[1120px]`, grid `gap-5`, `p-6` card padding per Phase 8 conventions.
+- Slug page gains `{author} · {N} {min_read_label}` byline, mono-xs short-month date (RU strips trailing "г."), `text-4xl sm:text-5xl tracking-[-0.02em]` h1, teal tag badges.
+- Schema tightens `tags` to required + adds `author` (default "Viktor Vedmich") / `reading_time` (remark-computed) / `cover_image` (optional, schema-ready).
+- Skill delegates rather than duplicates: mermaid-pro / excalidraw / art / viktor-vedmich-design / recall / episodic-memory MCP. Vault search enforces `10-AWS/11-Active-Clients/`, `14-Tips-AWS-Internal/`, `16-Amazon-Employer/` hard exclusion.
+- 3 posts per D-06 word counts: karpenter 1500-2500 (reuses 4 carousel PNGs), mcp 800-1200 (cites upcoming DOP202 Warsaw chalk talk), manifests 700-1000 (standalone opinion, recall-grounded).
+- Commit convention: Wave 1/2 use `docs|feat(09-XX):` with Co-Authored-By trailer; Wave 3 content commits use `Post: <title>` plain per CLAUDE.md.
+**Est. effort:** 6-8 hours (expanded from original 90 min — added reusable skill track + deeper schema work)
+**Plans:** 3 plans across 3 sequential waves (waves are sequential — Wave 3 consumes Wave 2 skill, Wave 2 targets Wave 1 schema)
+**Verification:** BlogCard renders 4-row layout; homepage shows 3 newest cards (Karpenter + hello-world + MCP by date desc); `/blog/` index shows all 4 posts in 3-col grid; slug pages render byline + teal tags + larger h1; 3 posts ship as `Post:` commits; ROADMAP Phase 9 marked complete; `npm run build` exits 0 with 6 new dist pages.
+
+Plans:
+- [ ] 09-01-PLAN.md — Wave 1: UI — BlogCard extraction + BlogPreview rewrite + /blog/ index rewrite + slug page updates + schema tighten + reading-time remark plugin + `blog.min_read` i18n key
+- [ ] 09-02-PLAN.md — Wave 2 (depends 09-01): Skill — `.claude/skills/vv-blog-from-vault/` with SKILL.md + 3 scripts + 5 references + 2 workflows; delegates to `mermaid-pro`/`excalidraw`/`art`/`viktor-vedmich-design`/`recall`/`episodic-memory` and enforces confidential vault exclusion
+- [ ] 09-03-PLAN.md — Wave 3 (depends 09-02): Content — 3 posts × 2 locales via the skill, reuse 4 karpenter carousel PNGs per D-39, 3 `Post:` commits + 1 `docs(09):` ROADMAP-close commit, push to main
 
 ---
 
@@ -213,10 +227,12 @@ Plans:
 - [x] Phase 6 complete (Plan 1 implementation done, awaiting user visual verify + push to main)
 - [x] Phase 7 complete (3 plans, commits `8096e60`→`f457667`, 2026-04-21)
 - [x] Phase 8 complete (3 plans, commits `895ef22`→`757ed8e`, 2026-04-24)
-- [ ] Phases 9-12 remaining — **next: Phase 9 (Blog)**
+- [ ] Phases 9-12 remaining — **next: Phase 9 (Blog) — 3 plans across 3 waves, see plan list above**
 - [ ] Live vedmich.dev visually matches `app.jsx` rendering of reference UI kit
 - [ ] Both /en/ and /ru/ render without regression at 1440px + 375px
 - [ ] ⌘K search works on live
 - [ ] Contact form opens on live
 - [ ] `npm run build` = 7 pages, passes
 - [ ] MEMORY updated with completion
+</content>
+</invoke>
