@@ -24,3 +24,14 @@ export function getLocalizedPath(path: string, locale: Locale): string {
 export function getAlternateLocale(locale: Locale): Locale {
   return locale === 'en' ? 'ru' : 'en';
 }
+
+// Rewrite the current pathname's locale prefix to `target`.
+// Keeps the rest of the path intact so the language switcher stays on
+// the same page — e.g. /en/blog/karpenter/ + target=ru → /ru/blog/karpenter/.
+// Falls back to /{target}/ if the path has no locale prefix.
+export function getLocaleSwitchPath(currentPath: string, target: Locale): string {
+  const match = currentPath.match(/^\/(en|ru)(\/.*)?$/);
+  if (!match) return `/${target}/`;
+  const rest = match[2] ?? '/';
+  return `/${target}${rest}`;
+}

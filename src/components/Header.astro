@@ -1,5 +1,5 @@
 ---
-import { t, type Locale, getAlternateLocale, getLocalizedPath } from '../i18n/utils';
+import { t, type Locale, getAlternateLocale, getLocalizedPath, getLocaleSwitchPath } from '../i18n/utils';
 
 interface Props {
   locale: Locale;
@@ -16,6 +16,10 @@ const homePath = getLocalizedPath('/', locale);
 const currentPath = Astro.url.pathname;
 const isHome = currentPath === homePath || currentPath === `${homePath}index.html`;
 const anchorPrefix = isHome ? '' : homePath;
+
+// Language switcher preserves the current path — only swaps the locale segment.
+const enSwitchPath = getLocaleSwitchPath(currentPath, 'en');
+const ruSwitchPath = getLocaleSwitchPath(currentPath, 'ru');
 
 const navItems = [
   { href: `${anchorPrefix}#about`, label: i.nav.about },
@@ -66,14 +70,14 @@ const navItems = [
       <!-- Locale switcher: EN · RU as a single button -->
       <div class="flex items-center font-mono text-xs border border-border rounded-md overflow-hidden">
         <a
-          href={getLocalizedPath('/', 'en')}
+          href={enSwitchPath}
           class={`lang-switch px-2.5 py-1.5 transition-colors ${locale === 'en' ? 'text-text-primary bg-surface' : 'text-text-secondary hover:text-text-primary'}`}
           data-lang="en"
           aria-current={locale === 'en' ? 'page' : undefined}
         >EN</a>
         <span class="text-border-strong select-none px-0" aria-hidden="true">·</span>
         <a
-          href={getLocalizedPath('/', 'ru')}
+          href={ruSwitchPath}
           class={`lang-switch px-2.5 py-1.5 transition-colors ${locale === 'ru' ? 'text-text-primary bg-surface' : 'text-text-secondary hover:text-text-primary'}`}
           data-lang="ru"
           aria-current={locale === 'ru' ? 'page' : undefined}
@@ -119,13 +123,13 @@ const navItems = [
       </li>
       <li class="flex items-center gap-2 text-sm">
         <a
-          href={getLocalizedPath('/', 'en')}
+          href={enSwitchPath}
           class={`lang-switch transition-colors ${locale === 'en' ? 'font-semibold text-text-primary' : 'text-text-muted'}`}
           data-lang="en"
         >EN</a>
         <span class="text-border-strong" aria-hidden="true">·</span>
         <a
-          href={getLocalizedPath('/', 'ru')}
+          href={ruSwitchPath}
           class={`lang-switch transition-colors ${locale === 'ru' ? 'font-semibold text-text-primary' : 'text-text-muted'}`}
           data-lang="ru"
         >RU</a>
