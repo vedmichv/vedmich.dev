@@ -11,14 +11,15 @@
 
 Personal portfolio site for Viktor Vedmich — bio, speaking, podcasts (DKT + AWS RU), book (Cracking the Kubernetes Interview), presentations, blog. Bilingual EN/RU. Static, zero-JS-first.
 
-## Current state (2026-04-21)
+## Current state (2026-04-26)
 
-Deep Signal design system is LIVE (teal #14B8A6 + amber #F59E0B). Hero matches reference artifact pixel-for-pixel on 1440×900 after Phase 4 rewrite. Podcasts section rewritten to reference in Phase 5: asymmetric badge treatment — DKT card keeps PNG logo with white chrome, AWS RU card gets inline amber text badge; music-note SVG dropped; stats now mono muted. Nav active-state IntersectionObserver + scroll-margin-top landed. `CNCF Kubestronaut` rename complete across codebase. Presentations section has 6 decks. Blog has 1 post. Site is stable, auto-deploying.
+Deep Signal design system is LIVE (teal #14B8A6 + amber #F59E0B). Hero matches reference artifact pixel-for-pixel on 1440×900 after Phase 4 rewrite. Podcasts section rewritten to reference in Phase 5: asymmetric badge treatment — DKT card keeps PNG logo with white chrome, AWS RU card gets inline amber text badge; music-note SVG dropped; stats now mono muted. Nav active-state IntersectionObserver + scroll-margin-top landed. `CNCF Kubestronaut` rename complete across codebase. Presentations section has 6 decks via Content Collection (Phase 8). Blog now has 4 posts with proper card format (Phase 9). Site is stable, auto-deploying.
 
-Phases complete: 01-header ✓, 02-search-palette ✓, 03-section-order-about ✓, 04-hero-reference-match ✓, 05-podcasts-badges ✓.
+Phases complete: 01-header ✓, 02-search-palette ✓, 03-section-order-about ✓, 04-hero-reference-match ✓, 05-podcasts-badges ✓, 07-speaking-portfolio ✓, 08-presentations-card-format ✓, 09-blog-3-posts-card-format ✓.
 
 Validated in Phase 4: REQ-011 (4-pill authority strip), REQ-013 (Hero typography reference-match), REQ-014 (Hero height ≤ 540px on 1440×900).
 Validated in Phase 5: REQ-004 (Podcasts monogram badges — DKT logo + AWS RU amber text badge, no music-note SVG, both locales identical DOM).
+Validated in Phase 9: REQ-002 (Blog — 3 posts × 2 locales in card format; `<BlogCard>` component + schema tightening + reading-time remark plugin + RU locale-aware Cyrillic author render; reusable `.claude/skills/vv-blog-from-vault/` skill for future posts). 11 local commits pending push + human visual verification (see `.planning/phases/09-blog-3-posts-card-format/09-HUMAN-UAT.md`).
 
 ## Current milestone: v0.4 — Reference Design Audit
 
