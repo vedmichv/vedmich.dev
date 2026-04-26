@@ -183,7 +183,7 @@ Plans:
 **Verification:** BlogCard renders 4-row layout; homepage shows 3 newest cards (Karpenter + hello-world + MCP by date desc); `/blog/` index shows all 4 posts in 3-col grid; slug pages render byline + teal tags + larger h1; 3 posts ship as `Post:` commits; ROADMAP Phase 9 marked complete; `npm run build` exits 0 with 6 new dist pages.
 
 Plans:
-- [ ] 09-01-PLAN.md — Wave 1: UI — BlogCard extraction + BlogPreview rewrite + /blog/ index rewrite + slug page updates + schema tighten + reading-time remark plugin + `blog.min_read` i18n key
+- [x] 09-01-PLAN.md — Wave 1: UI — BlogCard extraction + BlogPreview rewrite + /blog/ index rewrite + slug page updates + schema tighten + reading-time remark plugin + `blog.min_read` i18n key
 - [ ] 09-02-PLAN.md — Wave 2 (depends 09-01): Skill — `.claude/skills/vv-blog-from-vault/` with SKILL.md + 3 scripts + 5 references + 2 workflows; delegates to `mermaid-pro`/`excalidraw`/`art`/`viktor-vedmich-design`/`recall`/`episodic-memory` and enforces confidential vault exclusion
 - [ ] 09-03-PLAN.md — Wave 3 (depends 09-02): Content — 3 posts × 2 locales via the skill, reuse 4 karpenter carousel PNGs per D-39, 3 `Post:` commits + 1 `docs(09):` ROADMAP-close commit, push to main
 
