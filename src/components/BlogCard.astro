@@ -1,0 +1,51 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../i18n/utils';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  locale: Locale;
+}
+
+const { post, locale } = Astro.props;
+const { data, id } = post;
+
+const slug = id.replace(/^(en|ru)\//, '');
+const href = `/${locale}/blog/${slug}`;
+
+const formattedDate = locale === 'ru'
+  ? data.date
+      .toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })
+      .replace(/\s*г\.?$/, '')
+  : data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<a
+  href={href}
+  class="group flex flex-col p-6 rounded-xl bg-surface border border-border card-glow animate-on-scroll"
+>
+  <!-- Row 1: Date overline (mono) -->
+  <div class="font-mono text-xs text-text-muted mb-2">{formattedDate}</div>
+
+  <!-- Row 2: Title -->
+  <h3 class="font-display text-lg font-semibold leading-snug mt-0 text-text-primary group-hover:text-brand-primary transition-colors">
+    {data.title}
+  </h3>
+
+  <!-- Row 3: Description -->
+  <p class="font-body text-sm text-text-secondary my-2.5 leading-relaxed flex-1">
+    {data.description}
+  </p>
+
+  <!-- Row 4: Tags (teal Badge, reused verbatim from PresentationCard) -->
+  <div class="flex flex-wrap gap-1.5" role="list">
+    {data.tags.map((tag) => (
+      <span
+        role="listitem"
+        class="font-mono text-[11px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded text-brand-primary bg-brand-primary-soft/30 border border-brand-primary/40"
+      >
+        {tag}
+      </span>
+    ))}
+  </div>
+</a>

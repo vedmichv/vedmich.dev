@@ -68,7 +68,8 @@
   "blog": {
     "title": "Блог",
     "read_more": "Читать дальше",
-    "all_posts": "Все посты"
+    "all_posts": "Все посты",
+    "min_read": "мин чтения"
   },
   "contact": {
     "title": "Связаться",
