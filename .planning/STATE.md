@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
 current_phase: 09 (Blog — 3 posts with correct card format)
-status: ui-spec-approved
-last_updated: "2026-04-26T20:26:00.000Z"
+status: executing
+last_updated: "2026-04-26T20:00:42.552Z"
 progress:
-  total_phases: 12
+  total_phases: 9
   completed_phases: 6
   total_plans: 21
   completed_plans: 14
@@ -17,7 +17,7 @@ progress:
 
 **Current milestone:** v0.4 — Reference Design Audit
 **Current phase:** 09 (Blog — 3 posts with correct card format)
-**Status:** Phase 9 UI-SPEC approved (6/6 dimensions PASS) — ready to plan (scope: 3 waves — card format + skill + content)
+**Status:** Ready to execute
 **Last updated:** 2026-04-26
 
 ## Completed phases
@@ -76,6 +76,7 @@ None.
 **Context gathered:** 8 (Presentations — match card format + portfolio migration) — 2026-04-24 — `.planning/phases/08-presentations-match-card-format/08-CONTEXT.md` — commit `217d7bf` — scope expanded from 25 min card rewrite to Content Collection migration (mirror Phase 7 Speaking pattern); individual deck pages deferred to future Unified Slides milestone v0.5
 **Context gathered:** 9 (Blog — 3 posts with correct card format) — 2026-04-26 — `.planning/phases/09-blog-3-posts-card-format/09-CONTEXT.md` — scope expanded to 3 waves: (1) card rewrite + BlogCard component + index/slug unification + schema tighten (tags required + add author/reading_time/cover_image), (2) create `.claude/skills/vv-blog-from-vault/` project-local skill (vault search + session-recall + draft gen EN+RU + companion links + visuals routing + verify+push), (3) use skill to write 3 posts (karpenter/mcp/manifests) × 2 locales = 6 files. Est. 6-8 hours total. Voice: tech-expert first-person. Vault sources identified per post (karpenter carousel, MCP Warsaw talk, manifests via session recall).
 **UI-SPEC approved:** 9 (Blog — 3 posts with correct card format) — 2026-04-26 — `.planning/phases/09-blog-3-posts-card-format/09-UI-SPEC.md` — commit `d91bdc5` — 6/6 dimensions PASS (copywriting, visuals, color, typography, spacing, registry safety) — 579 lines — 44 decisions pre-populated from CONTEXT.md (D-01…D-44), 4 copywriting questions resolved (empty state preserved, no byline prefix, always abbreviated min/мин, RU suffix "г." stripped) — ~92% pre-populated, zero invented tokens — ready for /gsd-plan-phase 9
+**Planned Phase:** 09 (Blog — 3 posts with correct card format) — 3 plans in 3 sequential waves — 2026-04-26 — research HIGH confidence (mermaid-in-Astro native via syntaxHighlight.excludeLangs, reading-time official remark recipe, all 7 delegation skills + all vault paths verified), pattern map 27/28 analogs mapped (PresentationCard→BlogCard 1:1, Presentations→BlogPreview adapter, hello-world→content template, vv-carousel+sync-claude-sessions→skill structure), plan-checker VERIFICATION PASSED iter-3/3 after 2 revision cycles (iter-1 resolved 2 blockers: RU byline Latin-name via `authorDisplay` locale-aware render, Karpenter title restored to REQ-002 verbatim "right-sizing at scale"; iter-2 resolved translation-rule inconsistency by expanding "at scale" → both "в масштабе"/"на масштабе" idioms with usage guidance). Decision-coverage gate override recorded: 37/44 decisions lack explicit `D-NN:` citation in must_haves, but checker Dimension 7 (Context Compliance) PASSED — all decisions semantically honored. User chose "Proceed anyway" — lexical citation not worth a replanning pass.
 
 ## Key decisions — Phase 7 Plan 1
 
