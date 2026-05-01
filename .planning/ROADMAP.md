@@ -48,7 +48,7 @@
 | 8 | h1 letter-spacing | **-0.03em** | `tracking-tight` (-0.025em) | `tracking-[-0.03em]` |
 | 9 | h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
 | 10 | h1 color | 1/1 | Complete    | 2026-05-01 |
-| 11 | Role ("Senior SA @ AWS") | 1/2 | In Progress|  |
+| 11 | Role ("Senior SA @ AWS") | 2/2 | Complete   | 2026-05-01 |
 | 12 | Tagline | Inter 18 mute, margin-top 18, **"AI Engineer" emphasized in text-primary** | `text-lg text-text-muted mb-8` — no emphasis split | Split string so "AI Engineer" wraps in `text-text-primary`; margin-top 18px |
 | 13 | Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
 | 14 | CTA margin-top | 32 | `gap-3` (12 gap) | `mt-8` |
@@ -229,11 +229,11 @@ Plans:
 - Cache invalidation (D-12): filename bypass — new `/vv-logo-hero.png` path replaces `/favicon.svg` in Header; legacy `.ico` overwritten in place; manifest via fresh URL.
 
 **Est. effort:** 20–30 min (2 plans, 2 waves)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 11-01-PLAN.md — Wave 1: devDeps (sharp + png-to-ico) + `scripts/generate-icons.mjs` ESM pipeline + 3 canonical SVG copies to `public/` (md5 gated) + 64×64 optimised hero PNG (≤10 KB budget) + multi-size favicon.ico (16/32/48) + apple-touch-icon (180×180) + android-chrome (192×192 + 512×512) + `site.webmanifest` (D-05 verbatim) + mirror 6 derivatives to `.design-handoff/` (hero renamed `vv-logo-hero-64.png` to preserve 1.87 MB canonical).
-- [ ] 11-02-PLAN.md — Wave 2 (depends 11-01): Swap `Header.astro:39` to `/vv-logo-hero.png` + `alt="Viktor Vedmich"` + `loading="eager" decoding="sync"` (D-02); expand `BaseLayout.astro:35` to 5-line icon+manifest+theme-color block with 4-space indent + `<!-- Icons + PWA manifest -->` comment (D-06); phase-level gates (build 7 pages + i18n invariant 0 matches + no deprecated cyan hex + EN/RU dist markup symmetry).
+- [x] 11-02-PLAN.md — Wave 2 (depends 11-01): Swap `Header.astro:39` to `/vv-logo-hero.png` + `alt="Viktor Vedmich"` + `loading="eager" decoding="sync"` (D-02); expand `BaseLayout.astro:35` to 5-line icon+manifest+theme-color block with 4-space indent + `<!-- Icons + PWA manifest -->` comment (D-06); phase-level gates (build 7 pages + i18n invariant 0 matches + no deprecated cyan hex + EN/RU dist markup symmetry).
 
 **Verification:** `public/` has 11 new/copied assets; `.design-handoff/` has 6 mirror entries + 1.87 MB canonical unchanged (1,957,873 B); Header renders `/vv-logo-hero.png` with `alt="Viktor Vedmich"`; BaseLayout has full icon block + `theme-color #14B8A6` meta; `npm run build` exits 0 with 7 pages; EN + RU dist HTML render new markup symmetrically; zero deprecated cyan (`#06B6D4` / `#22D3EE`) introduced; `grep "favicon\|vv-logo" src/i18n/*.json` returns 0 matches; `scripts/generate-icons.mjs` is idempotent (re-running produces md5-identical outputs).
 
