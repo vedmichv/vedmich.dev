@@ -73,7 +73,23 @@
   },
   "contact": {
     "title": "Let's Connect",
-    "subtitle": "Find me on these platforms"
+    "subtitle": "Find me on these platforms",
+    "write_me_cta": "Write me a message",
+    "form": {
+      "name_label": "Name",
+      "name_placeholder": "Your name",
+      "email_label": "Email",
+      "email_placeholder": "you@domain.com",
+      "message_label": "Message",
+      "message_placeholder": "What should we build?",
+      "send": "Send",
+      "cancel": "Cancel"
+    },
+    "success": {
+      "heading": "Check your email client",
+      "body": "Your default mail app should have opened with a draft. Send when ready — I usually reply within a day or two.",
+      "close": "Close"
+    }
   },
   "footer": {
     "built_with": "Built with Astro",
