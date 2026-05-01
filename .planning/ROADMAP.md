@@ -192,11 +192,23 @@ Plans:
 
 ## Phase 10 — Contact: letter badges + working form
 
+**Goal:** Rewrite `src/components/Contact.astro` to match reference `app.jsx:577-632` — 5-col grid of letter badges (L / G / Y / 𝕏 / T) above a primary teal "Write me a message" CTA that expands in place into a Name / Email / Message form. Form builds a `mailto:viktor@vedmich.dev?subject=…&body=…` URL and hands off to the user's mail client. After submit, the Card swaps to an honest success state (`✓ Check your email client` — NOT `✓ Message sent` because we cannot truthfully claim delivery via mailto). All 37 decisions locked in `10-CONTEXT.md` (mailto backend D-01…D-04, instant state swap D-05…D-08, HTML5-only validation D-09…D-12, honest success copy D-13…D-17, letter-grid visuals D-18…D-22, form Card visuals D-23…D-28, i18n keys D-29…D-30, vanilla-TS island D-31…D-34, noscript fallback D-35, remove SVG sprite D-36, `social.ts` untouched D-37 per Footer dependency).
+
 **Requirements:** REQ-006 (upgraded — form must be functional, not CTA)
-**Files:** `src/components/Contact.astro`, `src/i18n/{en,ru}.json`
-**Change:** Per `app.jsx:577-632`. 5-col grid of square cards (LinkedIn, GitHub, YouTube, X, Telegram) — teal display-22 letter centered (X uses `𝕏`), platform name below. Below: "Write me a message" primary button → expands to Name/Email/Message form → success state `✓ Message sent`. Form submits via mailto: or Formspree endpoint (ask user for preference during execution).
-**Est. effort:** 60 min
-**Verification:** Letter badges in grid, form opens/submits, success state shows.
+**Files:** `src/components/Contact.astro` (full rewrite), `src/i18n/en.json` (+11 keys), `src/i18n/ru.json` (+11 keys mirror)
+**Change:** Single atomic rewrite. Letter badges use canonical Deep Signal tokens (`bg-bg-base`, `border-border`, `text-brand-primary`, `card-glow`). CTA + Send reuse Book's Phase 6 primary button shape swapped amber→teal. Form Card is `bg-bg-surface` non-hoverable; inputs `bg-bg-base` + `focus-visible:ring-brand-primary/40`. Success panel teal ✓ glyph (not `--success` emerald — ref is explicit). Island is ~60 lines vanilla TS mirroring SearchPalette null-guarded IIFE, state machine via `data-state` attribute on section root, ESC scoped to section (D-34 — avoids SearchPalette global ESC conflict). `<noscript>` fallback exposes plain `mailto:viktor@vedmich.dev` anchor for JS-off visitors. `src/data/social.ts` is untouched — Footer.astro still destructures `icon` field (D-37 resolution per 10-PATTERNS.md §4).
+
+**Security (T-10-01 HIGH):** mailto URL injection via CRLF in user fields. Mitigated via `encodeURIComponent()` on every interpolated value — verified by grep gate (`encodeURIComponent` must appear ≥ 3× in Contact.astro).
+
+**Pre-flight (D-03, user responsibility):** MX for `vedmich.dev` must be configured and `viktor@vedmich.dev` must receive mail. Phase 10 cannot close on live until this is verified — test by sending a mail to the address from an external account.
+
+**Est. effort:** 45 min
+**Plans:** 1 plan
+
+Plans:
+- [ ] 10-01-PLAN.md — Wave 1: Rewrite Contact.astro wholesale (letter grid + inline-expand form + success state + vanilla-TS island with scoped ESC + noscript fallback) + add 11 new `contact.*` i18n keys in both `en.json` and `ru.json` (bilingual atomic edit) + T-10-01 encodeURIComponent mitigation + token/hex hygiene + build gate.
+
+**Verification:** 5 letter badges render with 𝕏 literal Unicode, CTA → form → success state cycle works with Cancel/ESC/Close all returning to CTA, mailto URL properly URL-encoded, success copy honest ("Check your email client"), both locales render identically, `<noscript>` mailto anchor present for JS-off path, zero hex literals in Contact.astro, zero deprecated cyan, `npm run build` exits 0.
 
 ---
 
@@ -235,5 +247,3 @@ Plans:
 - [ ] Contact form opens on live
 - [ ] `npm run build` = 7 pages, passes
 - [ ] MEMORY updated with completion
-</content>
-</invoke>
