@@ -10,13 +10,13 @@ const { locale } = Astro.props;
 const i = t(locale);
 ---
 
-<section id="contact" data-state="cta" class="py-20 sm:py-28">
+<section id="contact" data-state="cta" class="py-20 sm:py-28 bg-surface/30">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
     <h2 class="font-display text-3xl font-bold mb-3 animate-on-scroll">{i.contact.title}</h2>
     <p class="text-text-muted mb-10 animate-on-scroll">{i.contact.subtitle}</p>
 
-    {/* Letter-badge grid — whole-card anchors per D-18/19/20/21/22 */}
-    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8 animate-on-scroll max-w-[640px] mx-auto">
+    {/* Social chips — compact inline pills, flex-wrap per reference */}
+    <div class="flex flex-wrap justify-center gap-3 mb-8 animate-on-scroll">
       {socialLinks.map(({ name, url, icon }) => {
         const isX = icon === 'twitter';
         const letter = isX ? '𝕏' : Array.from(name)[0];
@@ -26,11 +26,11 @@ const i = t(locale);
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            class="flex flex-col items-center justify-center gap-2 p-5 rounded-[10px] bg-bg-base border border-border card-glow"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-bg-base border border-border card-glow"
             aria-label={`${displayName} (${i.contact.opens_in_new_tab})`}
           >
-            <span class="font-display text-[22px] font-bold text-brand-primary leading-none">{letter}</span>
-            <span class="font-body text-[13px] text-text-primary">{displayName}</span>
+            <span class="font-display text-[16px] font-bold text-brand-primary leading-none">{letter}</span>
+            <span class="font-body text-[14px] text-text-primary">{displayName}</span>
           </a>
         );
       })}
