@@ -5,6 +5,8 @@ date: 2026-03-20
 tags: ["kubernetes", "aws", "karpenter"]
 ---
 
+import PodLifecycleAnimation from '../../../components/PodLifecycleAnimation.astro';
+
 Salesforce runs Karpenter on more than 1,000 production Kubernetes clusters. Switching from Cluster Autoscaler cut their cluster cost by 70% and dropped provisioning time below 60 seconds. Here is what they figured out — and the three traps most teams hit before they get to those numbers.
 
 ## Why Karpenter is different
@@ -14,6 +16,13 @@ Cluster Autoscaler scales node groups. Karpenter scales nodes.
 That sounds trivial until you realize what it means: CA needs you to pre-define instance types in node groups before autoscaling can pick one. Karpenter looks at pending pod requirements — CPU, memory, architecture, availability zone, instance family — and provisions whatever fits, without you creating a dozen node groups.
 
 The result: faster provisioning (sub-60 seconds vs 3-5 minutes), better bin-packing (Karpenter consolidates underutilized nodes automatically), and direct cloud-provider integration (no polling lag — Karpenter watches the Kubernetes API server and acts immediately).
+
+<PodLifecycleAnimation
+  title="What sub-60-second provisioning looks like"
+  caption="kubectl apply → API server writes to etcd · scheduler picks a node · kubelet spawns the pods"
+/>
+
+That path — `kubectl` through the API server, etcd and scheduler, into kubelet, then pods running — is what Karpenter accelerates. Cluster Autoscaler adds a polling loop between "pod pending" and "new node requested"; Karpenter watches the API directly.
 
 But speed and flexibility come with risk. If you don't constrain Karpenter, it will provision a 96-core instance for 3 small pods. I've seen staging bills double overnight because a team forgot to set NodePool limits. Let's walk through the three traps.
 
