@@ -1,8 +1,9 @@
 ---
 phase: 10-contact-letter-badges-working-form
 verified: 2026-05-01T17:00:00Z
-status: human_needed
-score: 10/10 must-haves verified (automated); 2 human verifications pending
+resolved_at: 2026-05-01T17:10:00Z
+status: passed
+score: 10/10 must-haves verified; human UAT approved (commit 7d7afe1 polish reviewed by user)
 overrides_applied: 0
 re_verification:
   previous_status: not_applicable

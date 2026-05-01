@@ -47,7 +47,7 @@
 | 7 | h1 weight | 700 | `font-bold` (700) ✓ | keep |
 | 8 | h1 letter-spacing | **-0.03em** | `tracking-tight` (-0.025em) | `tracking-[-0.03em]` |
 | 9 | h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
-| 10 | h1 color | 1/1 | Complete   | 2026-05-01 |
+| 10 | h1 color | 1/1 | Complete    | 2026-05-01 |
 | 11 | Role ("Senior SA @ AWS") | mono **amber 18px**, margin-top 12 | `font-mono text-xl sm:text-2xl text-warm-light font-medium` (20→24px) | `font-mono text-lg text-warm mt-3` (18px amber) |
 | 12 | Tagline | Inter 18 mute, margin-top 18, **"AI Engineer" emphasized in text-primary** | `text-lg text-text-muted mb-8` — no emphasis split | Split string so "AI Engineer" wraps in `text-text-primary`; margin-top 18px |
 | 13 | Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
