@@ -115,15 +115,36 @@ Note: `theme-color` hex literal is OK here — meta-tag values can't reference C
 
 ### D-07 · .design-handoff/ sync — Mirror new derivatives
 
-Every new file produced (`vv-logo-hero.png` optimised, `favicon.ico` regenerated, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `site.webmanifest`) is ALSO copied to `.design-handoff/deep-signal-design-system/project/assets/`.
+New derivatives mirrored to `.design-handoff/deep-signal-design-system/project/assets/`:
+- `vv-logo-hero-64.png` (optimised 64×64, ≤10 KB) — **renamed** in mirror to preserve the existing 1.87 MB canonical `vv-logo-hero.png` alongside it (clarified 2026-05-01)
+- `favicon.ico` (regenerated multi-size)
+- `apple-touch-icon.png`
+- `android-chrome-192x192.png`
+- `android-chrome-512x512.png`
+- `site.webmanifest`
 
-**Why:** `.design-handoff/` is the archival single-source-of-truth. Existing 4 files already md5-match vault → skill → public. Keeping new derivatives in the bundle prevents divergence later.
+**Why:** `.design-handoff/` is the archival single-source-of-truth at FULL FIDELITY. Existing 4 files already md5-match vault → skill (and now will match `public/` after the SVG copy in D-13). The 1.87 MB `vv-logo-hero.png` in `.design-handoff/` stays intact; the optimised derivative sits beside it under a distinct name.
 
-### D-08 · Source assets stay
+### D-08 · Source assets stay in .design-handoff/
 
-The 4 canonical files already in `public/` (`vv-favicon.svg`, `vv-logo-primary.svg`, `vv-logo-inverse.svg`, `vv-logo-hero.png` @ 2.0 MB) STAY — they are brand source-of-truth at full resolution. Only the Header rewires to the optimised derivative.
+The 4 canonical files in `.design-handoff/deep-signal-design-system/project/assets/` (`vv-favicon.svg`, `vv-logo-primary.svg`, `vv-logo-inverse.svg`, `vv-logo-hero.png` @ 1.87 MB) STAY — they are the brand archival source-of-truth at full resolution. Only the Header rewires to a new optimised derivative in `public/`.
 
-**No rename/delete** — the heavy `vv-logo-hero.png` remains available for OG/LinkedIn previews and future full-res contexts.
+**Correction (2026-05-01):** CONTEXT.md originally asserted those 4 files already lived in `public/`. Filesystem check (pattern-mapper) proved otherwise — `public/` currently only contains `CNAME`, `favicon.ico`, `favicon.svg`. D-13 below handles the full 3-SVG copy into `public/`.
+
+### D-13 · Copy 3 canonical SVGs → public/ (REQ-007 acceptance)
+
+REQ-007 acceptance explicitly requires all 3 SVGs to exist in `public/` (plus `.design-handoff/`). Currently only `public/favicon.svg` (md5 `60221f18…` matching `vv-favicon.svg`) exists.
+
+**Action:** Copy from `~/.claude/skills/viktor-vedmich-design/assets/` (md5-authoritative source):
+- `vv-favicon.svg` → `public/vv-favicon.svg`
+- `vv-logo-primary.svg` → `public/vv-logo-primary.svg`
+- `vv-logo-inverse.svg` → `public/vv-logo-inverse.svg`
+
+Verify post-copy md5s match `.design-handoff/deep-signal-design-system/project/assets/` (they already md5-match the skill assets).
+
+**Why:** Closes REQ-007 acceptance fully. Enables future OG/LinkedIn preview templates and light/dark logo variants without a follow-up phase.
+
+**Note:** `public/favicon.svg` (byte-identical to `vv-favicon.svg`) remains — the existing BaseLayout icon link points to it and serves the short `favicon.svg` name for browser default discovery.
 
 ### D-09 · Build tooling — inline script, not a dependency
 
@@ -170,15 +191,18 @@ MANDATORY reads for planner and executor:
 
 ## Existing Code Insights
 
-### Current surface
+### Current surface (verified 2026-05-01 by pattern-mapper)
 
-- `public/favicon.ico` (655 B, 2026-04-19) — **stale**, predates Deep Signal refresh.
-- `public/favicon.svg` (1.5 KB) — byte-identical to `public/vv-favicon.svg` (both md5 `60221f18…`). Currently active via BaseLayout:35.
-- `public/vv-logo-primary.svg` (1.7 KB), `public/vv-logo-inverse.svg` (1.8 KB), `public/vv-favicon.svg` (1.5 KB) — canonical Deep Signal, md5-match vault + skill.
-- `public/vv-logo-hero.png` (2.0 MB) — high-res source, NOT referenced by any component currently.
+- `public/` contains **only** `CNAME` (12 B), `favicon.ico` (655 B, 2026-04-19), `favicon.svg` (1.5 KB, 2026-04-19) plus subdirs (`blog-assets/`, `fonts/`, `images/`).
+- `public/favicon.ico` — **stale**, predates Deep Signal refresh.
+- `public/favicon.svg` (1.5 KB) — md5 `60221f18…`, matches `~/.claude/skills/viktor-vedmich-design/assets/vv-favicon.svg`. Currently active via BaseLayout:35.
+- **Not yet in `public/`:** `vv-favicon.svg`, `vv-logo-primary.svg`, `vv-logo-inverse.svg`, `vv-logo-hero.png` — live only in skill assets + `.design-handoff/`. D-13 copies them in.
+- `.design-handoff/deep-signal-design-system/project/assets/` contains: `vv-favicon.svg`, `vv-logo-primary.svg`, `vv-logo-inverse.svg`, `vv-logo-hero.png` (1.87 MB full-res).
 - `src/components/Header.astro:39` — serves `/favicon.svg` (NOT the reference's `vv-logo-hero.png`).
 - `src/components/Footer.astro` — no logo/favicon usage (only social-icon SVG paths inlined).
 - `src/layouts/BaseLayout.astro:35` — only `<link rel="icon" type="image/svg+xml">`, no apple-touch-icon, no manifest, no theme-color.
+- `scripts/` directory does NOT exist — D-09's `scripts/generate-icons.mjs` means creating the dir.
+- `package.json` devDependencies: only `mdast-util-to-string`, `reading-time`. Neither `sharp` nor `png-to-ico` installed.
 
 ### Reference pattern
 
@@ -220,7 +244,8 @@ None — no pending todos matched Phase 11 scope.
 
 A successful Phase 11 means:
 
-- [ ] `public/vv-logo-hero.png` exists at ≤10 KB (not the original 2 MB).
+- [ ] `public/vv-logo-hero.png` exists, ≤10 KB, 64×64 (generated derivative — NOT the 1.87 MB full-res, which stays in `.design-handoff/`).
+- [ ] `public/vv-favicon.svg`, `public/vv-logo-primary.svg`, `public/vv-logo-inverse.svg` exist (md5-match skill + `.design-handoff/` sources — D-13 REQ-007 acceptance).
 - [ ] `public/favicon.ico` regenerated from `vv-favicon.svg`, multi-size 16/32/48.
 - [ ] `public/apple-touch-icon.png` (180×180), `public/android-chrome-192x192.png`, `public/android-chrome-512x512.png` exist.
 - [ ] `public/site.webmanifest` exists with content per D-05.
@@ -230,7 +255,7 @@ A successful Phase 11 means:
 - [ ] Browser tab favicon shows the Deep Signal teal V on hard-reload in Chrome + Safari.
 - [ ] Adding the site to iOS home screen shows the teal-V logo, not a page screenshot.
 - [ ] `npm run build` exits 0, 7 pages emit, no asset warnings.
-- [ ] All new/regenerated artifacts mirrored into `.design-handoff/deep-signal-design-system/project/assets/`.
+- [ ] New artifacts mirrored into `.design-handoff/deep-signal-design-system/project/assets/`: `vv-logo-hero-64.png` (renamed in mirror to preserve 1.87 MB canonical), `favicon.ico`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `site.webmanifest`. The 1.87 MB `vv-logo-hero.png` already in `.design-handoff/` is NOT overwritten.
 - [ ] No hex literals added to `src/` (only `theme-color` meta tag contains `#14B8A6`, justified by D-06).
 - [ ] `scripts/generate-icons.mjs` committed; re-runnable.
 - [ ] Both `/en/` and `/ru/` render unchanged except for the Header logo swap.
