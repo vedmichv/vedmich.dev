@@ -49,7 +49,7 @@
 | 9 | h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
 | 10 | h1 color | 1/1 | Complete    | 2026-05-01 |
 | 11 | Role ("Senior SA @ AWS") | 2/2 | Complete    | 2026-05-01 |
-| 12 | Tagline | 1/1 | Complete   | 2026-05-01 |
+| 12 | Tagline | 1/1 | Complete    | 2026-05-01 |
 | 13 | Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
 | 14 | CTA margin-top | 32 | `gap-3` (12 gap) | `mt-8` |
 | 15 | Cursor | inline `_` char, teal, blinking opacity | `<span class="typing-cursor text-brand-primary-hover">` (CSS pseudo `|`) | keep current — visually equivalent |
