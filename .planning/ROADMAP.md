@@ -243,8 +243,12 @@ Plans:
 
 **Requirements:** NEW REQ-012
 **Files:** `src/components/Footer.astro`
-**Change:** Per `app.jsx:640-648`. Simple two-column flex: `© {year} Viktor Vedmich` left, `Built with Astro` right. 32px padding, top border.
+**Change:** Per `app.jsx:640-648`. Simple two-column flex: `© {year} Viktor Vedmich` left, `Built with Astro` right. 32px padding, top border. 5 social-icon SVGs + `socialLinks` import deleted (contacts live in Contact section via Phase 10). Container aligned to canonical v0.4 `max-w-[1120px]`. Solid `border-border` + `text-[13px]` + dynamic `new Date().getFullYear()` + bilingual i18n preserved (`footer.copyright` + `footer.built_with`). Target: ~14 LOC (from 43). Closes v0.4-reference-audit milestone.
 **Est. effort:** 10 min
+**Plans:** 1 plan
+
+Plans:
+- [ ] 12-01-PLAN.md — Wave 1: Full rewrite of `src/components/Footer.astro` to reference target shape (delete 5 SVG blocks + `socialLinks` import + nested flex wrapper; swap `max-w-6xl` → `max-w-[1120px]`; drop `bg-surface/30` + border `/50` alpha; bump `text-sm` → `text-[13px]`; two sibling spans in `flex items-center justify-between`) + token/hex hygiene + build gate (7 pages) + EN/RU dist symmetry check.
 
 ---
 
