@@ -48,7 +48,7 @@
 | 8 | h1 letter-spacing | **-0.03em** | `tracking-tight` (-0.025em) | `tracking-[-0.03em]` |
 | 9 | h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
 | 10 | h1 color | 1/1 | Complete    | 2026-05-01 |
-| 11 | Role ("Senior SA @ AWS") | mono **amber 18px**, margin-top 12 | `font-mono text-xl sm:text-2xl text-warm-light font-medium` (20→24px) | `font-mono text-lg text-warm mt-3` (18px amber) |
+| 11 | Role ("Senior SA @ AWS") | 1/2 | In Progress|  |
 | 12 | Tagline | Inter 18 mute, margin-top 18, **"AI Engineer" emphasized in text-primary** | `text-lg text-text-muted mb-8` — no emphasis split | Split string so "AI Engineer" wraps in `text-text-primary`; margin-top 18px |
 | 13 | Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
 | 14 | CTA margin-top | 32 | `gap-3` (12 gap) | `mt-8` |
@@ -214,10 +214,28 @@ Plans:
 
 ## Phase 11 — Logo + favicon refresh
 
+**Goal:** Adopt canonical Deep Signal brand assets as browser-surface icons — swap Header `<img>` from `/favicon.svg` to an optimised `/vv-logo-hero.png` (64×64, ≤10 KB, rendered 32×32 via CSS) with a11y `alt="Viktor Vedmich"`; regenerate multi-size `favicon.ico` (16/32/48) from Deep Signal SVG; add full icon coverage (apple-touch-icon 180×180 + android-chrome 192/512 + `site.webmanifest` with theme_color `#14B8A6` + background_color `#0F172A`); expand BaseLayout `<head>` to 5-tag icon+manifest+theme-color block; copy 3 canonical SVGs (`vv-favicon`, `vv-logo-primary`, `vv-logo-inverse`) from skill assets into `public/`; mirror all new derivatives to `.design-handoff/deep-signal-design-system/project/assets/` with hero renamed to `vv-logo-hero-64.png` so the 1.87 MB canonical stays intact. Generation via committed, re-runnable `scripts/generate-icons.mjs` (sharp + png-to-ico). All 13 decisions locked in `11-CONTEXT.md`.
+
 **Requirements:** REQ-007
-**Files:** `public/vv-logo-primary.svg`, `public/vv-logo-inverse.svg`, `public/favicon.svg`, `.design-handoff/deep-signal-design-system/project/assets/*`, `public/vv-logo-hero.png` (new, from skill assets)
-**Change:** Copy from `~/Documents/ViktorVedmich/40-Content/45-Personal-Brand/45.20-Brand-Kit/logo/exports/` + `/Users/viktor/.claude/skills/viktor-vedmich-design/assets/`. Verify Header uses `vv-logo-hero.png` (32×32, radius 7) per ref.
-**Est. effort:** 15 min
+**Files:**
+- Wave 1 (tooling + assets): `package.json` + `package-lock.json` (sharp + png-to-ico devDeps); `scripts/generate-icons.mjs` (new); `public/vv-favicon.svg` / `public/vv-logo-primary.svg` / `public/vv-logo-inverse.svg` (new, canonical SVG copies); `public/vv-logo-hero.png` (new, 64×64 optimised); `public/favicon.ico` (regenerated multi-size); `public/apple-touch-icon.png` (new); `public/android-chrome-192x192.png` (new); `public/android-chrome-512x512.png` (new); `public/site.webmanifest` (new); 6 mirror copies in `.design-handoff/deep-signal-design-system/project/assets/` (hero renamed `vv-logo-hero-64.png`).
+- Wave 2 (component wiring): `src/components/Header.astro:39` (swap `<img>`); `src/layouts/BaseLayout.astro:35` (expand to 5-tag icon+manifest+theme-color block).
+
+**Change:**
+- `scripts/generate-icons.mjs` — ESM one-shot (`node scripts/generate-icons.mjs`), enforces 10 KB hero PNG budget, renders 16/32/48 PNGs for favicon.ico packaging, renders 180/192/512 platform rasters from `vv-favicon.svg`, writes webmanifest with `theme_color: "#14B8A6"` and `background_color: "#0F172A"` (hex literals allowed per D-06 — JSON/meta can't reference CSS vars, REQ-007 tracks exception), and mirrors 6 derivatives into `.design-handoff/` (hero renamed to preserve 1.87 MB canonical).
+- Header markup: `alt="Viktor Vedmich"` (user a11y-first over reference's `alt="VV"` per D-02); keep `rounded-[7px]` + `w-8 h-8` (reference parity); add `loading="eager" decoding="sync"` (above-the-fold).
+- BaseLayout block: `<!-- Icons + PWA manifest -->` header + SVG icon link + multi-size ICO fallback + apple-touch-icon link + manifest link + theme-color meta (4-space indent, sibling style mirrors fonts-preload block).
+- No i18n changes (D-11: asset-name leakage check `grep "favicon\|vv-logo" src/i18n/*.json` must stay at 0).
+- Cache invalidation (D-12): filename bypass — new `/vv-logo-hero.png` path replaces `/favicon.svg` in Header; legacy `.ico` overwritten in place; manifest via fresh URL.
+
+**Est. effort:** 20–30 min (2 plans, 2 waves)
+**Plans:** 1/2 plans executed
+
+Plans:
+- [x] 11-01-PLAN.md — Wave 1: devDeps (sharp + png-to-ico) + `scripts/generate-icons.mjs` ESM pipeline + 3 canonical SVG copies to `public/` (md5 gated) + 64×64 optimised hero PNG (≤10 KB budget) + multi-size favicon.ico (16/32/48) + apple-touch-icon (180×180) + android-chrome (192×192 + 512×512) + `site.webmanifest` (D-05 verbatim) + mirror 6 derivatives to `.design-handoff/` (hero renamed `vv-logo-hero-64.png` to preserve 1.87 MB canonical).
+- [ ] 11-02-PLAN.md — Wave 2 (depends 11-01): Swap `Header.astro:39` to `/vv-logo-hero.png` + `alt="Viktor Vedmich"` + `loading="eager" decoding="sync"` (D-02); expand `BaseLayout.astro:35` to 5-line icon+manifest+theme-color block with 4-space indent + `<!-- Icons + PWA manifest -->` comment (D-06); phase-level gates (build 7 pages + i18n invariant 0 matches + no deprecated cyan hex + EN/RU dist markup symmetry).
+
+**Verification:** `public/` has 11 new/copied assets; `.design-handoff/` has 6 mirror entries + 1.87 MB canonical unchanged (1,957,873 B); Header renders `/vv-logo-hero.png` with `alt="Viktor Vedmich"`; BaseLayout has full icon block + `theme-color #14B8A6` meta; `npm run build` exits 0 with 7 pages; EN + RU dist HTML render new markup symmetrically; zero deprecated cyan (`#06B6D4` / `#22D3EE`) introduced; `grep "favicon\|vv-logo" src/i18n/*.json` returns 0 matches; `scripts/generate-icons.mjs` is idempotent (re-running produces md5-identical outputs).
 
 ---
 
