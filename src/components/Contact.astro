@@ -17,16 +17,17 @@ const i = t(locale);
 
     {/* Letter-badge grid — whole-card anchors per D-18/19/20/21/22 */}
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8 animate-on-scroll max-w-[640px] mx-auto">
-      {socialLinks.map(({ name, url }) => {
-        const letter = name.startsWith('X') ? '𝕏' : name[0];
-        const displayName = name.startsWith('X') ? 'X' : name;
+      {socialLinks.map(({ name, url, icon }) => {
+        const isX = icon === 'twitter';
+        const letter = isX ? '𝕏' : Array.from(name)[0];
+        const displayName = isX ? 'X' : name;
         return (
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
             class="flex flex-col items-center justify-center gap-2 p-5 rounded-[10px] bg-bg-base border border-border card-glow"
-            aria-label={`${displayName} (opens in new tab)`}
+            aria-label={`${displayName} (${i.contact.opens_in_new_tab})`}
           >
             <span class="font-display text-[22px] font-bold text-brand-primary leading-none">{letter}</span>
             <span class="font-body text-[13px] text-text-primary">{displayName}</span>
@@ -35,15 +36,18 @@ const i = t(locale);
       })}
     </div>
 
-    {/* CTA state — primary teal button + noscript fallback (D-23/24/35) */}
-    <div class="mt-8 animate-on-scroll" data-contact-cta-wrapper>
-      <button
-        type="button"
-        data-contact-open-form
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-primary text-bg-base font-body text-[15px] font-medium hover:bg-brand-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-      >
-        {i.contact.write_me_cta}
-      </button>
+    {/* CTA state — primary teal button + noscript fallback (D-23/24/35).
+        noscript anchor sits OUTSIDE animate-on-scroll so JS-off visitors see it (CR-01 fix). */}
+    <div class="mt-8" data-contact-cta-wrapper>
+      <div class="animate-on-scroll">
+        <button
+          type="button"
+          data-contact-open-form
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-primary text-bg-base font-body text-[15px] font-medium hover:bg-brand-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+        >
+          {i.contact.write_me_cta}
+        </button>
+      </div>
       <noscript>
         <a
           href="mailto:viktor@vedmich.dev"
@@ -63,7 +67,7 @@ const i = t(locale);
             required
             type="text"
             name="name"
-            minlength="1"
+            autocomplete="name"
             placeholder={i.contact.form.name_placeholder}
             class="bg-bg-base text-text-primary border border-border rounded-lg px-[14px] py-[10px] font-body text-[15px] outline-none focus-visible:border-brand-primary focus-visible:ring-1 focus-visible:ring-brand-primary/40 placeholder:text-text-muted"
           />
@@ -74,6 +78,7 @@ const i = t(locale);
             required
             type="email"
             name="email"
+            autocomplete="email"
             placeholder={i.contact.form.email_placeholder}
             class="bg-bg-base text-text-primary border border-border rounded-lg px-[14px] py-[10px] font-body text-[15px] outline-none focus-visible:border-brand-primary focus-visible:ring-1 focus-visible:ring-brand-primary/40 placeholder:text-text-muted"
           />
@@ -85,6 +90,7 @@ const i = t(locale);
             name="message"
             rows="4"
             minlength="10"
+            autocomplete="off"
             placeholder={i.contact.form.message_placeholder}
             class="bg-bg-base text-text-primary border border-border rounded-lg px-[14px] py-[10px] font-body text-[15px] outline-none focus-visible:border-brand-primary focus-visible:ring-1 focus-visible:ring-brand-primary/40 placeholder:text-text-muted resize-y"
           ></textarea>
@@ -107,12 +113,20 @@ const i = t(locale);
       </form>
     </div>
 
-    {/* Success state — honest copy per D-13/14/15/16 */}
-    <div class="max-w-[480px] mx-auto mt-8 p-6 rounded-xl bg-bg-surface border border-border" data-contact-success-wrapper>
+    {/* Success state — honest copy per D-13/14/15/16.
+        role=status + aria-live announces the panel change to SR users (WR-02 fix). */}
+    <div class="max-w-[480px] mx-auto mt-8 p-6 rounded-xl bg-bg-surface border border-border" data-contact-success-wrapper role="status" aria-live="polite">
       <div class="text-center py-5">
         <div class="font-mono text-[32px] text-brand-primary leading-none" aria-hidden="true">✓</div>
-        <h3 class="font-display text-[20px] text-text-primary my-2">{i.contact.success.heading}</h3>
+        <h3 tabindex="-1" data-contact-success-heading class="font-display text-[20px] text-text-primary my-2 outline-none">{i.contact.success.heading}</h3>
         <p class="font-body text-text-muted m-0">{i.contact.success.body}</p>
+        <p class="font-body text-[13px] text-text-muted mt-2 m-0">
+          {i.contact.success.fallback}{' '}
+          <a
+            href="mailto:viktor@vedmich.dev"
+            class="text-brand-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface rounded"
+          >viktor@vedmich.dev</a>.
+        </p>
         <button
           type="button"
           data-contact-close-success
@@ -151,13 +165,26 @@ const i = t(locale);
   const cancelBtn = section?.querySelector<HTMLButtonElement>('[data-contact-cancel]');
   const closeBtn = section?.querySelector<HTMLButtonElement>('[data-contact-close-success]');
   const nameInput = form?.querySelector<HTMLInputElement>('input[name="name"]');
+  const successHeading = section?.querySelector<HTMLElement>('[data-contact-success-heading]');
 
-  if (section && openBtn && form && cancelBtn && closeBtn && nameInput) {
+  if (section && openBtn && form && cancelBtn && closeBtn && nameInput && successHeading) {
+    let lastFocused: HTMLElement | null = null;
+
     function setState(next: ContactState): void {
+      if (next === 'form' || next === 'success') {
+        const active = document.activeElement as HTMLElement | null;
+        if (active && active !== document.body) {
+          lastFocused = active;
+        }
+      }
       section!.setAttribute('data-state', next);
       if (next === 'form') {
-        // Match SearchPalette focus pattern — 10ms defer so display toggle completes.
         setTimeout(() => nameInput!.focus(), 10);
+      } else if (next === 'success') {
+        setTimeout(() => successHeading!.focus(), 10);
+      } else if (next === 'cta' && lastFocused && typeof lastFocused.focus === 'function') {
+        lastFocused.focus();
+        lastFocused = null;
       }
     }
 
@@ -166,8 +193,6 @@ const i = t(locale);
     closeBtn.addEventListener('click', () => setState('cta'));
 
     form.addEventListener('submit', (e) => {
-      // Native HTML5 validation runs FIRST. If invalid, the browser blocks
-      // submit and this handler never fires (D-11 — validation enabled).
       e.preventDefault();
 
       const fd = new FormData(form!);
@@ -188,12 +213,25 @@ const i = t(locale);
         `?subject=${encodeURIComponent(subject)}` +
         `&body=${encodeURIComponent(body)}`;
 
+      // WR-03 mitigation: persist the draft so the user can recover if the
+      // mailto: handoff silently fails (no handler / blocked / dismissed).
+      try {
+        sessionStorage.setItem(
+          'vv-contact-draft',
+          JSON.stringify({ name, email, message, ts: Date.now() })
+        );
+      } catch {
+        // sessionStorage may be disabled; draft recovery is best-effort.
+      }
+
       window.location.href = mailto;
       setState('success');
     });
 
     // D-34: ESC scoped to the section, NOT document — avoids conflict with
-    // SearchPalette's global ESC handler.
+    // SearchPalette's global ESC handler. Known minor limitation: if focus
+    // leaves the section (e.g. user clicks on the footer), ESC won't collapse
+    // the form — user re-enters the section first. Accepted per D-34.
     section.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
       const state = section!.getAttribute('data-state');

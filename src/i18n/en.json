@@ -74,6 +74,7 @@
   "contact": {
     "title": "Let's Connect",
     "subtitle": "Find me on these platforms",
+    "opens_in_new_tab": "opens in new tab",
     "write_me_cta": "Write me a message",
     "form": {
       "name_label": "Name",
@@ -87,7 +88,8 @@
     },
     "success": {
       "heading": "Check your email client",
-      "body": "Your default mail app should have opened with a draft. Send when ready — I usually reply within a day or two.",
+      "body": "Your default mail app should have opened with a draft. Send when ready — I'll reply as soon as I can.",
+      "fallback": "If it didn't open, email",
       "close": "Close"
     }
   },
