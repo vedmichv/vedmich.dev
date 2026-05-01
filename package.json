@@ -19,6 +19,8 @@
   },
   "devDependencies": {
     "mdast-util-to-string": "^4.0.0",
-    "reading-time": "^1.5.0"
+    "png-to-ico": "^3.0.1",
+    "reading-time": "^1.5.0",
+    "sharp": "^0.34.5"
   }
 }
