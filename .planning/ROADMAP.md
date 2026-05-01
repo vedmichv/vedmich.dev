@@ -49,7 +49,7 @@
 | 9 | h1 line-height | **1.05** | default (~1.1) | `leading-[1.05]` |
 | 10 | h1 color | 1/1 | Complete    | 2026-05-01 |
 | 11 | Role ("Senior SA @ AWS") | 2/2 | Complete    | 2026-05-01 |
-| 12 | Tagline | Inter 18 mute, margin-top 18, **"AI Engineer" emphasized in text-primary** | `text-lg text-text-muted mb-8` — no emphasis split | Split string so "AI Engineer" wraps in `text-text-primary`; margin-top 18px |
+| 12 | Tagline | 1/1 | Complete   | 2026-05-01 |
 | 13 | Cert pills gap | `gap: 10, marginTop: 28` | `gap-2 mb-10` (8px gap, 40 mb) | `gap-2.5 mt-7` |
 | 14 | CTA margin-top | 32 | `gap-3` (12 gap) | `mt-8` |
 | 15 | Cursor | inline `_` char, teal, blinking opacity | `<span class="typing-cursor text-brand-primary-hover">` (CSS pseudo `|`) | keep current — visually equivalent |
@@ -245,10 +245,10 @@ Plans:
 **Files:** `src/components/Footer.astro`
 **Change:** Per `app.jsx:640-648`. Simple two-column flex: `© {year} Viktor Vedmich` left, `Built with Astro` right. 32px padding, top border. 5 social-icon SVGs + `socialLinks` import deleted (contacts live in Contact section via Phase 10). Container aligned to canonical v0.4 `max-w-[1120px]`. Solid `border-border` + `text-[13px]` + dynamic `new Date().getFullYear()` + bilingual i18n preserved (`footer.copyright` + `footer.built_with`). Target: ~14 LOC (from 43). Closes v0.4-reference-audit milestone.
 **Est. effort:** 10 min
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 12-01-PLAN.md — Wave 1: Full rewrite of `src/components/Footer.astro` to reference target shape (delete 5 SVG blocks + `socialLinks` import + nested flex wrapper; swap `max-w-6xl` → `max-w-[1120px]`; drop `bg-surface/30` + border `/50` alpha; bump `text-sm` → `text-[13px]`; two sibling spans in `flex items-center justify-between`) + token/hex hygiene + build gate (7 pages) + EN/RU dist symmetry check.
+- [x] 12-01-PLAN.md — Wave 1: Full rewrite of `src/components/Footer.astro` to reference target shape (delete 5 SVG blocks + `socialLinks` import + nested flex wrapper; swap `max-w-6xl` → `max-w-[1120px]`; drop `bg-surface/30` + border `/50` alpha; bump `text-sm` → `text-[13px]`; two sibling spans in `flex items-center justify-between`) + token/hex hygiene + build gate (7 pages) + EN/RU dist symmetry check.
 
 ---
 
