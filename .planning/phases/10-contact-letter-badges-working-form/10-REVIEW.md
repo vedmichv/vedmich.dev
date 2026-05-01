@@ -12,7 +12,11 @@ findings:
   warning: 6
   info: 4
   total: 12
-status: issues_found
+status: resolved
+resolved_at: 2026-05-01T16:41:00Z
+resolved_in_commit: a25379d
+skipped:
+  - WR-04 (ESC scope widening — conflicts with locked D-34 per phase plan)
 ---
 
 # Phase 10: Code Review Report
