@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CodeCopyEnhancer from '../../../components/CodeCopyEnhancer.astro';
 import { t } from '../../../i18n/utils';
 
 export async function getStaticPaths() {
@@ -64,4 +65,5 @@ const readingTime = post.data.reading_time ?? remarkPluginFrontmatter.minutesRea
       <Content />
     </div>
   </article>
+  <CodeCopyEnhancer locale="en" />
 </BaseLayout>
