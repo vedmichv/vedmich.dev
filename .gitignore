@@ -23,6 +23,10 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# Playwright @playwright/test output (artifacts + HTML report)
+test-results/
+playwright-report/
+
 # Playwright MCP temp snapshots
 .playwright-mcp/
 .playwright-cli/
