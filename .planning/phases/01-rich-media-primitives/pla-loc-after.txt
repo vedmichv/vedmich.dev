@@ -1,0 +1,3 @@
+      80 src/components/PodLifecycleAnimation.astro
+Pre-refactor LOC: 240
+Post-refactor LOC:       80

@@ -1,12 +1,23 @@
 ---
-// Inline SVG + CSS animation — zero JS.
-// Ported from slidev-theme-vv slide 84 (S2 Kubernetes pod lifecycle).
-// Scales responsively via CSS aspect-ratio + viewBox; respects prefers-reduced-motion.
-//
-// Layout: 5 columns × 3 rows on a 1800×820 design canvas.
-//   kubectl(60,330) → API(360,330) → etcd(660,130) + scheduler(660,530)
-//                                 → kubelet(960,330) → Pod A(1300,190), Pod B(1300,470)
-// Packets flow along wires on loop; each node pops in staggered.
+/**
+ * PodLifecycleAnimation — Kubernetes pod lifecycle animated diagram.
+ *
+ * Refactored in Phase 1 onto the Vv* primitives at src/components/visuals/.
+ * Public import path (src/components/PodLifecycleAnimation.astro) unchanged per D-24,
+ * so MDX consumers (src/content/blog/en/2026-03-20-karpenter-right-sizing.mdx) are
+ * not edited. Same viewBox (1800×820), same 7 nodes, same 7 wires, same 7 packets,
+ * same delays, same tone palette — all coordinates and timings are byte-for-byte
+ * identical to the pre-refactor implementation.
+ *
+ * Wire endpoints use fromPoint/toPoint overrides where the pre-refactor diagram
+ * exited/entered nodes at edge-midpoints instead of mathematical ray-to-rect
+ * intersections. This preserves pixel parity; see Plan 06 README for why authors
+ * should prefer default edge-points in new diagrams.
+ */
+import VvStage from './visuals/VvStage.astro';
+import VvNode from './visuals/VvNode.astro';
+import VvWire from './visuals/VvWire.astro';
+import VvPacket from './visuals/VvPacket.astro';
 
 interface Props {
   caption?: string;
@@ -19,222 +30,51 @@ const {
 } = Astro.props;
 ---
 
-<figure class="pod-lifecycle not-prose" aria-label={title}>
-  <div class="pla-title">{title}</div>
+<VvStage title={title} caption={caption}>
+  {/* 7 nodes — coordinates from pre-refactor percent math: x=left%*1800, y=top%*820 */}
+  <VvNode id="kubectl" x={60} y={330} label="kubectl" tone="teal" animation="slide-x" delay={0}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+  </VvNode>
 
-  <div class="pla-stage">
-    <!-- Nodes -->
-    <div class="pla-node pla-slide-x" style="left: 3.33%; top: 40.24%; --delay: 0ms;">
-      <svg class="pla-ic pla-ic-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-      <span>kubectl</span>
-    </div>
+  <VvNode id="api" x={360} y={330} label="API server" tone="teal" animation="pop" delay={300}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon><polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5"></polygon><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="8.5" x2="6" y2="9.5"></line><line x1="18" y1="9.5" x2="22" y2="8.5"></line><line x1="2" y1="15.5" x2="6" y2="14.5"></line><line x1="18" y1="14.5" x2="22" y2="15.5"></line></svg>
+  </VvNode>
 
-    <div class="pla-node pla-pop" style="left: 20%; top: 40.24%; --delay: 300ms;">
-      <svg class="pla-ic pla-ic-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon><polygon points="12 6 18 9.5 18 14.5 12 18 6 14.5 6 9.5"></polygon><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="8.5" x2="6" y2="9.5"></line><line x1="18" y1="9.5" x2="22" y2="8.5"></line><line x1="2" y1="15.5" x2="6" y2="14.5"></line><line x1="18" y1="14.5" x2="22" y2="15.5"></line></svg>
-      <span>API server</span>
-    </div>
+  <VvNode id="etcd" x={660} y={130} label="etcd" tone="teal" animation="drop" delay={600}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14a9 3 0 0 0 18 0V5"></path><path d="M3 12a9 3 0 0 0 18 0"></path></svg>
+  </VvNode>
 
-    <div class="pla-node pla-drop" style="left: 36.67%; top: 15.85%; --delay: 600ms;">
-      <svg class="pla-ic pla-ic-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14a9 3 0 0 0 18 0V5"></path><path d="M3 12a9 3 0 0 0 18 0"></path></svg>
-      <span>etcd</span>
-    </div>
+  <VvNode id="scheduler" x={660} y={530} label="scheduler" tone="teal" animation="drop" delay={900}>
+    <svg viewBox="0 0 24 24" fill="var(--brand-primary)" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 1 .3 2 .8 2.8A4 4 0 0 0 5 13.5C5 16 7 18 9.5 18H10v2a2 2 0 0 0 4 0v-2h.5c2.5 0 4.5-2 4.5-4.5a4 4 0 0 0-2.8-3.7c.5-.8.8-1.8.8-2.8a5 5 0 0 0-5-5z"></path></svg>
+  </VvNode>
 
-    <div class="pla-node pla-drop" style="left: 36.67%; top: 64.63%; --delay: 900ms;">
-      <svg class="pla-ic pla-ic-teal" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 1 .3 2 .8 2.8A4 4 0 0 0 5 13.5C5 16 7 18 9.5 18H10v2a2 2 0 0 0 4 0v-2h.5c2.5 0 4.5-2 4.5-4.5a4 4 0 0 0-2.8-3.7c.5-.8.8-1.8.8-2.8a5 5 0 0 0-5-5z"></path></svg>
-      <span>scheduler</span>
-    </div>
+  <VvNode id="kubelet" x={960} y={330} label="kubelet" tone="teal" animation="pop" delay={1200}>
+    <svg viewBox="0 0 32 32" fill="none" stroke="var(--brand-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 4 9v14l12 6 12-6V9L16 3z" fill="rgba(245,158,11,0.18)"/><path d="M4 9l12 6 12-6"/><path d="M16 15v14"/></svg>
+  </VvNode>
 
-    <div class="pla-node pla-pop" style="left: 53.33%; top: 40.24%; --delay: 1200ms;">
-      <svg class="pla-ic pla-ic-amber" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 4 9v14l12 6 12-6V9L16 3z" fill="rgba(245,158,11,0.18)"/><path d="M4 9l12 6 12-6"/><path d="M16 15v14"/></svg>
-      <span>kubelet</span>
-    </div>
+  <VvNode id="podA" x={1300} y={190} label="Pod A" tone="amber" animation="pop" delay={1500}>
+    <svg viewBox="0 0 32 32" fill="none" stroke="var(--brand-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 4 9v14l12 6 12-6V9L16 3z" fill="rgba(245,158,11,0.18)"/><path d="M4 9l12 6 12-6"/><path d="M16 15v14"/></svg>
+  </VvNode>
 
-    <div class="pla-node pla-pod pla-pop" style="left: 72.22%; top: 23.17%; --delay: 1500ms;">
-      <svg class="pla-ic pla-ic-amber" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 4 9v14l12 6 12-6V9L16 3z" fill="rgba(245,158,11,0.18)"/><path d="M4 9l12 6 12-6"/><path d="M16 15v14"/></svg>
-      <span>Pod A</span>
-    </div>
+  <VvNode id="podB" x={1300} y={470} label="Pod B" tone="amber" animation="pop" delay={1700}>
+    <svg viewBox="0 0 32 32" fill="none" stroke="var(--brand-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 4 9v14l12 6 12-6V9L16 3z" fill="rgba(245,158,11,0.18)"/><path d="M4 9l12 6 12-6"/><path d="M16 15v14"/></svg>
+  </VvNode>
 
-    <div class="pla-node pla-pod pla-pop" style="left: 72.22%; top: 57.32%; --delay: 1700ms;">
-      <svg class="pla-ic pla-ic-amber" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 4 9v14l12 6 12-6V9L16 3z" fill="rgba(245,158,11,0.18)"/><path d="M4 9l12 6 12-6"/><path d="M16 15v14"/></svg>
-      <span>Pod B</span>
-    </div>
+  {/* 7 wires — fromPoint/toPoint overrides preserve pre-refactor midpoint-based endpoints exactly */}
+  <VvWire from="kubectl" to="api" delay={700} fromPoint={[280, 410]} toPoint={[360, 410]}/>
+  <VvWire from="api" to="etcd" delay={1000} fromPoint={[580, 410]} toPoint={[660, 210]}/>
+  <VvWire from="api" to="scheduler" delay={1300} fromPoint={[580, 410]} toPoint={[660, 610]}/>
+  <VvWire from="etcd" to="kubelet" delay={1600} dashed fromPoint={[880, 210]} toPoint={[960, 410]}/>
+  <VvWire from="scheduler" to="kubelet" delay={1600} dashed fromPoint={[880, 610]} toPoint={[960, 410]}/>
+  <VvWire from="kubelet" to="podA" delay={1900} tone="amber" fromPoint={[1180, 410]} toPoint={[1300, 270]}/>
+  <VvWire from="kubelet" to="podB" delay={2100} tone="amber" fromPoint={[1180, 410]} toPoint={[1300, 550]}/>
 
-    <!-- Wires + packets share a single 1800x820 viewBox for unified user-space coords -->
-    <svg class="pla-wires" viewBox="0 0 1800 820" preserveAspectRatio="none" aria-hidden="true">
-      <!-- Glow filter for packets -->
-      <defs>
-        <filter id="pla-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      <!-- Wires -->
-      <g stroke-width="3" fill="none">
-        <line class="pla-line" style="--wd: 700ms;"  x1="280"  y1="410" x2="360"  y2="410" stroke="var(--brand-primary)" />
-        <line class="pla-line" style="--wd: 1000ms;" x1="580"  y1="410" x2="660"  y2="210" stroke="var(--brand-primary)" />
-        <line class="pla-line" style="--wd: 1300ms;" x1="580"  y1="410" x2="660"  y2="610" stroke="var(--brand-primary)" />
-        <line class="pla-line" style="--wd: 1600ms;" x1="880"  y1="210" x2="960"  y2="410" stroke="var(--brand-primary)" stroke-dasharray="8 5" />
-        <line class="pla-line" style="--wd: 1600ms;" x1="880"  y1="610" x2="960"  y2="410" stroke="var(--brand-primary)" stroke-dasharray="8 5" />
-        <line class="pla-line" style="--wd: 1900ms;" x1="1180" y1="410" x2="1300" y2="270" stroke="var(--brand-accent)" />
-        <line class="pla-line" style="--wd: 2100ms;" x1="1180" y1="410" x2="1300" y2="550" stroke="var(--brand-accent)" />
-      </g>
-
-      <!-- Packets via SMIL animateMotion (SVG user space — no offset-path scaling bug).
-           Each packet starts AFTER its wire has settled (--wd + 400ms fade in).
-           repeatCount=indefinite keeps the loop running. -->
-      <g class="pla-pkts">
-        <!-- Teal packets -->
-        <circle r="10" fill="var(--brand-primary)" filter="url(#pla-glow)" opacity="0">
-          <animateMotion dur="1.4s" begin="1.2s;pkt1.end+4s" repeatCount="1" id="pkt1" path="M 280 410 L 360 410" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="1.4s" begin="1.2s;pkt1.end+4s" repeatCount="1" />
-        </circle>
-        <circle r="10" fill="var(--brand-primary)" filter="url(#pla-glow)" opacity="0">
-          <animateMotion dur="1.4s" begin="1.5s;pkt2.end+4s" repeatCount="1" id="pkt2" path="M 580 410 L 660 210" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="1.4s" begin="1.5s;pkt2.end+4s" repeatCount="1" />
-        </circle>
-        <circle r="10" fill="var(--brand-primary)" filter="url(#pla-glow)" opacity="0">
-          <animateMotion dur="1.4s" begin="1.8s;pkt3.end+4s" repeatCount="1" id="pkt3" path="M 580 410 L 660 610" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="1.4s" begin="1.8s;pkt3.end+4s" repeatCount="1" />
-        </circle>
-        <circle r="10" fill="var(--brand-primary)" filter="url(#pla-glow)" opacity="0">
-          <animateMotion dur="1.5s" begin="2.1s;pkt4.end+4s" repeatCount="1" id="pkt4" path="M 880 210 L 960 410" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="1.5s" begin="2.1s;pkt4.end+4s" repeatCount="1" />
-        </circle>
-        <circle r="10" fill="var(--brand-primary)" filter="url(#pla-glow)" opacity="0">
-          <animateMotion dur="1.5s" begin="2.3s;pkt5.end+4s" repeatCount="1" id="pkt5" path="M 880 610 L 960 410" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="1.5s" begin="2.3s;pkt5.end+4s" repeatCount="1" />
-        </circle>
-        <!-- Amber packets (kubelet → pods) -->
-        <circle r="11" fill="var(--brand-accent)" filter="url(#pla-glow)" opacity="0">
-          <animateMotion dur="1.3s" begin="2.4s;pkt6.end+4s" repeatCount="1" id="pkt6" path="M 1180 410 L 1300 270" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="1.3s" begin="2.4s;pkt6.end+4s" repeatCount="1" />
-        </circle>
-        <circle r="11" fill="var(--brand-accent)" filter="url(#pla-glow)" opacity="0">
-          <animateMotion dur="1.3s" begin="2.6s;pkt7.end+4s" repeatCount="1" id="pkt7" path="M 1180 410 L 1300 550" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="1.3s" begin="2.6s;pkt7.end+4s" repeatCount="1" />
-        </circle>
-      </g>
-    </svg>
-  </div>
-
-  <figcaption class="pla-caption">{caption}</figcaption>
-</figure>
-
-<style>
-  .pod-lifecycle {
-    margin: 2.5rem 0;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .pla-title {
-    font-family: var(--font-display, 'Space Grotesk', sans-serif);
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--text-primary);
-    text-align: center;
-    margin-bottom: 0.75rem;
-  }
-
-  /* Stage keeps the 1800×820 design ratio — ~2.195:1 */
-  .pla-stage {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1800 / 820;
-    background: var(--bg-base);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .pla-node {
-    position: absolute;
-    /* Node is 220×160 on a 1800×820 canvas → 12.22% × 19.51% */
-    width: 12.22%;
-    height: 19.51%;
-    border-radius: 12px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    font-family: var(--font-body, 'Inter', sans-serif);
-    font-weight: 600;
-    font-size: clamp(0.7rem, 1.2vw, 1rem);
-    color: var(--text-primary);
-    opacity: 0;
-    animation-duration: 600ms;
-    animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
-    animation-fill-mode: forwards;
-    animation-delay: var(--delay, 0ms);
-  }
-
-  .pla-ic {
-    width: clamp(22px, 3.2vw, 40px);
-    height: clamp(22px, 3.2vw, 40px);
-  }
-  .pla-ic-teal  { color: var(--brand-primary); }
-  .pla-ic-amber { color: var(--brand-accent); }
-
-  .pla-slide-x { transform: translateX(-20px); animation-name: pla-slide-x; }
-  .pla-pop     { transform: scale(0.5); animation-name: pla-pop; animation-duration: 700ms; }
-  .pla-drop    { animation-name: pla-drop; }
-  .pla-pod {
-    border-color: rgba(245, 158, 11, 0.5);
-    background: rgba(245, 158, 11, 0.06);
-  }
-
-  @keyframes pla-slide-x {
-    0%   { opacity: 0; transform: translateX(-20px); }
-    100% { opacity: 1; transform: translateX(0); }
-  }
-  @keyframes pla-drop {
-    0%   { opacity: 0; transform: translateY(-20px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes pla-pop {
-    0%   { opacity: 0; transform: scale(0.5); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-
-  .pla-wires {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-  .pla-line {
-    opacity: 0;
-    animation: pla-wire-in 400ms ease-out var(--wd) forwards;
-  }
-  @keyframes pla-wire-in {
-    to { opacity: 0.55; }
-  }
-
-  .pla-caption {
-    margin-top: 0.85rem;
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-    text-align: center;
-  }
-
-  /* Reduced-motion: freeze nodes/wires in final state, hide moving packets */
-  @media (prefers-reduced-motion: reduce) {
-    .pla-node,
-    .pla-line {
-      opacity: 1;
-      animation: none;
-      transform: none;
-    }
-    .pla-line { opacity: 0.55; }
-    .pla-pkts { display: none; }
-  }
-</style>
+  {/* 7 packets */}
+  <VvPacket wire="kubectl-api" duration="1.4s" delay="1.2s"/>
+  <VvPacket wire="api-etcd" duration="1.4s" delay="1.5s"/>
+  <VvPacket wire="api-scheduler" duration="1.4s" delay="1.8s"/>
+  <VvPacket wire="etcd-kubelet" duration="1.5s" delay="2.1s"/>
+  <VvPacket wire="scheduler-kubelet" duration="1.5s" delay="2.3s"/>
+  <VvPacket wire="kubelet-podA" duration="1.3s" delay="2.4s" r={11} tone="amber"/>
+  <VvPacket wire="kubelet-podB" duration="1.3s" delay="2.6s" r={11} tone="amber"/>
+</VvStage>
