@@ -50,9 +50,9 @@
 
 Plans:
 **Wave 1**
-- [ ] 01-01-PLAN.md — Test + Icon infrastructure: install astro-icon + 8 Iconify collections + @playwright/test, register icon() integration in astro.config.mjs, scaffold playwright.config.ts, capture pre-refactor pixel-parity baseline PNG (wave 0)
-- [ ] 01-02-PLAN.md — Pure-TS utilities + node unit tests: _vv-registry.ts (SSR coordinate store), _vv-geom.ts (rectangle edge-point math), _vv-path.ts (SVG path builder); 17 unit tests (wave 0)
-- [ ] 01-03-PLAN.md — VvStage skeleton: SSR host, viewBox/aspect-ratio, tone palette CSS, reduced-motion :global rules, per-stage glow filter id (wave 1)
+- [x] 01-01-PLAN.md — Test + Icon infrastructure: install astro-icon + 8 Iconify collections + @playwright/test, register icon() integration in astro.config.mjs, scaffold playwright.config.ts, capture pre-refactor pixel-parity baseline PNG (wave 0)
+- [x] 01-02-PLAN.md — Pure-TS utilities + node unit tests: _vv-registry.ts (SSR coordinate store), _vv-geom.ts (rectangle edge-point math), _vv-path.ts (SVG path builder); 17 unit tests (wave 0)
+- [x] 01-03-PLAN.md — VvStage skeleton: SSR host, viewBox/aspect-ratio, tone palette CSS, reduced-motion :global rules, per-stage glow filter id (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-04-PLAN.md — VvNode + VvWire + VvPacket register-only primitives + extend registry with PacketRecord + update VvStage to emit nodes/packets from registry (wave 2)
