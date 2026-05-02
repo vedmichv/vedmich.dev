@@ -1,0 +1,53 @@
+---
+/**
+ * VvPacket — SMIL animateMotion packet registrar (register-only).
+ *
+ * Registers (id, wire?, path?, duration, delay, r, glow, tone, loop, gap) into
+ * the active VvStage registry. VvStage reads registry.packets and emits the
+ * <circle> + <animateMotion> + <animate> SVG fragment, computing the SMIL
+ * begin expression as `{delay};{id}.end+{gap}` when loop=true.
+ *
+ * Exactly one of `wire` or `path` must be set. `duration` and `delay` are
+ * required — no auto-timing (D-17). Author copies delays from Slidev slides 1:1.
+ */
+import { currentRegistry, type VvTone } from './_vv-registry.ts';
+
+interface Props {
+  wire?: string;
+  path?: string;
+  duration: string;
+  delay: string;
+  r?: number;
+  glow?: boolean;
+  tone?: VvTone;
+  loop?: boolean;
+  gap?: string;
+}
+
+const {
+  wire,
+  path,
+  duration,
+  delay,
+  r = 10,
+  glow = true,
+  tone = 'teal',
+  loop = true,
+  gap = '4s',
+} = Astro.props;
+
+if (!wire && !path) {
+  throw new Error('<VvPacket> requires either `wire` or `path` prop.');
+}
+if (wire && path) {
+  throw new Error('<VvPacket> — pass `wire` OR `path`, not both.');
+}
+
+const registry = currentRegistry();
+const pktId = `pkt-${registry.uid}-${Math.random().toString(36).slice(2, 8)}`;
+
+registry.registerPacket({
+  id: pktId, wire, path, duration, delay, r, glow, tone, loop, gap,
+});
+---
+<!-- VvPacket emits nothing -->

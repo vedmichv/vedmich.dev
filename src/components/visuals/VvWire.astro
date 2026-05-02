@@ -1,0 +1,37 @@
+---
+/**
+ * VvWire — wire registrar (register-only).
+ *
+ * Registers (id, from, to, curve?, via?, dashed, tone, delay) into the active
+ * VvStage registry. Emits NO markup; VvStage reads registry.wires and renders
+ * the visible <path id="wire-{id}"/> inside <defs> plus a <use href> in the
+ * visible wire layer. Centralizing emission in VvStage eliminates the
+ * two-coordinate-space bug (D-04 / Phase 9 v0.4 hotfix rationale).
+ */
+import { currentRegistry, type VvTone } from './_vv-registry.ts';
+
+interface Props {
+  from: string;
+  to: string;
+  id?: string;
+  curve?: number;
+  via?: Array<[number, number]>;
+  dashed?: boolean;
+  tone?: VvTone;
+  delay?: number;
+}
+
+const {
+  from,
+  to,
+  id = `${from}-${to}`,
+  curve,
+  via,
+  dashed = false,
+  tone = 'teal',
+  delay = 0,
+} = Astro.props;
+
+currentRegistry().registerWire({ id, from, to, curve, via, dashed, tone, delay });
+---
+<!-- VvWire emits nothing -->

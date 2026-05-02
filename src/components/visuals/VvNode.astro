@@ -1,0 +1,57 @@
+---
+/**
+ * VvNode — positioned node primitive (register-only).
+ *
+ * Captures the icon default slot via Astro.slots.render and writes
+ * (id, x, y, w, h, label, tone, animation, delay, iconHtml) into the active
+ * VvStage registry. Emits NO markup itself — VvStage iterates registry.nodes
+ * and renders the final <div class="vv-node"> block.
+ *
+ * Icon slot accepts anything renderable:
+ *   - <Icon name="logos:aws-lambda"/> (astro-icon)
+ *   - Raw inline <svg>...</svg> (copied from Slidev slide or hand-drawn)
+ *   - Text / emoji (rare)
+ *
+ * Tone (D-09b) controls only the node's border-left color; icon colors are
+ * whatever Iconify emits (native brand colors for multicolor logos).
+ */
+import {
+  currentRegistry,
+  type VvTone,
+  type VvNodeAnimation,
+} from './_vv-registry.ts';
+
+interface Props {
+  id: string;
+  x: number;
+  y: number;
+  w?: number;
+  h?: number;
+  label: string;
+  tone?: VvTone;
+  animation?: VvNodeAnimation;
+  delay?: number;
+}
+
+const {
+  id,
+  x,
+  y,
+  w = 220,
+  h = 160,
+  label,
+  tone = 'teal',
+  animation = 'pop',
+  delay = 0,
+} = Astro.props;
+
+// Render default slot to HTML string for the registry (empty if no slot content)
+const iconHtml = Astro.slots.has('default')
+  ? await Astro.slots.render('default')
+  : '';
+
+currentRegistry().registerNode({
+  id, x, y, w, h, label, tone, animation, delay, iconHtml,
+});
+---
+<!-- VvNode emits nothing — VvStage composes the final HTML from registry.nodes -->
