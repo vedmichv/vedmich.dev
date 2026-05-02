@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Content Platform
 status: planning
-last_updated: "2026-05-02T06:13:13.986Z"
+last_updated: "2026-05-02T12:00:00.000Z"
 last_activity: 2026-05-02
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,20 +17,55 @@ progress:
 
 **Current milestone:** v1.0 — Content Platform
 **Current phase:** —
-**Status:** Defining requirements
+**Status:** Roadmap created, awaiting approval
 **Last updated:** 2026-05-02
 
-## Completed phases
+## Project Reference
+
+**Core value:** Turn vedmich.dev from "static site with a handful of posts" into a full content platform — three streams (blog, presentations, companion posts), reusable rich-media primitives reducing Slidev slide lift from ~30 min to <10 min, Excalidraw diagrams, code block upgrades, and Slidev decks served as first-party routes.
+
+**Current focus:** Phase structure defined (7 phases: 1 primitives → 2 Shiki → 3 polish → 4 Excalidraw → 5 Slidev → 6 companions → 7 codegen OPTIONAL). Phase 7 checkpoint-gated after Phase 1 — only runs if manual slide lift still >15 min.
+
+## Current Position
+
+Phase: Not started (roadmap defined)
+Plan: —
+Status: Awaiting roadmap approval
+Last activity: 2026-05-02 — ROADMAP.md, STATE.md, REQUIREMENTS.md traceability written
+
+Progress: ░░░░░░░░░░░░░░░░░░░░ 0% (0/7 phases, 0/? plans)
+
+## Completed Phases
 
 _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 
-## Active context
+## Active Context
 
 - Milestone v0.4 Reference Design Audit shipped 2026-05-01 (12 phases, 26 plans, 41 tasks).
-- v1.0 scope defined from `.planning/notes/milestone-v0.5-content-platform.md` + `.planning/notes/rich-media-integration.md`, then expanded during kickoff to add Slidev integration + polish streams.
+- v1.0 scope defined from `.planning/notes/milestone-v0.5-content-platform.md` + `.planning/notes/rich-media-integration.md`, expanded during kickoff to add Slidev integration + polish streams.
 - Reference artifact: `/Users/viktor/.claude/skills/viktor-vedmich-design/ui_kits/vedmich-dev/app.jsx`.
+- Research completed 2026-05-02: 4 parallel research agents (SUMMARY, ARCHITECTURE, FEATURES, PITFALLS) analyzed stack, feature landscape, integration patterns, and domain pitfalls — HIGH confidence on Phases 1-6, LOW confidence on Phase 7 (codegen complexity unknown).
 
-## Pending todos
+## Performance Metrics
+
+**Velocity:** Not yet established (first phase not started)
+
+**Quality:**
+- v0.4 baseline: 12 phases, 26 plans, 41 tasks delivered with zero post-ship hotfixes
+- Build time: 31 pages in ~800ms (target: maintain <1s after v1.0)
+- Zero-JS budget: maintained (only IntersectionObserver, menu toggle, CodeCopyEnhancer allowed)
+
+## Accumulated Context
+
+### Key Decisions
+
+_Populated during phase planning and execution._
+
+### Technical Debt
+
+_None yet for v1.0 work._
+
+### Todos
 
 _Populated after roadmap approval._
 
@@ -41,14 +76,16 @@ None.
 ## Notes
 
 - Phase numbering resets to 1 (`config.json: continue_from_previous=false`, `phase_start=1`).
-- 4 parallel research agents will run before requirements (user approved).
+- Phase 2 (Shiki upgrades) flagged as HIGHEST regression risk — global config change affects all 4 existing posts. Mitigation: run early while post count is low, screenshot comparison, pin Astro version.
+- Phase 5 (Slidev integration) requires DNS audit (15 min) to check Route 53 + external backlinks to `s.vedmich.dev` before deciding on CNAME removal vs 301 redirect.
+- Phase 7 (codegen) is checkpoint-gated: after Phase 1, user re-ports one slide using primitives; if elapsed time >15 min, Phase 7 proceeds; if <15 min, Phase 7 skipped entirely (ROI insufficient).
 - Companion posts batch sized to 2 posts (1 DKT + 1 AWS RU, minimum viable for exit criterion).
 - GSD interactive questions asked in Russian; artifacts in English (see CLAUDE.md).
 - `playwright-cli attach --extension` required for visual verification on live site.
 
-## Accumulated context from prior milestones
+## Accumulated Context from Prior Milestones
 
-### Key decisions — Phase 6 Plan 1 (v0.4)
+### Key Decisions — v0.4
 
 - Kept `/images/book-cover-3d.jpg` over ref CSS faux cover (D-01) — JPG already has PACKT + V. Vedmich printed; same brand-asset-over-text-reproduction stance as Phase 5 DKT logo.
 - Introduced first full-bleed coloured section band on the site — `bg-brand-accent-soft border-y border-brand-accent/30` (D-04).
@@ -56,9 +93,6 @@ None.
 - Dropped `max-w-3xl` card constraint so the card stretches the full `max-w-[1120px]` container width.
 - Promoted 2-col `sm:flex-row` to 3-col grid `grid-cols-[140px_1fr_auto]` on desktop; mobile flex-col stack retained.
 - Solid amber CTA button replaces ghost `text-accent` variant — matches ref Button `variant="accent"`.
-
-### Key decisions — Phase 7 Plans 1-2 (v0.4)
-
 - tags field is required array (no .optional()) per D-06 frontmatter schema — differs from blog collection where tags are optional.
 - video and slides fields use z.string().url().optional() for URL validation at build time; omitted from frontmatter when no URLs available.
 - YouTube embed uses @astro-community/astro-embed-youtube wrapper over lite-youtube-embed for Astro-native API.
@@ -66,9 +100,12 @@ None.
 - Tags remain in English in both locales (topic keywords, not UI strings).
 - Event and city names remain in English (proper nouns).
 
-## Current Position
+## Session Continuity
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-02 — Milestone v1.0 started
+**For next session:**
+- Load `.planning/ROADMAP.md` + `.planning/REQUIREMENTS.md` + `.planning/STATE.md`
+- Check progress counters
+- Resume from current phase/plan
+
+**After roadmap approval:**
+- `/gsd-plan-phase 1` to decompose Phase 1 (Rich Media Primitives) into executable plans

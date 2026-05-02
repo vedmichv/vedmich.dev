@@ -111,16 +111,43 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 
 | REQ-ID | Category | Phase | Status |
 |---|---|---|---|
-| PRIMS-01..06 | Rich-Media Primitives | TBD | Pending |
-| CODE-01..05 | Code Block Upgrades | TBD | Pending |
-| DIAG-01..05 | Excalidraw Pipeline | TBD | Pending |
-| SLIDES-01..06 | Slidev Integration | TBD | Pending |
-| CODEGEN-01 | Codegen (optional) | TBD | Pending |
-| POLISH-01..06 | Homepage Polish | TBD | Pending |
-| CONTENT-01..05 | Companion Posts + Skill Updates | TBD | Pending |
+| PRIMS-01 | Rich-Media Primitives | Phase 1 | Pending |
+| PRIMS-02 | Rich-Media Primitives | Phase 1 | Pending |
+| PRIMS-03 | Rich-Media Primitives | Phase 1 | Pending |
+| PRIMS-04 | Rich-Media Primitives | Phase 1 | Pending |
+| PRIMS-05 | Rich-Media Primitives | Phase 1 | Pending |
+| PRIMS-06 | Rich-Media Primitives | Phase 1 | Pending |
+| CODE-01 | Code Block Upgrades | Phase 2 | Pending |
+| CODE-02 | Code Block Upgrades | Phase 2 | Pending |
+| CODE-03 | Code Block Upgrades | Phase 2 | Pending |
+| CODE-04 | Code Block Upgrades | Phase 2 | Pending |
+| CODE-05 | Code Block Upgrades | Phase 2 | Pending |
+| POLISH-01 | Homepage Polish | Phase 3 | Pending |
+| POLISH-02 | Homepage Polish | Phase 3 | Pending |
+| POLISH-03 | Homepage Polish | Phase 3 | Pending |
+| POLISH-04 | Homepage Polish | Phase 3 | Pending |
+| POLISH-05 | Homepage Polish | Phase 3 | Pending |
+| POLISH-06 | Homepage Polish | Phase 3 | Pending |
+| DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending |
+| DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending |
+| DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending |
+| DIAG-04 | Excalidraw Pipeline | Phase 4 | Pending |
+| DIAG-05 | Excalidraw Pipeline | Phase 4 | Pending |
+| SLIDES-01 | Slidev Integration | Phase 5 | Pending |
+| SLIDES-02 | Slidev Integration | Phase 5 | Pending |
+| SLIDES-03 | Slidev Integration | Phase 5 | Pending |
+| SLIDES-04 | Slidev Integration | Phase 5 | Pending |
+| SLIDES-05 | Slidev Integration | Phase 5 | Pending |
+| SLIDES-06 | Slidev Integration | Phase 5 | Pending |
+| CONTENT-01 | Companion Posts + Skill Updates | Phase 6 | Pending |
+| CONTENT-02 | Companion Posts + Skill Updates | Phase 6 | Pending |
+| CONTENT-03 | Companion Posts + Skill Updates | Phase 6 | Pending |
+| CONTENT-04 | Companion Posts + Skill Updates | Phase 5 | Pending |
+| CONTENT-05 | Companion Posts + Skill Updates | Phase 6 | Pending |
+| CODEGEN-01 | Codegen (optional) | Phase 7 | Checkpoint-gated |
 
-Filled by `gsd-roadmapper` during roadmap creation.
+**Coverage:** 32/32 v1.0 requirements mapped ✓ (33/33 including optional CODEGEN-01)
 
 ---
 
-**Summary:** 32 v1.0 requirements + 1 optional (CODEGEN-01) across 7 categories. Research flagged estimate 20-27 h base effort (excluding CODEGEN-01), 30-42 h with codegen.
+**Summary:** 32 v1.0 requirements + 1 optional (CODEGEN-01) across 7 categories. Research flagged estimate 24-34h base effort (Phases 1-6), 34-49h with codegen if triggered.
