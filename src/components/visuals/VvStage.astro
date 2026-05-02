@@ -1,0 +1,223 @@
+---
+/**
+ * VvStage — SSR host for VvNode / VvWire / VvPacket primitives.
+ *
+ * Workflow per render:
+ *   1. createStageRegistry() → fresh per-stage Registry with a unique uid
+ *   2. pushStage(registry) → module-level singleton for children to find
+ *   3. Astro.slots.render('default') → VvNode/VvWire/VvPacket frontmatter runs,
+ *      each child calls currentRegistry().registerNode/Wire
+ *   4. popStage() (in try/finally)
+ *   5. Walk registry.wires → compute d strings via _vv-path.computeWirePath
+ *   6. Emit <figure><svg><defs><g><Fragment set:html={slotHtml}/></svg></figure>
+ *
+ * Coordinate system: SVG user-space 1800×820 by default (D-03). Override via viewBox prop.
+ * Aspect-ratio: computed from viewBox so overriding viewBox reshapes the canvas.
+ * Per D-04, nodes, wires, and packets all live inside the SAME <svg> — this is the
+ * contract that eliminates the CSS offset-path two-coordinate-space bug.
+ */
+import {
+  createStageRegistry,
+  pushStage,
+  popStage,
+} from './_vv-registry.ts';
+import { computeWirePath } from './_vv-path.ts';
+import type { Rect } from './_vv-geom.ts';
+
+interface Props {
+  title?: string;
+  caption?: string;
+  viewBox?: string;
+}
+
+const { title, caption, viewBox = '0 0 1800 820' } = Astro.props;
+
+// Parse viewBox "minX minY w h" → derive aspect-ratio for responsive sizing
+const vbParts = viewBox.trim().split(/\s+/).map(Number);
+if (vbParts.length !== 4 || vbParts.some(Number.isNaN)) {
+  throw new Error(`<VvStage viewBox="${viewBox}"> — must be "minX minY width height" with 4 numeric values.`);
+}
+const [, , vbW, vbH] = vbParts;
+const aspectRatioStyle = `aspect-ratio: ${vbW} / ${vbH};`;
+
+// Set up per-stage registry
+const registry = createStageRegistry();
+pushStage(registry);
+
+let slotHtml: string;
+try {
+  slotHtml = await Astro.slots.render('default');
+} finally {
+  popStage();
+}
+
+// Resolve wires → compute d strings
+interface WireDef {
+  id: string;
+  d: string;
+  dashed: boolean;
+  tone: string;
+  delay: number;
+}
+const wireDefs: WireDef[] = [];
+for (const w of registry.wires.values()) {
+  const fromNode = registry.getNode(w.from);
+  const toNode = registry.getNode(w.to);
+  if (!fromNode || !toNode) {
+    const known = [...registry.nodes.keys()].join(', ') || '(none registered)';
+    throw new Error(
+      `<VvWire from="${w.from}" to="${w.to}"> — unknown node id. ` +
+      `Known node ids in this <VvStage>: ${known}.`,
+    );
+  }
+  const fromRect: Rect = {
+    cx: fromNode.x + fromNode.w / 2,
+    cy: fromNode.y + fromNode.h / 2,
+    w: fromNode.w,
+    h: fromNode.h,
+  };
+  const toRect: Rect = {
+    cx: toNode.x + toNode.w / 2,
+    cy: toNode.y + toNode.h / 2,
+    w: toNode.w,
+    h: toNode.h,
+  };
+  wireDefs.push({
+    id: w.id,
+    d: computeWirePath(fromRect, toRect, { curve: w.curve, via: w.via }),
+    dashed: w.dashed ?? false,
+    tone: w.tone ?? 'teal',
+    delay: w.delay ?? 0,
+  });
+}
+
+const glowId = `glow-${registry.uid}`;
+---
+
+<figure class="vv-stage not-prose" aria-label={title}>
+  {title && <div class="vv-stage-title">{title}</div>}
+
+  <div class="vv-stage-canvas" style={aspectRatioStyle}>
+    <svg class="vv-stage-svg" viewBox={viewBox} preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        {wireDefs.map((wd) => (
+          <path id={`wire-${wd.id}`} d={wd.d} fill="none" />
+        ))}
+      </defs>
+
+      <g class="vv-wires">
+        {wireDefs.map((wd) => (
+          <use
+            href={`#wire-${wd.id}`}
+            class={`vv-wire vv-tone-${wd.tone}`}
+            stroke-width="3"
+            stroke-dasharray={wd.dashed ? '8 5' : undefined}
+            style={`--wd: ${wd.delay}ms;`}
+          />
+        ))}
+      </g>
+
+      <Fragment set:html={slotHtml} />
+    </svg>
+  </div>
+
+  {caption && <figcaption class="vv-stage-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  /* Outer figure — matches PodLifecycleAnimation .pod-lifecycle chrome */
+  .vv-stage {
+    margin: 2.5rem 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .vv-stage-title {
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Canvas: aspect-ratio is set inline from the viewBox prop */
+  .vv-stage-canvas {
+    position: relative;
+    width: 100%;
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .vv-stage-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .vv-stage-caption {
+    margin-top: 0.85rem;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* Wires — fade-in keyframe (0 → 0.55 opacity), retargeted for VvStage */
+  :global(.vv-wire) {
+    opacity: 0;
+    animation: vv-wire-in 400ms ease-out var(--wd, 0ms) forwards;
+    stroke: var(--tone, var(--brand-primary));
+    fill: none;
+  }
+  @keyframes vv-wire-in {
+    to { opacity: 0.55; }
+  }
+
+  /* Tone palette (D-10) — expressed as :global CSS custom-property setters
+     so children under any data-astro-cid-* scope inherit the tone. */
+  :global(.vv-tone-teal)          { --tone: var(--brand-primary); }
+  :global(.vv-tone-amber)         { --tone: var(--brand-accent); }
+  :global(.vv-tone-k8s)           { --tone: var(--topic-k8s); }
+  :global(.vv-tone-architecture)  { --tone: var(--topic-architecture); }
+  :global(.vv-tone-opinion)       { --tone: var(--topic-opinion); }
+  :global(.vv-tone-tutorial)      { --tone: var(--topic-tutorial); }
+
+  /* Node tone accent — left border color driven by --tone */
+  :global(.vv-node) {
+    border-left-color: var(--tone, var(--brand-primary));
+  }
+
+  /* Packet tone — fill driven by --tone */
+  :global(.vv-packet) {
+    fill: var(--tone, var(--brand-primary));
+  }
+
+  /* Reduced-motion (D-18): freeze nodes/wires at final state, hide packets.
+     :global() required because VvNode/VvWire/VvPacket live under different scopes. */
+  @media (prefers-reduced-motion: reduce) {
+    :global(.vv-stage .vv-node),
+    :global(.vv-stage .vv-wire) {
+      opacity: 1;
+      animation: none;
+      transform: none;
+    }
+    :global(.vv-stage .vv-wire) {
+      opacity: 0.55;
+    }
+    :global(.vv-stage .vv-packet) {
+      display: none;
+    }
+  }
+</style>
