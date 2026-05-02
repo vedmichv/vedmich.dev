@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import { remarkReadingTime } from './remark-reading-time.mjs';
+import icon from 'astro-icon';
 
 // https://astro.build/config
 export default defineConfig({
@@ -22,5 +23,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [mdx(), sitemap()],
+  // icon() uses default auto-tree-shaking; no `include` needed unless dynamic names appear.
+  integrations: [mdx(), sitemap(), icon()],
 });
