@@ -26,7 +26,7 @@
 - [ ] **Phase 4: Excalidraw Pipeline** — Export script + replace ASCII diagrams + stress-test on 2-3 posts
 - [ ] **Phase 5: Slidev Integration** — Git submodule + CI build + migrate 6 decks + DNS decision + onboarding docs
 - [ ] **Phase 6: Companion Posts** — 1 DKT + 1 AWS RU companion post via vv-blog-from-vault skill + schema extension
-- [ ] **Phase 7: Slidev → Astro Codegen (OPTIONAL)** — Checkpoint-gated; only if manual slide lift > 15 min after Phase 1
+- [~] **Phase 7: Slidev → Astro Codegen (OPTIONAL)** — **SKIPPED 2026-05-02**: time-to-port measured at 0.73 min (44s) on AWS three-tier; primitives alone hit the <10 min target, codegen ROI insufficient
 
 ---
 
@@ -55,13 +55,13 @@ Plans:
 - [x] 01-03-PLAN.md — VvStage skeleton: SSR host, viewBox/aspect-ratio, tone palette CSS, reduced-motion :global rules, per-stage glow filter id (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-04-PLAN.md — VvNode + VvWire + VvPacket register-only primitives + extend registry with PacketRecord + update VvStage to emit nodes/packets from registry (wave 2)
+- [x] 01-04-PLAN.md — VvNode + VvWire + VvPacket register-only primitives + extend registry with PacketRecord + update VvStage to emit nodes/packets from registry (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 01-05-PLAN.md — Refactor PodLifecycleAnimation.astro onto primitives (≤100 LOC) + Playwright pixel-parity gate + human visual sign-off (wave 3)
+- [x] 01-05-PLAN.md — Refactor PodLifecycleAnimation.astro onto primitives (≤100 LOC) + Playwright pixel-parity gate + human visual sign-off (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
-- [ ] 01-06-PLAN.md — src/components/visuals/README.md (200+ lines, 9 sections) + time-to-port metric measurement + Phase 7 go/skip decision (wave 4)
+- [x] 01-06-PLAN.md — src/components/visuals/README.md (200+ lines, 9 sections) + time-to-port metric measurement + Phase 7 go/skip decision (wave 4)
 
 **UI hint:** yes
 
@@ -161,8 +161,11 @@ Plans:
 
 ---
 
-### Phase 7: Slidev → Astro Codegen (OPTIONAL)
-**Goal:** Ship `scripts/slidev-to-astro.mjs` that reads one Slidev slide's `.md` + scoped `<style>`, strips Vue-specific attributes, swaps tokens, converts Iconify to inline SVG, and emits an `.astro` component using primitives — validated on S1 arch-grid, S2 lifecycle, and S3 mesh patterns.
+### Phase 7: Slidev → Astro Codegen (OPTIONAL) — **SKIPPED 2026-05-02**
+
+**Decision:** SKIP. Time-to-port measured at 0.73 min (44 s) on AWS three-tier architecture slide — primitives + README alone hit the <10 min target by a ~14× margin. Codegen would save ≤ 30 s per slide, not worth the 10-15 h effort. See `.planning/phases/01-rich-media-primitives/time-to-port-report.md` for the full measurement and rationale.
+
+**Original goal (preserved for reference):** Ship `scripts/slidev-to-astro.mjs` that reads one Slidev slide's `.md` + scoped `<style>`, strips Vue-specific attributes, swaps tokens, converts Iconify to inline SVG, and emits an `.astro` component using primitives — validated on S1 arch-grid, S2 lifecycle, and S3 mesh patterns.
 
 **Depends on:** Phase 1 (primitives must exist)
 
