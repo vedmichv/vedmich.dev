@@ -24,16 +24,30 @@ Validated in Phase 10: REQ-006 (Contact — functional mailto form replacing the
 Validated in Phase 11: REQ-007 (Brand-kit refresh — 3 canonical Deep Signal SVGs shipped to `public/`, 64×64 optimised hero PNG ≤ 10 KB, multi-size favicon.ico (16/32/48), full icon coverage via apple-touch-icon 180×180 + android-chrome 192/512 + site.webmanifest with theme-color `#14B8A6` + background-color `#0F172A`; idempotent `scripts/generate-icons.mjs` pipeline; `.design-handoff/` mirrors preserve 1.87 MB canonical hero beside the 5 KB derivative).
 Validated in Phase 12: REQ-012 (Footer reference-match — two-column flex matching `app.jsx:640-648`; 5 social-icon SVGs + `socialLinks` Footer import deleted (export retained for Contact section consumer); canonical `max-w-[1120px]` container; solid `border-border` + `text-[13px]`; bilingual i18n `footer.copyright` + `footer.built_with` and dynamic `new Date().getFullYear()` preserved; zero hex literals; 43 → 18 LOC).
 
-## Current milestone: v0.5 — Content Platform (planned)
+## Current milestone: v1.0 — Content Platform (planned, started 2026-05-02)
 
-Move vedmich.dev from "static site with a handful of posts" to a platform that lifts existing artifacts (Slidev slides, vv-carousel PNGs, Excalidraw diagrams, vault notes, podcast episodes) into blog posts with minimal manual work. Carousel/slide content integrated **as-is** — no major rewrites.
+Turn vedmich.dev from "static site with a handful of posts" into a full content platform: three content streams (blog, presentations, podcast/talk companion posts) under one domain, Slidev decks served as first-party sub-routes under `vedmich.dev/slides/<slug>/`, reusable rich-media primitives that cut Slidev-slide lift from ~30 min to < 10 min, Excalidraw diagrams embedded as inline SVGs, and an overall UI polish pass (transitions, hover states, "See all" CTAs, minor design fixes).
 
-Tentative phases (full design at `.planning/notes/milestone-v0.5-content-platform.md`):
-- **Phase 1 — Rich-media integration:** `VvStage`/`VvNode`/`VvWire`/`VvPacket` primitives + Shiki language badge + `// [!code highlight]` transformer + Excalidraw SVG-export pipeline (6-10h).
-- **Phase 2+ — Podcast/talk companion posts:** use `vv-blog-from-vault` skill for companion posts on new DKT + AWS RU podcast episodes (ongoing).
-- **Phase 3 (optional) — Phase 9.1 Karpenter animation polish:** only if Phase 9 rich-media experiment surfaces issues on live.
+**Target features:**
 
-**Exit criteria:** Slidev slide lift <10 min/slide (down from ~30 min); ≥1 Excalidraw diagram embedded; code blocks show language badge + highlight-lines; ≥2 companion posts shipped.
+- **Wave 1 — Rich-media primitives.** `VvStage` / `VvNode` / `VvWire` / `VvPacket` Astro components mirroring the Slidev Vue primitives; refactor `PodLifecycleAnimation.astro` onto the new primitives as a validation test.
+- **Wave 2 — Code block upgrades.** Shiki language badge (top-right pill), `// [!code highlight]` transformer, Shiki dark theme tuned to Deep Signal tokens.
+- **Wave 3 — Excalidraw pipeline.** `.excalidraw.json → SVG export → commit → embed`. Replace the ASCII diagram in the MCP post with a real Excalidraw SVG and add 1-2 more inline diagrams in existing posts for stress-testing.
+- **Wave 4 — Slidev → Astro codegen.** Script that reads one slide's `.md` + scoped `<style>` and emits an `.astro` component using the Wave 1 primitives. Handles S1 arch-grid, S2 lifecycle, S3 mesh.
+- **Slidev integration.** `vedmich.dev/slides/<slug>/` sub-routes replacing the current `s.vedmich.dev` subdomain. Unified domain, unified navigation, documented onboarding workflow (git submodule / subtree + CI + theme template) for shipping a new deck end-to-end.
+- **Polish pass.** Add "See all →" CTAs at the top and bottom of the Blog and Presentations homepage sections pointing to the existing `/{locale}/blog/` and `/{locale}/presentations/` index pages; extend `.animate-on-scroll` with section-transition / reveal variants; add hover states to `BlogCard` / `PresentationCard` / `SpeakingCard`; clean up remaining spacing / typography / alignment nits across homepage sections.
+- **Companion posts batch.** Ship 2 companion posts (1 DKT + 1 AWS RU episode) via the `vv-blog-from-vault` skill — validates the end-to-end content pipeline on real episodes.
+- **Optional — Karpenter animation polish.** Hotfix-style mini-phase, only triggered if the Wave 1 primitives refactor surfaces regressions on live `PodLifecycleAnimation`.
+
+**Exit criteria:**
+- Slidev slide lift < 10 min/slide (down from ~30 min) — proven by re-porting `PodLifecycleAnimation` onto Wave 1 primitives
+- At least 1 Excalidraw diagram embedded via the new pipeline (MCP post minimum; 2-3 additional placements desirable)
+- Code blocks render language badge + support `// [!code highlight]` comments with Deep Signal-matched Shiki theme
+- Slidev decks served under `vedmich.dev/slides/<slug>/` with a documented "add a new deck" workflow
+- "See all →" CTAs present at top and bottom of Blog + Presentations homepage sections
+- ≥ 2 companion posts shipped (1 DKT + 1 AWS RU)
+
+Design sketch: `.planning/notes/milestone-v0.5-content-platform.md` + `.planning/notes/rich-media-integration.md` (v0.5 scoping doc — scope now promoted to v1.0 with added Slidev integration + polish streams).
 
 ## Prior milestones
 
@@ -70,9 +84,30 @@ Tentative phases (full design at `.planning/notes/milestone-v0.5-content-platfor
 
 Site content sourced from `~/Documents/ViktorVedmich/`. NEVER read `10-AWS/11-Active-Clients/`, `14-Tips-AWS-Internal/`, `16-Amazon-Employer/` (confidential). Blog post sources: `33-Book-Kubernetes/`, `73-KB-Tech/`, `32-DKT/`, `15.10-AWS-RU-Podcast/`.
 
-## Not in scope for v0.4
+## Not in scope for v1.0
 
-- Real search (Pagefind/Algolia) — search pill is visual placeholder only.
-- Slidev presentation content fill.
-- Lighthouse/a11y audit.
-- Obsidian → blog auto-sync script.
+- Real search (Pagefind/Algolia) — search pill remains a visual placeholder.
+- Lighthouse / a11y formal audit (deferred to v1.1).
+- Obsidian → blog auto-sync script (manual `vv-blog-from-vault` skill stays the path).
+- Full interactive Excalidraw (breaks zero-JS budget — static SVG export only).
+- Slidev presenter / navigation UX inside blog posts (slides stay on sub-routes).
+- Slidev-exact fidelity for every slide (selective porting — some slides won't port cleanly, accept it).
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
+**Last updated:** 2026-05-02 (milestone v1.0 Content Platform kickoff)
