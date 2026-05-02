@@ -1266,20 +1266,20 @@ Phase 1 is **greenfield** — creating 4 new components + 1 refactor of an alrea
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the `via=` polyline preserve edge-point math on the endpoints, or should it use raw first/last coordinates?**
    - Current sketch: edge-points ARE computed (a, b), then waypoints interpolate between. So `M ${a.x} ${a.y} L waypoints... L ${b.x} ${b.y}`. Author's waypoints are between the edge points.
    - Alternative: waypoints include endpoints. Requires author to compute edge points themselves — defeats the convenience.
-   - **Recommendation: keep auto edge-points + interpolate waypoints between.** Document clearly.
+   - **RESOLVED:** keep auto edge-points + interpolate waypoints between. Document clearly.
 
 2. **Does `node --test` suffice for unit tests, or should we standardize on `@playwright/test`?**
    - `node --test` needs no config, runs fast, but shares no ecosystem with Playwright assertions.
    - `@playwright/test` provides a unified `expect()` API and baseline snapshot management.
-   - **Recommendation: unit tests use `node --test` (pure geometry functions); integration + visual tests use Playwright. Two tools, different jobs.** Planner can flip to Playwright-only if simpler.
+   - **RESOLVED:** unit tests use `node --test` (pure geometry functions); integration + visual tests use Playwright. Two tools, different jobs. Planner can flip to Playwright-only if simpler.
 
 3. **Should VvNode's `w`/`h` default be the PodLifecycle 12.22% × 19.51% (= 220×160 on 1800×820)?**
-   - Yes — keeps parity with the existing node size. Document in README.md. Authors override when needed.
+   - **RESOLVED:** Yes — keeps parity with the existing node size. Document in README.md. Authors override when needed.
 
 ---
 
