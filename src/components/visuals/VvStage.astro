@@ -91,6 +91,32 @@ for (const w of registry.wires.values()) {
   });
 }
 
+// Packet emissions from registry.packets
+interface PacketDef {
+  id: string;
+  wireRef?: string;
+  path?: string;
+  duration: string;
+  r: number;
+  glow: boolean;
+  tone: string;
+  beginExpr: string;
+}
+const packetDefs: PacketDef[] = [];
+for (const p of registry.packets.values()) {
+  const beginExpr = p.loop ? `${p.delay};${p.id}.end+${p.gap}` : p.delay;
+  packetDefs.push({
+    id: p.id,
+    wireRef: p.wire,
+    path: p.path,
+    duration: p.duration,
+    r: p.r,
+    glow: p.glow,
+    tone: p.tone,
+    beginExpr,
+  });
+}
+
 const glowId = `glow-${registry.uid}`;
 ---
 
@@ -98,6 +124,19 @@ const glowId = `glow-${registry.uid}`;
   {title && <div class="vv-stage-title">{title}</div>}
 
   <div class="vv-stage-canvas" style={aspectRatioStyle}>
+    {/* HTML node layer — reconstructed from registry.nodes */}
+    {[...registry.nodes.values()].map((n) => (
+      <div
+        class={`vv-node vv-anim-${n.animation} vv-tone-${n.tone}`}
+        data-id={n.id}
+        style={`left: ${(n.x / vbW) * 100}%; top: ${(n.y / vbH) * 100}%; width: ${(n.w / vbW) * 100}%; height: ${(n.h / vbH) * 100}%; --delay: ${n.delay}ms;`}
+      >
+        <span class="vv-node-icon" set:html={n.iconHtml} />
+        <span class="vv-node-label">{n.label}</span>
+      </div>
+    ))}
+
+    {/* SVG layer — wires (visible) + packets (animated) */}
     <svg class="vv-stage-svg" viewBox={viewBox} preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
@@ -124,7 +163,32 @@ const glowId = `glow-${registry.uid}`;
         ))}
       </g>
 
-      <Fragment set:html={slotHtml} />
+      <g class="vv-packets">
+        {packetDefs.map((pd) => (
+          <circle
+            r={pd.r}
+            class={`vv-packet vv-tone-${pd.tone}`}
+            filter={pd.glow ? `url(#${glowId})` : undefined}
+            opacity="0"
+          >
+            {pd.wireRef ? (
+              <animateMotion id={pd.id} dur={pd.duration} begin={pd.beginExpr} repeatCount="1">
+                <mpath href={`#wire-${pd.wireRef}`} />
+              </animateMotion>
+            ) : (
+              <animateMotion id={pd.id} dur={pd.duration} begin={pd.beginExpr} repeatCount="1" path={pd.path} />
+            )}
+            <animate
+              attributeName="opacity"
+              values="0;1;1;0"
+              keyTimes="0;0.15;0.85;1"
+              dur={pd.duration}
+              begin={pd.beginExpr}
+              repeatCount="1"
+            />
+          </circle>
+        ))}
+      </g>
     </svg>
   </div>
 
@@ -172,6 +236,69 @@ const glowId = `glow-${registry.uid}`;
     font-size: 0.8125rem;
     color: var(--text-muted);
     text-align: center;
+  }
+
+  /* Node base — absolute positioning inside .vv-stage-canvas.
+     Percentages come from inline style computed from x/y/w/h + viewBox dims. */
+  :global(.vv-stage .vv-node) {
+    position: absolute;
+    border-radius: 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-weight: 600;
+    font-size: clamp(0.7rem, 1.2vw, 1rem);
+    color: var(--text-primary);
+    opacity: 0;
+    animation-duration: 600ms;
+    animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
+    animation-fill-mode: forwards;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  :global(.vv-stage .vv-node-icon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Icon child sizing — works for both inline <svg> and astro-icon's <svg data-icon> output */
+  :global(.vv-stage .vv-node-icon > svg),
+  :global(.vv-stage .vv-node-icon > [data-icon]) {
+    width: clamp(22px, 3.2vw, 40px);
+    height: clamp(22px, 3.2vw, 40px);
+  }
+
+  :global(.vv-stage .vv-anim-slide-x) {
+    transform: translateX(-20px);
+    animation-name: vv-slide-x;
+  }
+  :global(.vv-stage .vv-anim-pop) {
+    transform: scale(0.5);
+    animation-name: vv-pop;
+    animation-duration: 700ms;
+  }
+  :global(.vv-stage .vv-anim-drop) {
+    animation-name: vv-drop;
+  }
+
+  @keyframes vv-slide-x {
+    0%   { opacity: 0; transform: translateX(-20px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes vv-drop {
+    0%   { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes vv-pop {
+    0%   { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1); }
   }
 
   /* Wires — fade-in keyframe (0 → 0.55 opacity), retargeted for VvStage */
