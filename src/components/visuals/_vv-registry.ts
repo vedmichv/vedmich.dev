@@ -15,12 +15,20 @@
  * singleton for AsyncLocalStorage-keyed per-request scopes. Contracts stay stable.
  */
 
+export type VvTone = 'teal' | 'amber' | 'k8s' | 'architecture' | 'opinion' | 'tutorial';
+export type VvNodeAnimation = 'slide-x' | 'pop' | 'drop';
+
 export interface NodeRecord {
   id: string;
   x: number;
   y: number;
   w: number;
   h: number;
+  label: string;
+  tone: VvTone;
+  animation: VvNodeAnimation;
+  delay: number;       // milliseconds
+  iconHtml: string;    // rendered default-slot output; empty string if slot absent
 }
 
 export interface WireRecord {
@@ -34,24 +42,42 @@ export interface WireRecord {
   delay?: number;
 }
 
+export interface PacketRecord {
+  id: string;
+  wire?: string;
+  path?: string;
+  duration: string;    // SMIL time value e.g. '1.4s'
+  delay: string;       // SMIL time value e.g. '1.2s'
+  r: number;
+  glow: boolean;
+  tone: VvTone;
+  loop: boolean;
+  gap: string;         // SMIL time value e.g. '4s'
+}
+
 export interface Registry {
   uid: string;
   nodes: Map<string, NodeRecord>;
   wires: Map<string, WireRecord>;
+  packets: Map<string, PacketRecord>;
   registerNode(n: NodeRecord): void;
   registerWire(w: WireRecord): void;
+  registerPacket(p: PacketRecord): void;
   getNode(id: string): NodeRecord | undefined;
   getWire(id: string): WireRecord | undefined;
+  getPacket(id: string): PacketRecord | undefined;
 }
 
 export function createStageRegistry(): Registry {
   const uid = `s${Math.random().toString(36).slice(2, 10)}`;
   const nodes = new Map<string, NodeRecord>();
   const wires = new Map<string, WireRecord>();
+  const packets = new Map<string, PacketRecord>();
   return {
     uid,
     nodes,
     wires,
+    packets,
     registerNode(n: NodeRecord) {
       if (nodes.has(n.id)) {
         console.warn(`<VvNode id="${n.id}"> — duplicate id; overwriting previous registration.`);
@@ -64,11 +90,20 @@ export function createStageRegistry(): Registry {
       }
       wires.set(w.id, w);
     },
+    registerPacket(p: PacketRecord) {
+      if (packets.has(p.id)) {
+        console.warn(`<VvPacket id="${p.id}"> — duplicate id; overwriting previous registration.`);
+      }
+      packets.set(p.id, p);
+    },
     getNode(id: string) {
       return nodes.get(id);
     },
     getWire(id: string) {
       return wires.get(id);
+    },
+    getPacket(id: string) {
+      return packets.get(id);
     },
   };
 }

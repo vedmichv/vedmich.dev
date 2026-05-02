@@ -72,3 +72,44 @@ test('sequential stage lifecycles work without leakage', () => {
   // After the loop, no stage is active
   assert.throws(() => currentRegistry(), /must be inside a <VvStage>/);
 });
+
+test('registerPacket stores record + getPacket retrieves', () => {
+  const r = createStageRegistry();
+  r.registerPacket({
+    id: 'pkt-1', wire: 'kubectl-api',
+    duration: '1.4s', delay: '1.2s',
+    r: 10, glow: true, tone: 'teal', loop: true, gap: '4s',
+  });
+  const got = r.getPacket('pkt-1');
+  assert.equal(got?.wire, 'kubectl-api');
+  assert.equal(got?.duration, '1.4s');
+  assert.equal(got?.glow, true);
+  assert.equal(r.getPacket('missing'), undefined);
+});
+
+test('NodeRecord carries label/tone/animation/delay/iconHtml', () => {
+  const r = createStageRegistry();
+  r.registerNode({
+    id: 'api', x: 360, y: 330, w: 220, h: 160,
+    label: 'API server', tone: 'teal', animation: 'pop', delay: 300,
+    iconHtml: '<svg viewBox="0 0 24 24"/>',
+  });
+  const got = r.getNode('api');
+  assert.equal(got?.label, 'API server');
+  assert.equal(got?.tone, 'teal');
+  assert.equal(got?.animation, 'pop');
+  assert.equal(got?.delay, 300);
+  assert.equal(got?.iconHtml, '<svg viewBox="0 0 24 24"/>');
+});
+
+test('packets map starts empty + is isolated across stage lifecycles', () => {
+  const r1 = createStageRegistry();
+  assert.equal(r1.packets.size, 0);
+  r1.registerPacket({
+    id: 'p', path: 'M 0 0 L 10 10', duration: '1s', delay: '0s',
+    r: 10, glow: true, tone: 'teal', loop: false, gap: '0s',
+  });
+  assert.equal(r1.packets.size, 1);
+  const r2 = createStageRegistry();
+  assert.equal(r2.packets.size, 0);
+});
