@@ -22,7 +22,7 @@ import {
   popStage,
 } from './_vv-registry.ts';
 import { computeWirePath } from './_vv-path.ts';
-import type { Rect } from './_vv-geom.ts';
+import { computeEdgePoints, type Rect } from './_vv-geom.ts';
 
 interface Props {
   title?: string;
@@ -82,9 +82,27 @@ for (const w of registry.wires.values()) {
     w: toNode.w,
     h: toNode.h,
   };
+
+  // Escape hatch: if fromPoint/toPoint provided, build path manually; else use computeWirePath
+  let d: string;
+  if (w.fromPoint || w.toPoint) {
+    // Derive missing endpoint via computeEdgePoints so either override still works
+    const mathed = computeEdgePoints(fromRect, toRect);
+    const [ax, ay] = w.fromPoint ?? [mathed.a.x, mathed.a.y];
+    const [bx, by] = w.toPoint ?? [mathed.b.x, mathed.b.y];
+    if (w.via && w.via.length > 0) {
+      const segments = [`M ${ax} ${ay}`, ...w.via.map(([x, y]) => `L ${x} ${y}`), `L ${bx} ${by}`];
+      d = segments.join(' ');
+    } else {
+      d = `M ${ax} ${ay} L ${bx} ${by}`;
+    }
+  } else {
+    d = computeWirePath(fromRect, toRect, { curve: w.curve, via: w.via });
+  }
+
   wireDefs.push({
     id: w.id,
-    d: computeWirePath(fromRect, toRect, { curve: w.curve, via: w.via }),
+    d,
     dashed: w.dashed ?? false,
     tone: w.tone ?? 'teal',
     delay: w.delay ?? 0,

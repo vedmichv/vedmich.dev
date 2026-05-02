@@ -40,6 +40,8 @@ export interface WireRecord {
   dashed?: boolean;
   tone?: string;
   delay?: number;
+  fromPoint?: [number, number];    // escape hatch: override auto edge-point on `from`
+  toPoint?: [number, number];      // escape hatch: override auto edge-point on `to`
 }
 
 export interface PacketRecord {
