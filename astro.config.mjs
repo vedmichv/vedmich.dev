@@ -40,5 +40,15 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   // icon() uses default auto-tree-shaking; no `include` needed unless dynamic names appear.
-  integrations: [mdx(), sitemap(), icon()],
+  integrations: [
+    mdx(),
+    // Exclude draft content from sitemap (e.g. Phase 2 `__fixture-*` posts).
+    // Astro builds draft pages into `dist/` by default; homepage/BlogPreview
+    // filter via `.filter(p => !p.data.draft)`, but @astrojs/sitemap does not
+    // know about that flag and would index the URL otherwise. Keep SEO clean.
+    sitemap({
+      filter: (page) => !/\/blog\/__/.test(page),
+    }),
+    icon(),
+  ],
 });
