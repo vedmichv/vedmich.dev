@@ -125,7 +125,7 @@ Plans:
 ---
 
 ### Phase 4: Excalidraw Pipeline
-**Goal:** Establish build-time `.excalidraw.json → SVG` export pipeline, replace ASCII diagram in MCP blog post with Excalidraw SVG, and stress-test the pipeline on 2-3 additional diagrams in existing posts.
+**Goal:** Establish build-time `.excalidraw.json → SVG` export pipeline at `scripts/excalidraw-to-svg.mjs` using `@aldinokemal2104/excalidraw-to-svg@1.1.1` (per D-01e) with SVGO `preset-default` + `removeDesc: false` override, inject `<title>`+`<desc>` pre-SVGO, enforce ≤ 10 KB per-file budget, embed via `<img>` in bilingual MDX. Validated by swapping the MCP post ASCII diagram for an Excalidraw SVG (EN + RU) plus a karpenter split-ownership stress-test diagram.
 
 **Depends on:** Phase 3 (independent, but positioned before companion posts so diagram pipeline is ready for them)
 
@@ -135,10 +135,24 @@ Plans:
 1. `scripts/excalidraw-to-svg.mjs` converts `.excalidraw.json → .svg` via build-time Node script (zero runtime JS)
 2. Emitted diagrams are SVGO-optimized to ≤ 10 KB each (prevents LCP regression)
 3. Convention established: `public/blog-assets/<slug>/diagrams/*.svg` for committed diagrams, with `title`+`desc` a11y elements injected during export
-4. MCP blog post (`2026-03-15-mcp-intro.md`) ASCII diagram replaced with Excalidraw SVG rendered via the new pipeline (both `en/` and `ru/` locales)
-5. 2-3 additional Excalidraw diagrams added to existing posts (karpenter / manifests / TBD-third) — pipeline stress-tested on real content
+4. MCP blog post (`2026-03-02-mcp-servers-plainly-explained.md`) ASCII diagram replaced with Excalidraw SVG rendered via the new pipeline (both `en/` and `ru/` locales)
+5. 2-3 additional Excalidraw diagrams added to existing posts (karpenter split-ownership minimum; stretch as capacity allows) — pipeline stress-tested on real content
 
-**Plans:** TBD
+**Plans:** 5 plans across 4 waves (0 → 1 → 2 → 3). Wave 2 runs Plans 03 + 04 in parallel (zero file overlap).
+
+Plans:
+**Wave 0** *(RED-state foundation)*
+- [ ] 04-01-PLAN.md — Pin `@aldinokemal2104/excalidraw-to-svg@1.1.1` as exact devDep (per D-01d + D-01e); create `tests/fixtures/excalidraw/` with `minimal.excalidraw.json` + `minimal.meta.json` + `oversize.excalidraw.json`; author `tests/unit/excalidraw-to-svg.test.ts` with 9 RED-state stubs (DIAG-01/02/03 + T-04-01 path-traversal)
+
+**Wave 1** *(blocked on 04-01)*
+- [ ] 04-02-PLAN.md — Implement `scripts/excalidraw-to-svg.mjs`: SVGO `preset-default` + `removeDesc: false`, inject `<title>`+`<desc>` pre-SVGO, viewBox → numeric width/height, 10 KB budget gate, `validatePath` (T-04-01), `validateFilesBlob` (T-04-03), `escapeXml` (T-04-02); turns all 9 Wave-0 tests GREEN
+
+**Wave 2** *(parallel — 04-03 and 04-04 share zero files; both blocked on 04-02)*
+- [ ] 04-03-PLAN.md — Author MCP `client-server.excalidraw.json` + meta; run pipeline → `public/blog-assets/2026-03-02-mcp-servers-plainly-explained/diagrams/client-server.svg`; swap ASCII `←→` at line 21 in EN + RU locales for `<img>` with `loading="eager"` + numeric width/height + localized alt (DIAG-04)
+- [ ] 04-04-PLAN.md — Author karpenter `split-ownership.excalidraw.json` + meta; run pipeline; insert `<img>` with `loading="lazy"` after the prose-only split-ownership section (line 55 EN / line 53 RU) of `2026-03-20-karpenter-right-sizing.mdx` in both locales; optional stretch-3rd-diagram task (DIAG-05)
+
+**Wave 3** *(blocked on 04-03 + 04-04)*
+- [ ] 04-05-PLAN.md — Ship `diagrams-source/README.md` runbook (5 H2 sections: Authoring / Metadata / Exporting / Embedding / Gotchas); update `.claude/skills/vv-blog-from-vault/references/visuals-routing.md` Priority 1 `excalidraw` row with delivery path; post-phase REQUIREMENTS.md DIAG-05 doc-drift fix per D-06 (DIAG-01 UNCHANGED per D-01e)
 
 ---
 
@@ -211,7 +225,7 @@ Plans:
 | 1. Rich Media Primitives | 0/? | Not started | - |
 | 2. Code Block Upgrades | 0/? | Not started | - |
 | 3. UI Polish | 3/4 | Executing (Plans 01 + 02 + 03 shipped 2026-05-03) | - |
-| 4. Excalidraw Pipeline | 0/? | Not started | - |
+| 4. Excalidraw Pipeline | 0/5 | Planned 2026-05-03 — 5 plans across 4 waves | - |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
 | 7. Slidev Codegen (OPTIONAL) | 0/? | Checkpoint-gated | - |
@@ -287,11 +301,11 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | POLISH-04 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (CSS infrastructure + grid wiring) |
 | POLISH-05 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (curve token + canonical CTA class) |
 | POLISH-06 | Homepage Polish | Phase 3 | Plan 04 shipped (14 baselines + AUDIT.md + 2 atomic fixes: About sm:py-28, Podcasts bg-surface+gap-5) |
-| DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-04 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-05 | Excalidraw Pipeline | Phase 4 | Pending |
+| DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (infra) + 04-02 (script) |
+| DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (budget test) + 04-02 (gate impl) |
+| DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (a11y tests) + 04-02 (injection) + 04-03/04 (canonical path) |
+| DIAG-04 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-03 (MCP swap, EN + RU) |
+| DIAG-05 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-04 (karpenter, EN + RU) |
 | SLIDES-01 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-02 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-03 | Slidev Integration | Phase 5 | Pending |
@@ -309,4 +323,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-03 (Phase 3 COMPLETE — all 4 plans shipped: motion infrastructure + bottom CTAs + stagger wiring + Shiki palette guard test + spacing audit)
+**Last updated:** 2026-05-03 (Phase 4 planned — 5 plans across 4 waves, Wave 2 parallel)
