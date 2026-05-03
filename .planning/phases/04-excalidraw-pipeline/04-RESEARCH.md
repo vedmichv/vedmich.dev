@@ -586,32 +586,37 @@ Research surfaced NO official Excalidraw docs for this path. All five failure-mo
 
 **If this table grows, users' confidence in the plan should drop. All A1-A7 are LOW-MEDIUM risk and empirically verifiable during Wave 0 (first real diagram export).**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does user want to stay literal on D-01 (`@excalidraw/excalidraw` + planner-picked shim) or accept the research-recommended drift (`@aldinokemal2104/excalidraw-to-svg`)?**
    - What we know: Research surfaces `@aldinokemal2104/excalidraw-to-svg@1.1.1` as the strong fit (~60 LOC script, zero unknown unknowns). Raw `@excalidraw/excalidraw` works but needs 4-6h of undocumented glue.
    - What's unclear: Whether D-01's "official package" preference was (a) about fidelity (both preserve it via shared `@excalidraw/utils`) or (b) about naming discipline (pin `@excalidraw/*` namespace). If (a), drift is trivially justified; if (b), user might want D-01 kept and absorb the 4-6h cost.
    - Recommendation: Planner surfaces this as a 1-question `AskUserQuestion` in PLAN-00 pre-wave (ask in Russian per CLAUDE.md GSD rule) before locking library choice. Question: "Use `@aldinokemal2104/excalidraw-to-svg` (thin wrapper over official `@excalidraw/utils`, documented Node path, +15 MB devDeps) OR use raw `@excalidraw/excalidraw` + hand-rolled jsdom/worker/font-embed (+90 MB devDeps, +4-6h effort, no official Node-headless docs)?" Either answer is valid; researcher has documented both paths.
+   - **RESOLVED:** CONTEXT D-01e (2026-05-03 user reconciliation) — use wrapper `@aldinokemal2104/excalidraw-to-svg@1.1.1`. See 04-CONTEXT.md §Library Choice.
 
 2. **MCP post second diagram — client-server (primary) + server-resource fan-out (stretch)?**
    - What we know: CONTEXT D-04b allows up to 2 MCP diagrams. Post has natural 2-diagram decomposition: §"The shape of it" (client-server flow) + §"Three concrete servers I use" (server fan-out to docs / DB / API).
    - What's unclear: Whether the 3 servers diagram aids content clarity enough to justify +1 diagram authoring effort.
    - Recommendation: Ship primary (client-server) first. Evaluate during DIAG-04 implementation — if the primary took < 20 min end-to-end, ship the fan-out as a stretch target the same day. If > 40 min, defer.
+   - **RESOLVED:** PLAN 04-04 task 4 (stretch gate) — optional second MCP diagram OR Karpenter 2nd — user-checkpoint decides at execute time.
 
 3. **Karpenter DIAG-05 candidate: split-ownership topology vs NodePool-constrained-provisioning?**
    - What we know: karpenter.mdx §"Trap 2 — Running CA and Karpenter at the same time" (lines 46-59) has a prose-only explanation of "split ownership" between CA (system node groups) and Karpenter (everything else) that would benefit from a labeled 2-pool diagram. It also has §"Step 1: Split ownership" at line 111 that references the same concept.
    - What's unclear: Whether a CA/Karpenter pool-split diagram is simpler to author than a NodePool-requirements-funnel diagram (showing how `limits.cpu` + `requirements` constrain Karpenter's instance-picker).
    - Recommendation: Planner picks based on author-effort estimate during diagrams-source creation. Split-ownership is structurally simpler (2 labeled boxes + 4 pod bubbles). NodePool-requirements is richer but requires more Excalidraw text. Prefer the simpler one for pipeline stress-test; content coverage is secondary to pipeline validation.
+   - **RESOLVED:** PLAN 04-04 task 1 picks Karpenter split-ownership topology (content gap at lines 55-59 of karpenter-right-sizing.mdx).
 
 4. **Does CONTEXT.md D-05b's "no `.prose img` override in v1" survive the MCP + karpenter reality?**
    - What we know: `@tailwindcss/typography` default sets `max-width: 100%` on `.prose img`. Should work.
    - What's unclear: Whether Excalidraw's 1800-wide native viewBox interacts with the `.prose` `max-width: 65ch` constraint cleanly. Preview on both 1440 and 375 viewports before committing.
    - Recommendation: Verify on dev build after first diagram lands; add `.prose img { margin-block: 1.5rem; }` scoped override only if visual inspection shows diagrams feel cramped.
+   - **RESOLVED:** CONTEXT D-05b — no override in v1; planner verifies on actual render and adds only if needed (deferred to post-exec sanity pass).
 
 5. **Does `<desc>` need to be bilingual, or just English?**
    - What we know: D-02d meta shape locks `descEn` required, `descRu` optional. Bilingual MDX `alt` is the primary a11y channel (different `<img>` per locale).
    - What's unclear: Whether a single SVG `<desc>` with `"EN // RU"` concatenation is screen-reader-friendly OR confuses AT.
    - Recommendation: Ship `<desc>` in English only for v1 (simpler, dominant audience). If a Russian audibility concern surfaces post-launch, add `<desc xml:lang="ru">` + `<desc xml:lang="en">` sibling pattern later (both W3C-valid). Script stays meta-driven.
+   - **RESOLVED:** PLAN 04-02 task 1 injects descEn only for v1; descRu remains in meta file as future-phase upgrade path (per RESEARCH recommendation).
 
 ## Environment Availability
 
