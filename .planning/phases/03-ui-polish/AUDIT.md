@@ -39,7 +39,7 @@ grep -nE "#[0-9A-Fa-f]{6}" src/components/{Hero,About,Podcasts,Speaking,Book,Pre
 
 | Section | Viewport | Finding | Fix | Status |
 |---------|----------|---------|-----|--------|
-| About | 1440 | Reference match structurally — bio + skills grid `md:grid-cols-[1.4fr_1fr]` = reference `gridTemplateColumns: '1.4fr 1fr'`, `gap-10` = reference `gap: 40`, bio `text-lg leading-[1.7]` = reference `fontSize: 18, lineHeight: 1.7`, pills `rounded-full px-3.5 py-1.5 text-[13px]` = reference Pill `padding: '6px 14px', borderRadius: 9999, fontSize: 13`. Only H2 uses reference-exact scale `text-[28px] font-semibold` in the entire site (finding F-systemic below). Section uses `py-20 px-6` only — no `sm:py-28` at desktop — inconsistent with the other 5 homepage sections (Podcasts/Speaking/Book/Presentations/Blog all use `py-20 sm:py-28`). | `fix(03-04): add sm:py-28 to About.astro to match homepage section rhythm` | FIX `PENDING-1` |
+| About | 1440 | Reference match structurally — bio + skills grid `md:grid-cols-[1.4fr_1fr]` = reference `gridTemplateColumns: '1.4fr 1fr'`, `gap-10` = reference `gap: 40`, bio `text-lg leading-[1.7]` = reference `fontSize: 18, lineHeight: 1.7`, pills `rounded-full px-3.5 py-1.5 text-[13px]` = reference Pill `padding: '6px 14px', borderRadius: 9999, fontSize: 13`. Only H2 uses reference-exact scale `text-[28px] font-semibold` in the entire site (finding F-systemic below). Section uses `py-20 px-6` only — no `sm:py-28` at desktop — inconsistent with the other 5 homepage sections (Podcasts/Speaking/Book/Presentations/Blog all use `py-20 sm:py-28`). | `fix(03-04): add sm:py-28 to About.astro to match homepage section rhythm` | FIX `8ceb39e` |
 | About | 375 | Reference match — bio stacks above skills grid (grid collapses to single column, expected), pills wrap tightly at 2-3 per row, no baseline shift or overflow. EXPERTISE label renders at `text-[11px]` uppercase tracking-[0.08em] which matches reference `fontSize: 11, textTransform: uppercase, letterSpacing: 0.08em`. "About Me" (live) vs "About me" (reference) is an i18n-string drift — deferred (DEFER-2 below). | — | OK |
 
 ---
@@ -142,7 +142,7 @@ grep -nE "#[0-9A-Fa-f]{6}" src/components/{Hero,About,Podcasts,Speaking,Book,Pre
 
 | # | Commit | Section | Change |
 |---|--------|---------|--------|
-| 1 | `PENDING-1` | About | Add `sm:py-28` to section padding for cross-section rhythm consistency |
+| 1 | `8ceb39e` | About | Add `sm:py-28` to section padding for cross-section rhythm consistency |
 | 2 | `PENDING-2` | Podcasts | Both cards `bg-bg` → `bg-surface` and grid `gap-6` → `gap-5` (reference-aligned) |
 
 ### After screenshots
