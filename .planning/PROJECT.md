@@ -24,6 +24,11 @@ Validated in Phase 10: REQ-006 (Contact — functional mailto form replacing the
 Validated in Phase 11: REQ-007 (Brand-kit refresh — 3 canonical Deep Signal SVGs shipped to `public/`, 64×64 optimised hero PNG ≤ 10 KB, multi-size favicon.ico (16/32/48), full icon coverage via apple-touch-icon 180×180 + android-chrome 192/512 + site.webmanifest with theme-color `#14B8A6` + background-color `#0F172A`; idempotent `scripts/generate-icons.mjs` pipeline; `.design-handoff/` mirrors preserve 1.87 MB canonical hero beside the 5 KB derivative).
 Validated in Phase 12: REQ-012 (Footer reference-match — two-column flex matching `app.jsx:640-648`; 5 social-icon SVGs + `socialLinks` Footer import deleted (export retained for Contact section consumer); canonical `max-w-[1120px]` container; solid `border-border` + `text-[13px]`; bilingual i18n `footer.copyright` + `footer.built_with` and dynamic `new Date().getFullYear()` preserved; zero hex literals; 43 → 18 LOC).
 
+**v1.0 milestone validations:**
+
+Validated in v1.0 Phase 2 (code-block-upgrades): CODE-01..05 — Shiki language badge pill, `// [!code highlight]` transformer, Deep Signal tuned github-dark palette with 8 load-bearing hex overrides, visual regression tests on 4 posts × 2 locales (9 playwright specs).
+Validated in v1.0 Phase 3 (ui-polish): POLISH-01..06 — bottom "All X →" CTAs unified on Blog/Presentations/Speaking using canonical class `text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap` (existing `blog.all_posts` / `presentations.all_decks` / `speaking.all_talks` i18n keys kept per D-01, REQUIREMENTS.md reference to `*.see_all` is accepted doc-drift); `--transition-normal` updated to `250ms cubic-bezier(0.16, 1, 0.3, 1)` (expo-out curve per reference app.jsx); `.animate-on-scroll-stagger` CSS variant (pure CSS `:nth-child(1..10)` at 60ms step, cap at 540ms for n+11, reduced-motion guard with `0ms !important`); 14-row visual audit against Deep Signal reference with 2 atomic fixes (About `sm:py-28` rhythm, Podcasts `bg-surface` + `gap-5`) and 3 cross-cutting DEFER rows (H2 scale, About Me casing, max-w-6xl harmonization); WR-03 Shiki palette guard test folded in (8 codeToHtml assertions, sentinel-anchored pointers via `SHIKI_TOKEN_OVERRIDES_BEGIN`/`END`). Card hover follows reference border+glow+title-color-shift (no translate-Y, no amber underline) per D-02.
+
 ## Current milestone: v1.0 — Content Platform (planned, started 2026-05-02)
 
 Turn vedmich.dev from "static site with a handful of posts" into a full content platform: three content streams (blog, presentations, podcast/talk companion posts) under one domain, Slidev decks served as first-party sub-routes under `vedmich.dev/slides/<slug>/`, reusable rich-media primitives that cut Slidev-slide lift from ~30 min to < 10 min, Excalidraw diagrams embedded as inline SVGs, and an overall UI polish pass (transitions, hover states, "See all" CTAs, minor design fixes).
@@ -110,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
-**Last updated:** 2026-05-03 (Phase 2 code-block-upgrades complete — CODE-01..05 shipped)
+**Last updated:** 2026-05-03 (Phase 3 ui-polish complete — POLISH-01..06 shipped)
