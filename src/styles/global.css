@@ -144,3 +144,131 @@ h1, h2, h3, h4,
     opacity: 1;
   }
 }
+
+/* =======================================================================
+   Phase 2 — Code Block Upgrades
+   Scope: .prose .shiki / .prose .code-block / .prose .line
+   Tokens: design-tokens.css §Brand, §Text, §Status, §Type, §Motion
+   ======================================================================= */
+
+/* -- Shiki <pre> base override (D-03b) -------------------------------- */
+.prose pre.shiki {
+  background-color: var(--bg-code) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border);
+}
+
+/* -- Token color overrides (D-03 / D-03c / D-03d).
+     Shiki github-dark emits `style="color:#XXXXXX"` inline per span;
+     we override with attribute selectors. `i` flag = case-insensitive
+     (Shiki sometimes emits lower-/upper-case hex between versions). -- */
+.prose .shiki span[style*="color:#E1E4E8" i] {
+  color: var(--text-primary) !important;
+}
+.prose .shiki span[style*="color:#F97583" i] {
+  color: var(--brand-primary) !important;
+}
+.prose .shiki span[style*="color:#9ECBFF" i] {
+  color: var(--brand-accent) !important;
+}
+.prose .shiki span[style*="color:#85E89D" i] {
+  color: var(--brand-primary) !important;
+}
+.prose .shiki span[style*="color:#79B8FF" i] {
+  color: var(--brand-primary-hover) !important;
+}
+.prose .shiki span[style*="color:#6A737D" i] {
+  color: var(--text-muted) !important;
+}
+.prose .shiki span[style*="color:#B392F0" i] {
+  color: var(--text-primary) !important;
+}
+.prose .shiki span[style*="color:#FFAB70" i] {
+  color: var(--brand-primary-hover) !important;
+}
+
+/* -- Figure wrapper (from rehype-code-badge.mjs) -------------------- */
+.prose .code-block {
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+/* Kill default browser <figure> margin so Tailwind prose still controls spacing. */
+.prose figure.code-block > pre.shiki {
+  margin: 0;
+}
+
+/* -- Language badge (D-06) ------------------------------------------ */
+.prose .code-lang-badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.25rem 0.5rem;
+  pointer-events: none;
+  user-select: none;
+  transition: color 120ms ease;
+  z-index: 1;
+}
+
+.prose .code-block:hover .code-lang-badge {
+  color: var(--text-primary);
+}
+
+/* -- Highlighted line (D-04) — border-left + soft bg tint ---------- */
+.prose .shiki .line.highlighted {
+  display: inline-block;
+  width: 100%;
+  background: color-mix(in srgb, var(--brand-primary-soft) 45%, transparent);
+  border-left: 2px solid var(--brand-primary);
+  padding-left: calc(1rem - 2px);
+  margin-left: -1rem;
+}
+
+/* -- Diff add line (D-05) — success tint + `+` gutter glyph -------- */
+.prose .shiki .line.diff.add {
+  display: inline-block;
+  width: 100%;
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  padding-left: 0;
+  margin-left: -1rem;
+}
+
+.prose .shiki .line.diff.add::before {
+  content: "+";
+  display: inline-block;
+  width: 1rem;
+  padding-left: 0.25rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* -- Diff remove line (D-05) — error tint + `−` gutter glyph ------- */
+.prose .shiki .line.diff.remove {
+  display: inline-block;
+  width: 100%;
+  background: color-mix(in srgb, var(--error) 15%, transparent);
+  padding-left: 0;
+  margin-left: -1rem;
+}
+
+.prose .shiki .line.diff.remove::before {
+  content: "−"; /* U+2212 MINUS SIGN — visually heavier than hyphen */
+  display: inline-block;
+  width: 1rem;
+  padding-left: 0.25rem;
+  color: var(--error);
+  font-weight: 600;
+}
+
+/* -- Reduced motion — disable badge color transition --------------- */
+@media (prefers-reduced-motion: reduce) {
+  .prose .code-lang-badge {
+    transition: none;
+  }
+}
