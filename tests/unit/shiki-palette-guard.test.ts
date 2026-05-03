@@ -4,8 +4,9 @@ import { codeToHtml } from 'shiki';
 
 // Freeze github-dark palette hexes. If Shiki bumps the theme and one of these
 // changes, the corresponding test fails fast — forcing us to update the
-// matching attribute selector in src/styles/global.css (lines 169-192) so the
-// Deep Signal token override keeps matching.
+// matching attribute selector inside the SHIKI_TOKEN_OVERRIDES_BEGIN / _END
+// sentinel block in src/styles/global.css so the Deep Signal token override
+// keeps matching. Grep for `SHIKI_TOKEN_OVERRIDES_BEGIN` — line numbers drift.
 //
 // Run via: `npm run test:unit`. This test is picked up automatically by the
 // `tests/unit/*.test.ts` glob in package.json.
@@ -15,7 +16,8 @@ import { codeToHtml } from 'shiki';
 // global.css selector that needs its hex updated. Do not merge the bump until
 // all 8 pass.
 //
-// Load-bearing assertions (mirrors the 8 attribute selectors in global.css):
+// Load-bearing assertions (mirrors the 8 attribute selectors in the
+// SHIKI_TOKEN_OVERRIDES_BEGIN block of global.css):
 //   #E1E4E8 → --text-primary      (default text)
 //   #F97583 → --brand-primary     (keywords)
 //   #9ECBFF → --brand-accent      (strings)

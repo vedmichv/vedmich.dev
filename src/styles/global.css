@@ -186,10 +186,17 @@ h1, h2, h3, h4,
   border: 1px solid var(--border);
 }
 
-/* -- Token color overrides (D-03 / D-03c / D-03d).
-     Shiki github-dark emits `style="color:#XXXXXX"` inline per span;
-     we override with attribute selectors. `i` flag = case-insensitive
-     (Shiki sometimes emits lower-/upper-case hex between versions). -- */
+/* SHIKI_TOKEN_OVERRIDES_BEGIN — do not remove this sentinel.
+   Referenced by:
+     - tests/unit/shiki-palette-guard.test.ts (WR-03 palette guard)
+     - CLAUDE.md §Deep Signal Design System → "Shiki palette guard pattern"
+   Grep `SHIKI_TOKEN_OVERRIDES_BEGIN` to find the 8 load-bearing hex overrides
+   regardless of line shifts elsewhere in this file.
+
+   D-03 / D-03c / D-03d: Shiki github-dark emits `style="color:#XXXXXX"`
+   inline per span; we override with attribute selectors. `i` flag =
+   case-insensitive (Shiki sometimes emits lower-/upper-case hex between
+   versions). */
 .prose :is(.shiki, .astro-code) span[style*="color:#E1E4E8" i] {
   color: var(--text-primary) !important;
 }
@@ -214,6 +221,7 @@ h1, h2, h3, h4,
 .prose :is(.shiki, .astro-code) span[style*="color:#FFAB70" i] {
   color: var(--brand-primary-hover) !important;
 }
+/* SHIKI_TOKEN_OVERRIDES_END */
 
 /* -- Figure wrapper (from rehype-code-badge.mjs) -------------------- */
 .prose .code-block {
