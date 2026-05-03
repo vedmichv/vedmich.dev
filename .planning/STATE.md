@@ -3,22 +3,22 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Content Platform
 current_phase: 03
-status: executing
-last_updated: "2026-05-03T13:28:17.966Z"
+status: phase_complete
+last_updated: "2026-05-03T13:59:17.000Z"
 last_activity: 2026-05-03
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 16
-  completed_plans: 15
-  percent: 94
+  completed_plans: 16
+  percent: 100
 ---
 
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
 **Current phase:** 03
-**Status:** Executing Phase 03 (Plans 01 + 02 + 03 complete, Plan 04 next in Wave 3)
+**Status:** Phase 03 COMPLETE (all 4 plans shipped — ready for phase close-out and Phase 04 kickoff)
 **Last updated:** 2026-05-03
 
 ## Project Reference
@@ -29,13 +29,13 @@ progress:
 
 ## Current Position
 
-Phase: 03 (ui-polish) — EXECUTING
-Plan: 4 of 4
-Status: Plans 01 + 02 + 03 shipped; Plan 04 next (Wave 3 — spacing/typography audit)
-Resume file: .planning/phases/03-ui-polish/03-04-PLAN.md
-Last activity: 2026-05-03 -- Phase 03 Plan 02 shipped (118s, 3 commits, 3 files, POLISH-01..05 wiring)
+Phase: 03 (ui-polish) — COMPLETE
+Plan: 4 of 4 — ALL SHIPPED
+Status: All 4 plans complete; phase ready for orchestrator wrap-up (REQUIREMENTS.md doc-drift cleanup per D-01e) + Phase 04 (Excalidraw Pipeline) kickoff
+Resume file: next — Phase 04 planning
+Last activity: 2026-05-03 -- Phase 03 Plan 04 shipped (12min, 4 commits, 2 src files + AUDIT.md + 14 baseline PNGs + 4 after PNGs, POLISH-06 complete)
 
-Progress: [█████████░] 94%
+Progress: [██████████] 100%
 
 ## Completed Phases
 
@@ -57,6 +57,7 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 | 03    | 01   | 65s      | 2     | 2     | 2026-05-03 |
 | 03    | 03   | ~10min   | 2     | 2     | 2026-05-03 |
 | 03    | 02   | 118s     | 3     | 3     | 2026-05-03 |
+| 03    | 04   | 12min    | 2     | 2 src + AUDIT + 14 baseline + 4 after PNGs | 2026-05-03 |
 
 **Quality:**
 
@@ -66,6 +67,7 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 - Phase 03 Plan 01: zero deviations, all grep acceptance checks passed, build green on both task boundaries
 - Phase 03 Plan 03: 1 auto-fixed deviation (Rule 1 Bug — plan's `echo $FOO` fixture didn't produce `#FFAB70` under shiki@3.23.0; swapped to `echo $1` which does); 8/8 new assertions pass, total unit-test count 27 → 35
 - Phase 03 Plan 02: zero deviations, all 19 grep acceptance checks passed, build green on all three task boundaries, en.json/ru.json/BlogCard.astro/PresentationCard.astro byte-identical to HEAD~3
+- Phase 03 Plan 04: 2 atomic fixes shipped (About sm:py-28 + Podcasts bg-surface/gap-5); 3 cross-cutting findings logged as DEFER with rationale (H2 scale 6-file sweep, max-w-6xl 3-file harmonization, About Me→About me copy); zero hex in all 7 homepage components; build green on every boundary, 35/35 unit tests pass; homepage now ~98% reference-aligned
 
 ## Accumulated Context
 
@@ -81,10 +83,16 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 - **Phase 03 Plan 02 (2026-05-03):** Bottom `All posts →` and `All decks →` CTAs added to `src/components/BlogPreview.astro` and `src/components/Presentations.astro`. Blog bottom CTA guarded by `posts.length > 0` (empty state hides both top and bottom simultaneously); Presentations bottom CTA unconditional (matches unconditional top CTA — no empty-state branch). Both reuse existing `i.blog.all_posts` / `i.presentations.all_decks` keys per D-01 — zero new i18n keys added. REQUIREMENTS.md POLISH-01..03 `blog.see_all` / `presentations.see_all` naming drift is a deferred doc-only fix per D-01e.
 - **Phase 03 Plan 02 (2026-05-03):** `src/components/Speaking.astro` bottom CTA class list unified to canonical `text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap` per D-01c. Previous `font-body text-sm text-brand-primary hover:text-brand-primary-hover transition-colors` replaced. `font-body` dropped (redundant — section inherits body font); `whitespace-nowrap` added for consistency. All three homepage section bottom CTAs (Blog + Presentations + Speaking) now render with matching `text-text-muted → text-brand-primary` hover tone.
 - **Phase 03 Plan 02 (2026-05-03):** `animate-on-scroll-stagger` wrapper class attached to the Blog grid (3-card cascade at 0/60/120ms) and the Presentations grid (6-card cascade at 0..300ms). `BlogCard.astro` and `PresentationCard.astro` untouched — both already carry `.animate-on-scroll` on their outer `<a>` so they become stagger children automatically with zero per-card edit.
+- **Phase 03 Plan 04 (2026-05-03):** 14 baseline PNGs captured against live `vedmich.dev/en/` via repo-local `playwright chromium` headless script (no playwright-cli skill on disk — direct `playwright` package usage equivalent for public static site). Element-scoped on `section#<id>` for tight framing; `.animate-on-scroll` force-unhidden pre-capture for final reveal state. `.planning/phases/03-ui-polish/AUDIT.md` shipped with 14 rows across 7 H2 blocks (Hero/About/Podcasts/Speaking/Book/Presentations/Blog) + 3 DEFER blocks + summary tally.
+- **Phase 03 Plan 04 (2026-05-03):** Two atomic `fix(03-04): ...` commits: **8ceb39e** — `About.astro` cross-section padding rhythm (`py-20 px-6` → `py-20 sm:py-28 px-6`, +64px desktop section height); **bd589c5** — `Podcasts.astro` card bg + grid gap alignment (both cards `bg-bg` → `bg-surface`, grid `gap-6` → `gap-5` per reference `app.jsx:161,426`). Single-source-file per commit; AUDIT.md + after PNGs co-committed per plan acceptance criteria.
+- **Phase 03 Plan 04 (2026-05-03):** Three cross-cutting findings DEFER'd with rationale: (DEFER-1) H2 scale drift `text-3xl font-bold` vs `text-[28px] font-semibold` in 6 files — checkpoint-worthy subjective call; (DEFER-2) "About Me" vs "About me" i18n casing — copy/translation scope; (DEFER-3) `max-w-6xl` vs `max-w-[1120px]` section-width harmonization in 3 files. Each DEFER has future-phase pointer.
+- **Phase 03 Plan 04 (2026-05-03):** Three-commit atomic fix pattern pioneered — `fix-A` + AUDIT-with-PENDING-1 placeholder, `fix-B` + AUDIT-with-A-SHA-resolved + PENDING-2 placeholder, `docs-AUDIT-finalize` with both SHAs resolved. Avoids `git amend`, preserves one-source-file-per-commit atomicity. Reusable pattern for future audit phases.
 
 ### Technical Debt
 
 - **WR-03 Shiki palette guard todo** — shipped via 03-03 on 2026-05-03. `.planning/todos/pending/shiki-palette-guard.md` marked archivable; phase orchestrator to move to done/ (or delete) during end-of-phase cleanup after all 4 phase-3 plans complete.
+- **REQUIREMENTS.md POLISH-01..03 key-naming drift** — deferred per D-01e: post-phase doc-only commit to update language from `blog.see_all` / `presentations.see_all` / `speaking.see_all` to "keeping existing `blog.all_posts` / `presentations.all_decks` / `speaking.all_talks` keys". Phase 3 code changes kept existing keys; REQUIREMENTS.md still says rename. Orchestrator to fix post-phase.
+- **Phase 3 Plan 04 DEFER items (3 cross-cutting findings)** — see AUDIT.md DEFER-1, DEFER-2, DEFER-3 for full rationale. All three are polish-class, low-urgency. Candidates for a v1.1 "Typography alignment + copy pass" mini-plan or roll-into-next UI-phase.
 
 ### Todos
 
@@ -129,6 +137,8 @@ None.
 - Check progress counters
 - Resume from current phase/plan
 
-**After roadmap approval:**
+**Phase 3 complete. Next steps:**
 
-- `/gsd-plan-phase 1` to decompose Phase 1 (Rich Media Primitives) into executable plans
+- Orchestrator end-of-phase cleanup: (a) move `.planning/todos/pending/shiki-palette-guard.md` to archived/, (b) fix REQUIREMENTS.md POLISH-01..03 key-naming drift per D-01e, (c) evolve PROJECT.md after phase completion if relevant
+- `/gsd-context-phase 04` to gather Phase 04 (Excalidraw Pipeline) context
+- Phase 04 goal: `.excalidraw.json → SVG` build pipeline + replace MCP-post ASCII diagram + stress-test on 2-3 additional posts

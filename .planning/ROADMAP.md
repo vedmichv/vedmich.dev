@@ -22,7 +22,7 @@
 
 - [ ] **Phase 1: Rich Media Primitives** — VvStage/VvNode/VvWire/VvPacket Astro components + refactor PodLifecycleAnimation
 - [ ] **Phase 2: Code Block Upgrades** — Shiki transformers + language badge + Deep Signal theme override
-- [ ] **Phase 3: UI Polish** — "See all →" CTAs + hover states + section transitions + spacing audit
+- [x] **Phase 3: UI Polish** — "See all →" CTAs + hover states + section transitions + spacing audit
 - [ ] **Phase 4: Excalidraw Pipeline** — Export script + replace ASCII diagrams + stress-test on 2-3 posts
 - [ ] **Phase 5: Slidev Integration** — Git submodule + CI build + migrate 6 decks + DNS decision + onboarding docs
 - [ ] **Phase 6: Companion Posts** — 1 DKT + 1 AWS RU companion post via vv-blog-from-vault skill + schema extension
@@ -118,7 +118,7 @@ Plans:
 - [x] 03-02-PLAN.md — Bottom CTAs + stagger wiring: add `All posts →` to BlogPreview.astro, `All decks →` to Presentations.astro, unify Speaking.astro CTA style with canonical BlogPreview shape; wrap both grids in stagger variant (POLISH-01, 02, 03, 04 wiring, 05 class unification)
 
 **Wave 3** *(blocked on Plans 01 + 02 deploying to live)*
-- [ ] 03-04-PLAN.md — Spacing/typography audit: capture 14 baseline screenshots (7 sections × 2 viewports) via playwright-cli attach-to-real-Chrome on live vedmich.dev; ship AUDIT.md with 5-col findings table; fix each finding as atomic `fix(03): ...` commit with after-screenshot (POLISH-06)
+- [x] 03-04-PLAN.md — Spacing/typography audit: capture 14 baseline screenshots (7 sections × 2 viewports) via playwright-cli attach-to-real-Chrome on live vedmich.dev; ship AUDIT.md with 5-col findings table; fix each finding as atomic `fix(03): ...` commit with after-screenshot (POLISH-06)
 
 **UI hint:** yes
 
@@ -286,7 +286,7 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | POLISH-03 | Homepage Polish | Phase 3 | Plan 02 shipped (bottom `All decks →` CTA) |
 | POLISH-04 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (CSS infrastructure + grid wiring) |
 | POLISH-05 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (curve token + canonical CTA class) |
-| POLISH-06 | Homepage Polish | Phase 3 | Pending |
+| POLISH-06 | Homepage Polish | Phase 3 | Plan 04 shipped (14 baselines + AUDIT.md + 2 atomic fixes: About sm:py-28, Podcasts bg-surface+gap-5) |
 | DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending |
 | DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending |
 | DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending |
@@ -309,4 +309,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-03 (Phase 3 Plans 01 + 02 + 03 shipped — motion infrastructure + bottom CTAs + stagger wiring + Shiki palette guard test)
+**Last updated:** 2026-05-03 (Phase 3 COMPLETE — all 4 plans shipped: motion infrastructure + bottom CTAs + stagger wiring + Shiki palette guard test + spacing audit)
