@@ -21,7 +21,7 @@
     "synthesizer": "sonnet",
     "roadmapper": "sonnet"
   },
-  "current_milestone": "v0.4-reference-audit",
+  "current_milestone": "v1.0-content-platform",
   "milestone_numbering": {
     "phase_start": 1,
     "continue_from_previous": false
