@@ -197,16 +197,22 @@ h1, h2, h3, h4,
   margin: 1.5rem 0;
 }
 
-/* Kill default browser <figure> margin so Tailwind prose still controls spacing. */
+/* Kill default browser <figure> margin so Tailwind prose still controls spacing.
+   Reserve top padding for the badge + copy-button toolbar row (gap closure #1:
+   without this, the first code line renders under the badge/button at top). */
 .prose figure.code-block > pre:is(.shiki, .astro-code) {
   margin: 0;
+  padding-top: 2.25rem;
 }
 
-/* -- Language badge (D-06) ------------------------------------------ */
+/* -- Language badge (D-06) ------------------------------------------
+   Gap closure #1: badge moved right next to Copy button (was left: 0.6rem).
+   Rest: icon Copy + badge live in the same top-right corner.
+   Hover: badge fades out so it doesn't collide with the expanded "COPY" label. */
 .prose .code-lang-badge {
   position: absolute;
   top: 0.5rem;
-  left: 0.6rem;
+  right: 3rem;
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 500;
@@ -216,12 +222,12 @@ h1, h2, h3, h4,
   padding: 0.25rem 0.5rem;
   pointer-events: none;
   user-select: none;
-  transition: color 120ms ease;
+  transition: color 120ms ease, opacity 160ms ease;
   z-index: 1;
 }
 
 .prose .code-block:hover .code-lang-badge {
-  color: var(--text-primary);
+  opacity: 0;
 }
 
 /* -- Highlighted line (D-04) — border-left + soft bg tint ---------- */
