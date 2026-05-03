@@ -34,7 +34,7 @@ const posts = allPosts
     </div>
 
     {posts.length > 0 ? (
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-on-scroll-stagger">
         {posts.map((post) => (
           <BlogCard post={post} locale={locale} />
         ))}
@@ -43,6 +43,17 @@ const posts = allPosts
       <p class="text-text-muted animate-on-scroll">
         {locale === 'ru' ? 'Посты появятся скоро...' : 'Posts coming soon...'}
       </p>
+    )}
+
+    {posts.length > 0 && (
+      <div class="mt-10 animate-on-scroll">
+        <a
+          href={`/${locale}/blog`}
+          class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
+        >
+          {i.blog.all_posts} →
+        </a>
+      </div>
     )}
   </div>
 </section>
