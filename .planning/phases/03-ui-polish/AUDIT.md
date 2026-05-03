@@ -50,7 +50,7 @@ grep -nE "#[0-9A-Fa-f]{6}" src/components/{Hero,About,Podcasts,Speaking,Book,Pre
 
 | Section | Viewport | Finding | Fix | Status |
 |---------|----------|---------|-----|--------|
-| Podcasts | 1440 | Two card-glow cards render correctly, DKT logo image in first card, AWS RU text badge in second card. BUT cards use `bg-bg` (= `--bg-base` = `#0F172A`, same as page background) instead of `bg-surface` (= `--bg-surface` = `#1E293B`) — reference `Card` at `app.jsx:161` uses `background: VV.surface`. Cards look flush against the section background instead of lifted. Additionally grid uses `gap-6` (=24px) while reference `Podcasts` at `app.jsx:426` uses `gap: 20` (=20px) and the other site grids (Blog, Presentations) use `gap-5` (=20px). | `fix(03-04): align Podcasts cards + grid gap to reference (bg-surface, gap-5)` | FIX `PENDING-2` |
+| Podcasts | 1440 | Two card-glow cards render correctly, DKT logo image in first card, AWS RU text badge in second card. BUT cards use `bg-bg` (= `--bg-base` = `#0F172A`, same as page background) instead of `bg-surface` (= `--bg-surface` = `#1E293B`) — reference `Card` at `app.jsx:161` uses `background: VV.surface`. Cards look flush against the section background instead of lifted. Additionally grid uses `gap-6` (=24px) while reference `Podcasts` at `app.jsx:426` uses `gap: 20` (=20px) and the other site grids (Blog, Presentations) use `gap-5` (=20px). | `fix(03-04): align Podcasts cards + grid gap to reference (bg-surface, gap-5)` | FIX `bd589c5` |
 | Podcasts | 375 | Cards stack vertically (grid collapses). Same `bg-bg` vs `bg-surface` drift from 1440 — fix covers both viewports. H2 uses `text-3xl font-bold` site-wide drift (DEFER-1 below). `max-w-6xl` (=1152px) vs reference `1120` — known section-width harmonization drift flagged in PATTERNS.md, 3-section sweep, DEFER. | — | OK (see 1440 fix) |
 
 ---
@@ -143,7 +143,7 @@ grep -nE "#[0-9A-Fa-f]{6}" src/components/{Hero,About,Podcasts,Speaking,Book,Pre
 | # | Commit | Section | Change |
 |---|--------|---------|--------|
 | 1 | `8ceb39e` | About | Add `sm:py-28` to section padding for cross-section rhythm consistency |
-| 2 | `PENDING-2` | Podcasts | Both cards `bg-bg` → `bg-surface` and grid `gap-6` → `gap-5` (reference-aligned) |
+| 2 | `bd589c5` | Podcasts | Both cards `bg-bg` → `bg-surface` and grid `gap-6` → `gap-5` (reference-aligned) |
 
 ### After screenshots
 
