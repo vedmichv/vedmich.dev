@@ -65,7 +65,7 @@ const l = labels[locale];
 
       btn.addEventListener('click', async () => {
         const code = pre.querySelector('code');
-        const text = code ? code.innerText : pre.innerText;
+        const text = code ? code.textContent : pre.textContent;
 
         try {
           await navigator.clipboard.writeText(text);
