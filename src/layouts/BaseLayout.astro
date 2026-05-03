@@ -71,6 +71,19 @@ const altURL = new URL(getLocalizedPath(path, altLocale), Astro.site);
     </main>
     <Footer locale={locale} />
 
+    <!-- Singleton toast for CodeCopyEnhancer (D-07b). One per page, hidden until
+         a copy action sets text + .is-visible. Screen-reader polite announcement.
+         MUST be hidden via opacity:0 (NOT display:none / visibility:hidden /
+         aria-hidden) — those remove the element from the AT tree, silencing
+         aria-live announcements. See RESEARCH.md §Q6. -->
+    <div
+      id="code-copy-toast"
+      class="code-copy-toast"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
     <script>
       // Scroll-triggered animations — skipped when user prefers reduced motion.
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

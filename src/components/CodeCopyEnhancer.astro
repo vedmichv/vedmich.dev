@@ -1,10 +1,17 @@
 ---
-// Enhance all <pre> blocks inside `.prose` with a copy-to-clipboard button.
-// Mounts once per page; picks up every Shiki-rendered code block Astro emits.
-// The button uses Clipboard API with a graceful fallback; copy state is
-// announced to screen readers via aria-live.
+// Enhance Shiki-rendered code blocks inside `.prose` with a copy-to-clipboard
+// button. Pairs with `rehype-code-badge.mjs` which wraps every <pre class="shiki">
+// in <figure class="code-block">. This script targets `.code-block > pre` — the
+// figure already provides the toolbar container.
 //
-// Includes per-button localized labels so the same component serves EN + RU.
+// UX (D-02, D-07, D-07b): button always visible (icon-only at rest), expands to
+// [icon + label] on .code-block:hover. On successful copy, sets the singleton
+// toast text in BaseLayout (#code-copy-toast) + toggles .is-visible for ~2s.
+// No intra-button success class (toast is canonical — RESEARCH.md Pitfall 7).
+//
+// Preserves: Clipboard API + textarea fallback, aria-label, bilingual labels.
+
+import { Icon } from 'astro-icon/components';
 
 interface Props {
   locale?: 'en' | 'ru';
@@ -13,42 +20,57 @@ interface Props {
 const { locale = 'en' } = Astro.props;
 
 const labels = {
-  en: { copy: 'Copy', copied: 'Copied' },
-  ru: { copy: 'Копировать', copied: 'Скопировано' },
+  en: { copy: 'Copy', toastCopied: 'Copied to clipboard' },
+  ru: { copy: 'Копировать', toastCopied: 'Скопировано в буфер' },
 } as const;
 
 const l = labels[locale];
 ---
 
-<script is:inline data-copy-label={l.copy} data-copied-label={l.copied}>
+<!-- SSR template: inert at page load, cloned at runtime by the script below.
+     Using astro-icon's <Icon> here keeps the Lucide SVG canonical (not hardcoded). -->
+<template id="code-copy-btn-template">
+  <button type="button" class="code-copy-btn" aria-label={l.copy}>
+    <Icon name="lucide:copy" width="14" height="14" aria-hidden="true" />
+    <span class="code-copy-btn-label">{l.copy}</span>
+  </button>
+</template>
+
+<script
+  is:inline
+  data-copy-label={l.copy}
+  data-toast-copied-label={l.toastCopied}
+>
   (() => {
     const script = document.currentScript;
-    const COPY = script?.dataset.copyLabel ?? 'Copy';
-    const COPIED = script?.dataset.copiedLabel ?? 'Copied';
+    const COPY_LABEL = script?.dataset.copyLabel ?? 'Copy';
+    const TOAST_COPIED = script?.dataset.toastCopiedLabel ?? 'Copied';
 
-    const pres = document.querySelectorAll('.prose pre');
+    // Clone the SSR template once per page (shared across all buttons).
+    const template = document.getElementById('code-copy-btn-template');
+    if (!(template instanceof HTMLTemplateElement)) return;
+
+    const pres = document.querySelectorAll('.prose .code-block > pre');
     pres.forEach((pre) => {
-      if (pre.parentElement?.classList.contains('code-wrap')) return;
+      const figure = pre.parentElement;
+      if (!figure || !figure.classList.contains('code-block')) return;
+      // Skip if a copy button already exists (hot-reload or double-run safety).
+      if (figure.querySelector('.code-copy-btn')) return;
 
-      const wrap = document.createElement('div');
-      wrap.className = 'code-wrap';
-      pre.parentNode?.insertBefore(wrap, pre);
-      wrap.appendChild(pre);
-
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'code-copy-btn';
-      btn.setAttribute('aria-label', COPY);
-      btn.textContent = COPY;
-      wrap.appendChild(btn);
+      const frag = template.content.cloneNode(true);
+      const btn = frag.querySelector('.code-copy-btn');
+      if (!(btn instanceof HTMLButtonElement)) return;
+      btn.setAttribute('aria-label', COPY_LABEL);
+      figure.appendChild(btn);
 
       btn.addEventListener('click', async () => {
         const code = pre.querySelector('code');
         const text = code ? code.innerText : pre.innerText;
+
         try {
           await navigator.clipboard.writeText(text);
         } catch {
-          // Fallback: textarea selection
+          // Fallback: off-screen textarea selection + execCommand.
           const ta = document.createElement('textarea');
           ta.value = text;
           ta.style.position = 'fixed';
@@ -58,64 +80,79 @@ const l = labels[locale];
           try { document.execCommand('copy'); } catch { /* noop */ }
           document.body.removeChild(ta);
         }
-        btn.textContent = COPIED;
-        btn.classList.add('is-copied');
-        setTimeout(() => {
-          btn.textContent = COPY;
-          btn.classList.remove('is-copied');
-        }, 1600);
+
+        // Toast feedback — singleton in BaseLayout.astro.
+        const toast = document.getElementById('code-copy-toast');
+        if (toast) {
+          toast.textContent = TOAST_COPIED;
+          toast.classList.add('is-visible');
+          // Clear any pending hide from a previous copy so double-clicks
+          // reset the 2s window (last-write-wins per D-07c).
+          if (toast.__hideTimer) clearTimeout(toast.__hideTimer);
+          toast.__hideTimer = setTimeout(() => {
+            toast.classList.remove('is-visible');
+          }, 2000);
+        }
       });
     });
   })();
 </script>
 
 <style is:global>
-  .prose .code-wrap {
+  /* Copy button baseline — always visible, icon-only at rest. */
+  .prose .code-block {
+    /* Ensure figure is the positioning context for the absolute button. */
     position: relative;
-  }
-
-  .prose .code-wrap > pre {
-    /* preserve whatever Shiki+Astro set */
   }
 
   .prose .code-copy-btn {
     position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    padding: 0.3rem 0.6rem;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.5rem;
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--text-muted);
-    background: var(--bg-base);
-    border: 1px solid var(--border);
+    background: transparent;
+    border: 1px solid transparent;
     border-radius: 6px;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 120ms ease, color 120ms ease, border-color 120ms ease, background 120ms ease;
+    transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+    z-index: 1;
   }
 
-  .prose .code-wrap:hover .code-copy-btn,
+  /* Label hidden at rest — icon only. */
+  .prose .code-copy-btn-label {
+    display: none;
+  }
+
+  /* On .code-block hover: expand to icon + label. */
+  .prose .code-block:hover .code-copy-btn,
   .prose .code-copy-btn:focus-visible {
-    opacity: 1;
+    color: var(--text-primary);
+    border-color: var(--border);
+    background: var(--bg-elevated);
   }
 
-  .prose .code-copy-btn:hover {
-    color: var(--brand-primary);
-    border-color: var(--brand-primary);
+  .prose .code-block:hover .code-copy-btn-label,
+  .prose .code-copy-btn:focus-visible .code-copy-btn-label {
+    display: inline;
   }
 
-  .prose .code-copy-btn.is-copied {
-    color: var(--brand-primary);
-    border-color: var(--brand-primary);
-    background: var(--brand-primary-soft);
-    opacity: 1;
+  /* Icon sizing — Lucide stroke inherits currentColor from the button. */
+  .prose .code-copy-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
   }
 
-  /* Always visible on touch devices (no hover) */
-  @media (hover: none) {
-    .prose .code-copy-btn { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .prose .code-copy-btn { transition: none; }
   }
 </style>

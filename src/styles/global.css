@@ -272,3 +272,39 @@ h1, h2, h3, h4,
     transition: none;
   }
 }
+
+/* =======================================================================
+   Phase 2 — Code Copy Toast (D-07b / D-07c)
+   Singleton <div id="code-copy-toast"> in BaseLayout.astro. Hidden via
+   opacity:0 (NOT display:none) so aria-live announcements still fire.
+   ======================================================================= */
+
+.code-copy-toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--success);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  z-index: 1000;
+  transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.code-copy-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-copy-toast {
+    transition: none;
+  }
+}
