@@ -110,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
-**Last updated:** 2026-05-02 (milestone v1.0 Content Platform kickoff)
+**Last updated:** 2026-05-03 (Phase 2 code-block-upgrades complete — CODE-01..05 shipped)
