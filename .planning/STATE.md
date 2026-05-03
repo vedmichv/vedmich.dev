@@ -4,21 +4,21 @@ milestone: v1.0
 milestone_name: Content Platform
 current_phase: 03
 status: executing
-last_updated: "2026-05-03T13:20:38.000Z"
+last_updated: "2026-05-03T13:28:17.966Z"
 last_activity: 2026-05-03
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 15
+  percent: 94
 ---
 
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
 **Current phase:** 03
-**Status:** Executing Phase 03 (Plans 01 + 03 complete, Plan 02 next in Wave 2)
+**Status:** Executing Phase 03 (Plans 01 + 02 + 03 complete, Plan 04 next in Wave 3)
 **Last updated:** 2026-05-03
 
 ## Project Reference
@@ -30,12 +30,12 @@ progress:
 ## Current Position
 
 Phase: 03 (ui-polish) — EXECUTING
-Plan: 2 of 4
-Status: Plan 01 complete (POLISH-04 CSS + POLISH-05 curve shipped); Plan 03 complete (WR-03 shiki palette guard); Plan 02 next (Wave 2 — bottom CTAs + stagger wiring)
-Resume file: .planning/phases/03-ui-polish/03-02-PLAN.md
-Last activity: 2026-05-03 -- Phase 03 Plan 03 shipped (~10min, 2 commits, 2 files, WR-03 Phase 2 tech-debt closure)
+Plan: 4 of 4
+Status: Plans 01 + 02 + 03 shipped; Plan 04 next (Wave 3 — spacing/typography audit)
+Resume file: .planning/phases/03-ui-polish/03-04-PLAN.md
+Last activity: 2026-05-03 -- Phase 03 Plan 02 shipped (118s, 3 commits, 3 files, POLISH-01..05 wiring)
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 94%
 
 ## Completed Phases
 
@@ -56,6 +56,7 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 |-------|------|----------|-------|-------|-----------|
 | 03    | 01   | 65s      | 2     | 2     | 2026-05-03 |
 | 03    | 03   | ~10min   | 2     | 2     | 2026-05-03 |
+| 03    | 02   | 118s     | 3     | 3     | 2026-05-03 |
 
 **Quality:**
 
@@ -64,6 +65,7 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 - Zero-JS budget: maintained (only IntersectionObserver, menu toggle, CodeCopyEnhancer allowed)
 - Phase 03 Plan 01: zero deviations, all grep acceptance checks passed, build green on both task boundaries
 - Phase 03 Plan 03: 1 auto-fixed deviation (Rule 1 Bug — plan's `echo $FOO` fixture didn't produce `#FFAB70` under shiki@3.23.0; swapped to `echo $1` which does); 8/8 new assertions pass, total unit-test count 27 → 35
+- Phase 03 Plan 02: zero deviations, all 19 grep acceptance checks passed, build green on all three task boundaries, en.json/ru.json/BlogCard.astro/PresentationCard.astro byte-identical to HEAD~3
 
 ## Accumulated Context
 
@@ -76,6 +78,9 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 - **Phase 03 Plan 03 (2026-05-03):** Shipped `tests/unit/shiki-palette-guard.test.ts` (8 `codeToHtml(...theme:'github-dark')` node:test assertions, one per load-bearing hex in `src/styles/global.css` attribute selectors); all 8 pass on current shiki@3.23.0. WR-03 (Phase 2 tech debt) closed.
 - **Phase 03 Plan 03 (2026-05-03):** CLAUDE.md §Deep Signal Design System gains `### Shiki palette guard pattern` subsection documenting what/when/run-command/origin — pointer only; test file is the 8-hex canonical source of truth.
 - **Phase 03 Plan 03 (2026-05-03):** Rule 1 bug in plan's fixture — `echo $FOO` renders `$FOO` as default-text #E1E4E8 under shiki@3.23.0 bash grammar, not #FFAB70. Swapped to `echo $1` (positional arg, which IS colored #FFAB70). Probed 23 candidate fixtures across 13 languages before selecting. Inline NB comment added to the test to prevent re-litigation.
+- **Phase 03 Plan 02 (2026-05-03):** Bottom `All posts →` and `All decks →` CTAs added to `src/components/BlogPreview.astro` and `src/components/Presentations.astro`. Blog bottom CTA guarded by `posts.length > 0` (empty state hides both top and bottom simultaneously); Presentations bottom CTA unconditional (matches unconditional top CTA — no empty-state branch). Both reuse existing `i.blog.all_posts` / `i.presentations.all_decks` keys per D-01 — zero new i18n keys added. REQUIREMENTS.md POLISH-01..03 `blog.see_all` / `presentations.see_all` naming drift is a deferred doc-only fix per D-01e.
+- **Phase 03 Plan 02 (2026-05-03):** `src/components/Speaking.astro` bottom CTA class list unified to canonical `text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap` per D-01c. Previous `font-body text-sm text-brand-primary hover:text-brand-primary-hover transition-colors` replaced. `font-body` dropped (redundant — section inherits body font); `whitespace-nowrap` added for consistency. All three homepage section bottom CTAs (Blog + Presentations + Speaking) now render with matching `text-text-muted → text-brand-primary` hover tone.
+- **Phase 03 Plan 02 (2026-05-03):** `animate-on-scroll-stagger` wrapper class attached to the Blog grid (3-card cascade at 0/60/120ms) and the Presentations grid (6-card cascade at 0..300ms). `BlogCard.astro` and `PresentationCard.astro` untouched — both already carry `.animate-on-scroll` on their outer `<a>` so they become stagger children automatically with zero per-card edit.
 
 ### Technical Debt
 

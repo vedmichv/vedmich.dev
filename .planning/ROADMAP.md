@@ -115,7 +115,7 @@ Plans:
 - [x] 03-03-PLAN.md — WR-03 fold: ship `tests/unit/shiki-palette-guard.test.ts` with 8 github-dark hex assertions + document guard pattern in CLAUDE.md (Phase 2 tech-debt closure, folded per D-05)
 
 **Wave 2** *(blocked on Plan 01)*
-- [ ] 03-02-PLAN.md — Bottom CTAs + stagger wiring: add `All posts →` to BlogPreview.astro, `All decks →` to Presentations.astro, unify Speaking.astro CTA style with canonical BlogPreview shape; wrap both grids in stagger variant (POLISH-01, 02, 03, 04 wiring, 05 class unification)
+- [x] 03-02-PLAN.md — Bottom CTAs + stagger wiring: add `All posts →` to BlogPreview.astro, `All decks →` to Presentations.astro, unify Speaking.astro CTA style with canonical BlogPreview shape; wrap both grids in stagger variant (POLISH-01, 02, 03, 04 wiring, 05 class unification)
 
 **Wave 3** *(blocked on Plans 01 + 02 deploying to live)*
 - [ ] 03-04-PLAN.md — Spacing/typography audit: capture 14 baseline screenshots (7 sections × 2 viewports) via playwright-cli attach-to-real-Chrome on live vedmich.dev; ship AUDIT.md with 5-col findings table; fix each finding as atomic `fix(03): ...` commit with after-screenshot (POLISH-06)
@@ -210,7 +210,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Rich Media Primitives | 0/? | Not started | - |
 | 2. Code Block Upgrades | 0/? | Not started | - |
-| 3. UI Polish | 2/4 | Executing (Plans 01 + 03 shipped 2026-05-03) | - |
+| 3. UI Polish | 3/4 | Executing (Plans 01 + 02 + 03 shipped 2026-05-03) | - |
 | 4. Excalidraw Pipeline | 0/? | Not started | - |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
@@ -281,11 +281,11 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | CODE-03 | Code Block Upgrades | Phase 2 | Pending |
 | CODE-04 | Code Block Upgrades | Phase 2 | Pending |
 | CODE-05 | Code Block Upgrades | Phase 2 | Pending |
-| POLISH-01 | Homepage Polish | Phase 3 | Pending |
-| POLISH-02 | Homepage Polish | Phase 3 | Pending |
-| POLISH-03 | Homepage Polish | Phase 3 | Pending |
-| POLISH-04 | Homepage Polish | Phase 3 | Plan 01 shipped (CSS infrastructure) |
-| POLISH-05 | Homepage Polish | Phase 3 | Plan 01 shipped (curve token) |
+| POLISH-01 | Homepage Polish | Phase 3 | Plan 02 shipped (top CTA already present; verified) |
+| POLISH-02 | Homepage Polish | Phase 3 | Plan 02 shipped (bottom `All posts →` CTA) |
+| POLISH-03 | Homepage Polish | Phase 3 | Plan 02 shipped (bottom `All decks →` CTA) |
+| POLISH-04 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (CSS infrastructure + grid wiring) |
+| POLISH-05 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (curve token + canonical CTA class) |
 | POLISH-06 | Homepage Polish | Phase 3 | Pending |
 | DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending |
 | DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending |
@@ -309,4 +309,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-03 (Phase 3 Plans 01 + 03 shipped — motion infrastructure + Shiki palette guard test)
+**Last updated:** 2026-05-03 (Phase 3 Plans 01 + 02 + 03 shipped — motion infrastructure + bottom CTAs + stagger wiring + Shiki palette guard test)
