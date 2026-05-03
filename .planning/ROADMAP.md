@@ -84,12 +84,12 @@ Plans:
 **Plans:** 6 plans across 6 waves (0 → 1 → 2 → 3 → 4 → 5)
 
 Plans:
-- [ ] 02-01-PLAN.md — Test infrastructure + Astro exact-pin 5.18.0 + 8 pre-change baseline PNGs (wave 0)
-- [ ] 02-02-PLAN.md — Install @shikijs/transformers@^3.23.0 + shikiConfig block + fixture post exercising highlight/diff on bash/yaml/ts/dockerfile (wave 1)
-- [ ] 02-03-PLAN.md — remark-stash-code-lang.mjs + rehype-code-badge.mjs plugins at project root + 6 unit tests + astro.config.mjs wiring (wave 2)
-- [ ] 02-04-PLAN.md — Deep Signal Shiki CSS overrides (github-dark attribute-selector + !important) + figure/badge/highlight/diff styling (wave 3)
-- [ ] 02-05-PLAN.md — CodeCopyEnhancer.astro rewrite (icon-only-at-rest + label-on-hover + singleton aria-live toast in BaseLayout.astro + bilingual labels) (wave 4)
-- [ ] 02-06-PLAN.md — Final baseline re-capture + 8-screenshot regression gate + human sign-off checkpoint + Astro caret restore to ^5.18.0 (wave 5)
+- [x] 02-01-PLAN.md — Test infrastructure + Astro exact-pin 5.18.0 + 8 pre-change baseline PNGs (wave 0)
+- [x] 02-02-PLAN.md — Install @shikijs/transformers@^3.23.0 + shikiConfig block + fixture post exercising highlight/diff on bash/yaml/ts/dockerfile (wave 1)
+- [x] 02-03-PLAN.md — remark-stash-code-lang.mjs + rehype-code-badge.mjs plugins at project root + 6 unit tests + astro.config.mjs wiring (wave 2)
+- [x] 02-04-PLAN.md — Deep Signal Shiki CSS overrides (github-dark attribute-selector + !important) + figure/badge/highlight/diff styling (wave 3)
+- [x] 02-05-PLAN.md — CodeCopyEnhancer.astro rewrite (icon-only-at-rest + label-on-hover + singleton aria-live toast in BaseLayout.astro + bilingual labels) (wave 4)
+- [x] 02-06-PLAN.md — Final baseline re-capture + 8-screenshot regression gate + human sign-off checkpoint + Astro caret restore to ^5.18.0 (wave 5)
 
 ---
 
