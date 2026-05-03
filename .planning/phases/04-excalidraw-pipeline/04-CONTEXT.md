@@ -26,10 +26,19 @@ Ship a build-time `.excalidraw.json → SVG` export pipeline at `scripts/excalid
 ## Implementation Decisions
 
 ### Library Choice (DIAG-01)
-- **D-01:** **Use official `@excalidraw/excalidraw` as devDependency.** Full-fidelity coverage of every Excalidraw shape (rectangles, arrows, stars, freedraw, embeds, magic-frames), fonts (Virgil, Cascadia, Assistant), palette, arrow styles. Maintained in lockstep with desktop Excalidraw — no drift risk. Dev-only path: script lives in `scripts/`, never imported from `src/`. Pitfall 6 (zero-JS budget) mitigated by script-boundary, not by package choice.
-- **D-01b:** **REQUIREMENTS.md DIAG-01 drift — accepted.** Current DIAG-01 names `@aldinokemal2104/excalidraw-to-svg` (pure-JS wrapper, ~50 KB). Rejected here because (a) full-fidelity matters when `@excalidraw` is the vault-authoring tool, (b) wrapper may lag on new shapes/embeds, (c) official package stays in sync. Corrective commit after Phase 4 ships: update REQUIREMENTS.md DIAG-01 language to reference `@excalidraw/excalidraw` (pattern mirrors Phase 3 D-01e's REQUIREMENTS.md doc-drift fix).
-- **D-01c:** **Planner selects JSDOM-shim strategy.** `exportToSvg()` requires `document` / `window` — Node shims include `jsdom` (~9 MB, complete), `happy-dom` (~2 MB, partial), or `linkedom` (fast, subset). Planner picks during research based on which API surface Excalidraw's export path actually touches. All three are devDeps — runtime footprint unchanged either way.
-- **D-01d:** **Pin `@excalidraw/excalidraw` exact version.** Install with `npm install -D @excalidraw/excalidraw@<exact>` (mirrors Phase 2's `astro@5.18.0` pin discipline). Prevents silent API change between phases breaking the script. Planner picks the pin during install; `npm update` becomes an explicit decision, not drift.
+- **D-01:** ~~**Use official `@excalidraw/excalidraw` as devDependency.**~~ **SUPERSEDED by D-01e (2026-05-03).** Original rationale kept for history: full-fidelity coverage of every shape, fonts, palette; maintained in lockstep with desktop. Reversed after RESEARCH.md verified the package declares React 17/18/19 as peer dep, has **no documented Node-headless path**, and would add ~4-6h of jsdom + font-loader glue work outside the phase estimate.
+- **D-01b:** ~~**REQUIREMENTS.md DIAG-01 drift — accepted.**~~ **REVERSED by D-01e.** `@aldinokemal2104/excalidraw-to-svg` is NOT a pure-JS "~50 KB pure-JS wrapper" as described — it's a thin Node wrapper over `@excalidraw/utils` (the OFFICIAL export library), with worker-thread jsdom + auto-embed of 7 Excalidraw fonts + glyph subsetting. Full upstream fidelity is preserved via `@excalidraw/utils` transitively. REQUIREMENTS.md was always right.
+- **D-01c:** ~~**Planner selects JSDOM-shim strategy.**~~ **OBVIATED by D-01e.** Wrapper runs jsdom inside a worker thread — no shim choice needed in the main script. Assumption that "all three shims are devDeps — runtime footprint unchanged either way" was correct but moot since the wrapper encapsulates this.
+- **D-01d:** **Pin exact version** — pattern preserved, target package changed. Install with `npm install -D @aldinokemal2104/excalidraw-to-svg@1.1.1` (mirrors Phase 2's `astro@5.18.0` pin discipline). Prevents silent API change between phases breaking the script.
+- **D-01e (2026-05-03, user reconciliation after RESEARCH.md):** **Use `@aldinokemal2104/excalidraw-to-svg@1.1.1` as the primary export library.** Reasoning:
+  1. **Upstream fidelity preserved** — wrapper pulls in `@excalidraw/utils@0.1.3-test32` (the OFFICIAL Excalidraw export library, minus React). Same shape/font/palette coverage as D-01 intended.
+  2. **Documented Node-headless path** — the package's entire reason for existing. Official `@excalidraw/excalidraw` has no such path.
+  3. **Footprint ~15 MB vs ~90 MB devDeps.** React + Radix + Jotai + browser-fs-access not pulled in.
+  4. **Worker-thread jsdom isolation** — no main-thread global pollution, matches project's zero-JS-in-src/ hygiene.
+  5. **Font handling built-in** — auto-embeds all 7 Excalidraw fonts (Excalifont, Virgil, Cascadia, Comic Shanns, Liberation Sans, Lilita One, Nunito) with glyph subsetting via `subset-font@^2.4`. Avoids hand-rolling WOFF2 `@font-face` injection.
+  6. **Script LOC — ~60 vs ~180.** Matches phase estimate (2-3h) vs D-01 literal's 6-9h.
+  7. **Maintained** — v1.1.1 published 2026-04-08 (25 days old at reconciliation time), MIT licensed.
+  8. **REQUIREMENTS.md DIAG-01 was always correct** — D-01b's "accepted drift" was wrong. D-06 post-phase commit now REVERSES direction: DIAG-01 language stays as-is (already references the wrapper); no REQUIREMENTS.md edit needed for library choice. D-06 still fixes DIAG-05 `manifests` → `MCP + karpenter + stretch` per D-04b.
 
 ### Source Storage (DIAG-03 structural decision)
 - **D-02:** **Source-of-truth `.excalidraw.json` lives at `diagrams-source/<slug>/<name>.excalidraw.json`** — repo root, outside `public/`. Committed, versioned with git, never served to prod (not in `dist/` after `astro build`). Enables CI / local re-export when palette or SVGO config changes without manual re-import from vault.
@@ -53,9 +62,9 @@ Ship a build-time `.excalidraw.json → SVG` export pipeline at `scripts/excalid
 - **D-05b:** **No `.prose img` override needed in v1.** Existing typography handles `<img>` with `max-width: 100%` via `@tailwindcss/typography`. Planner verifies on actual MCP post render — if diagrams look cramped or oversized on 1440/375px, add a scoped override then.
 
 ### REQUIREMENTS.md Doc-Drift Fix (post-phase)
-- **D-06:** **Post-phase corrective commit** updates `.planning/REQUIREMENTS.md`:
-  - DIAG-01: `@aldinokemal2104/excalidraw-to-svg` → `@excalidraw/excalidraw` (D-01b)
-  - DIAG-05: "karpenter / manifests / TBD-third" → "MCP + karpenter + 1-2 stretch" (D-04b)
+- **D-06 (revised 2026-05-03 per D-01e):** **Post-phase corrective commit** updates `.planning/REQUIREMENTS.md`:
+  - ~~DIAG-01: `@aldinokemal2104/excalidraw-to-svg` → `@excalidraw/excalidraw`~~ **DROPPED — REQUIREMENTS.md DIAG-01 was always correct; library choice per D-01e now aligns with the document.**
+  - DIAG-05: "karpenter / manifests / TBD-third" → "MCP + karpenter + 1-2 stretch" (D-04b). **Still needed.**
   - Pattern mirrors Phase 3 D-01e.
 
 ### Claude's Discretion (planner decisions)
