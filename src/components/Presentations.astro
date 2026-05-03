@@ -34,10 +34,19 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
     </div>
     <p class="text-text-muted mb-12 animate-on-scroll">{subtitle}</p>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-on-scroll-stagger">
       {homepageDecks.map((deck) => (
         <PresentationCard deck={deck} />
       ))}
+    </div>
+
+    <div class="mt-10 animate-on-scroll">
+      <a
+        href={`/${locale}/presentations`}
+        class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
+      >
+        {i.presentations.all_decks} →
+      </a>
     </div>
   </div>
 </section>
