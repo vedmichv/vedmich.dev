@@ -232,7 +232,7 @@
 
   /* -- Motion -- */
   --transition-fast: 150ms ease-out;
-  --transition-normal: 250ms ease-out;
+  --transition-normal: 250ms cubic-bezier(0.16, 1, 0.3, 1); /* expo-out (D-02b) — matches Card component in viktor-vedmich-design */
   --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
