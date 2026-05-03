@@ -71,11 +71,11 @@ Salesforce использует этот паттерн на всех 1000+ кл
 ```yaml
 spec:
   disruption:
-    consolidationPolicy: WhenUnderutilized
+    consolidationPolicy: WhenUnderutilized  # [!code highlight]
     consolidateAfter: 30s
     budgets:
     # No churn Mon-Fri 09-18 UTC
-    - schedule: "0 9 * * 1-5"
+    - schedule: "0 9 * * 1-5"  # [!code highlight]
       duration: 9h
       nodes: "0"
 ```

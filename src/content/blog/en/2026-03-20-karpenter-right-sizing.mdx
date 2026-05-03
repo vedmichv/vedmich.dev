@@ -73,11 +73,11 @@ The fix: disruption budgets and consolidation schedules. The NodePool snippet fr
 ```yaml
 spec:
   disruption:
-    consolidationPolicy: WhenUnderutilized
+    consolidationPolicy: WhenUnderutilized  # [!code highlight]
     consolidateAfter: 30s
     budgets:
     # No churn Mon-Fri 09-18 UTC
-    - schedule: "0 9 * * 1-5"
+    - schedule: "0 9 * * 1-5"  # [!code highlight]
       duration: 9h
       nodes: "0"
 ```
