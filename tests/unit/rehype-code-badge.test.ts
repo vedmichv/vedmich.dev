@@ -129,3 +129,38 @@ test('rehypeCodeBadge skips <div> elements (even with shiki class)', () => {
   // <div> with shiki class is not a <pre>, so untouched
   assert.equal((tree.children[0] as any).tagName, 'div');
 });
+
+test('rehypeCodeBadge wraps <pre class="astro-code"> (Astro integration marker)', () => {
+  // Astro's built-in Shiki renderer emits `class="astro-code"` rather than `shiki`.
+  // Plugin must accept BOTH marker classes — not just `shiki` — so the pipeline
+  // works under Astro without extra config.
+  const tree = {
+    type: 'root',
+    children: [
+      {
+        type: 'element',
+        tagName: 'pre',
+        properties: {
+          className: ['astro-code', 'github-dark', 'has-highlighted'],
+          'data-language': 'dockerfile',
+        },
+        children: [
+          {
+            type: 'element',
+            tagName: 'code',
+            properties: {},
+            children: [{ type: 'text', value: 'FROM node:22\n' }],
+          },
+        ],
+      },
+    ],
+  };
+  const transform = rehypeCodeBadge();
+  transform(tree as any);
+
+  const root = tree.children[0] as any;
+  assert.equal(root.tagName, 'figure');
+  assert.ok(root.properties.className.includes('code-block'));
+  assert.equal(root.children[0].tagName, 'span');
+  assert.equal(root.children[0].children[0].value, 'dockerfile');
+});

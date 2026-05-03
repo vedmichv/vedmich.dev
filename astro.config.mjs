@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import { remarkReadingTime } from './remark-reading-time.mjs';
+import { remarkStashCodeLang } from './remark-stash-code-lang.mjs';
+import { rehypeCodeBadge } from './rehype-code-badge.mjs';
 import {
   transformerNotationHighlight,
   transformerNotationDiff,
@@ -22,11 +24,16 @@ export default defineConfig({
     },
   },
   markdown: {
-    remarkPlugins: [remarkReadingTime],
+    // remarkStashCodeLang propagates fence `lang` onto <pre data-language="...">
+    // so rehypeCodeBadge can read it after Shiki strips the language-* class.
+    remarkPlugins: [remarkReadingTime, remarkStashCodeLang],
+    // rehypeCodeBadge wraps every `<pre class="shiki">` in `<figure class="code-block">`
+    // and prepends `<span class="code-lang-badge">LANG</span>`. Build-time, zero JS.
+    // Deep Signal CSS for the badge + figure lands in Plan 02-04.
+    rehypePlugins: [rehypeCodeBadge],
     // Shiki config — github-dark base + transformers for `// [!code highlight]` and
     // `// [!code ++]` / `// [!code --]`. MDX inherits via @astrojs/mdx's default
     // `extendMarkdownConfig: true`. Deep Signal CSS overrides land in Plan 02-04.
-    // Language-badge rehype plugin arrives in Plan 02-03.
     shikiConfig: {
       theme: 'github-dark',
       wrap: true,
