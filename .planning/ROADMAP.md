@@ -112,7 +112,7 @@ Plans:
 Plans:
 **Wave 1** *(parallel — zero file overlap)*
 - [x] 03-01-PLAN.md — Token + Motion infrastructure: update `--transition-normal` to expo-out curve in design-tokens.css; add `.animate-on-scroll-stagger` variant + reduced-motion guard in global.css (POLISH-04 CSS, POLISH-05 curve)
-- [ ] 03-03-PLAN.md — WR-03 fold: ship `tests/unit/shiki-palette-guard.test.ts` with 8 github-dark hex assertions + document guard pattern in CLAUDE.md (Phase 2 tech-debt closure, folded per D-05)
+- [x] 03-03-PLAN.md — WR-03 fold: ship `tests/unit/shiki-palette-guard.test.ts` with 8 github-dark hex assertions + document guard pattern in CLAUDE.md (Phase 2 tech-debt closure, folded per D-05)
 
 **Wave 2** *(blocked on Plan 01)*
 - [ ] 03-02-PLAN.md — Bottom CTAs + stagger wiring: add `All posts →` to BlogPreview.astro, `All decks →` to Presentations.astro, unify Speaking.astro CTA style with canonical BlogPreview shape; wrap both grids in stagger variant (POLISH-01, 02, 03, 04 wiring, 05 class unification)
@@ -210,7 +210,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Rich Media Primitives | 0/? | Not started | - |
 | 2. Code Block Upgrades | 0/? | Not started | - |
-| 3. UI Polish | 1/4 | Executing (Plan 01 shipped 2026-05-03) | - |
+| 3. UI Polish | 2/4 | Executing (Plans 01 + 03 shipped 2026-05-03) | - |
 | 4. Excalidraw Pipeline | 0/? | Not started | - |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
@@ -309,4 +309,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-03 (Phase 3 Plan 01 shipped — motion infrastructure: curve swap + stagger variant)
+**Last updated:** 2026-05-03 (Phase 3 Plans 01 + 03 shipped — motion infrastructure + Shiki palette guard test)
