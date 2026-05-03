@@ -74,6 +74,12 @@ Migration from Electric Horizon (cyan) → Deep Signal (teal + amber) completed 
 - **Tailwind 4 `@theme` inlines colors statically** — `.light`/`[data-theme="light"]` override only affects raw CSS rules that use `var(--brand-*)` directly (e.g. `.typing-cursor`, `.card-glow`, `body`). Tailwind utilities like `bg-surface` compile to hex literals and do NOT follow the class toggle. Light mode is therefore intended only for OG/LinkedIn image rendering via dedicated preview templates, not for a user-facing toggle.
 - **Never add hardcoded hex** to components — always reference a token. Especially avoid `#06B6D4`/`#22D3EE` (deprecated cyan).
 
+### Shiki palette guard pattern
+- **What:** `tests/unit/shiki-palette-guard.test.ts` pins 8 load-bearing github-dark hex values (`#E1E4E8`, `#F97583`, `#9ECBFF`, `#85E89D`, `#79B8FF`, `#6A737D`, `#B392F0`, `#FFAB70`) via `codeToHtml()` assertions. If Shiki silently changes a palette color, the matching `src/styles/global.css` attribute selector (lines 169-192) stops matching and the un-styled github-dark color renders in blog code blocks.
+- **When to run:** before `npm update astro` or any Astro/Shiki minor/major bump. Run `npm run test:unit`. If any assertion fails after the bump, the failure message names the drifted hex and its global.css selector — update the selector to match, then proceed with the bump.
+- **Run command:** `npm run test:unit` (also covers the other unit tests — rehype plugin, vv-registry, vv-geom, vv-path).
+- **Origin:** Phase 2 tech debt (WR-03), folded into Phase 3.
+
 ### Color Tokens (canonical)
 
 **Brand (dark default):**
