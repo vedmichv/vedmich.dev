@@ -125,8 +125,8 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 | POLISH-01 | Homepage Polish | Phase 3 | Pending |
 | POLISH-02 | Homepage Polish | Phase 3 | Pending |
 | POLISH-03 | Homepage Polish | Phase 3 | Pending |
-| POLISH-04 | Homepage Polish | Phase 3 | Pending |
-| POLISH-05 | Homepage Polish | Phase 3 | Pending |
+| POLISH-04 | Homepage Polish | Phase 3 | Plan 01 shipped CSS infrastructure (stagger variant + reduced-motion guard); Plan 02 wires to grids |
+| POLISH-05 | Homepage Polish | Phase 3 | Plan 01 shipped curve token (D-02b expo-out); D-02 scoped out translate-Y + amber underline from original text |
 | POLISH-06 | Homepage Polish | Phase 3 | Pending |
 | DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending |
 | DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending |

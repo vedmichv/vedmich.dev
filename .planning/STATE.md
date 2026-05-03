@@ -4,22 +4,22 @@ milestone: v1.0
 milestone_name: Content Platform
 current_phase: 03
 status: executing
-last_updated: "2026-05-03T13:12:07.971Z"
-last_activity: 2026-05-03 -- Phase 03 execution started
+last_updated: "2026-05-03T13:15:50.940Z"
+last_activity: 2026-05-03
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 16
-  completed_plans: 12
-  percent: 75
+  completed_plans: 13
+  percent: 81
 ---
 
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
 **Current phase:** 03
-**Status:** Executing Phase 03
-**Last updated:** 2026-05-02
+**Status:** Executing Phase 03 (Plan 01 complete, Plan 02 next)
+**Last updated:** 2026-05-03
 
 ## Project Reference
 
@@ -30,12 +30,12 @@ progress:
 ## Current Position
 
 Phase: 03 (ui-polish) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 03
-Resume file: .planning/phases/03-ui-polish/03-CONTEXT.md
-Last activity: 2026-05-03 -- Phase 03 execution started
+Plan: 2 of 4
+Status: Plan 01 complete (POLISH-04 CSS + POLISH-05 curve shipped); Plan 02 + Plan 03 unblocked
+Resume file: .planning/phases/03-ui-polish/03-02-PLAN.md
+Last activity: 2026-05-03 -- Phase 03 Plan 01 shipped (65s, 2 commits, 2 files, token + motion infrastructure)
 
-Progress: ░░░░░░░░░░░░░░░░░░░░ 0% (0/7 phases, 0/? plans)
+Progress: [████████░░] 81%
 
 ## Completed Phases
 
@@ -50,19 +50,27 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 
 ## Performance Metrics
 
-**Velocity:** Not yet established (first phase not started)
+**Velocity:**
+
+| Phase | Plan | Duration | Tasks | Files | Completed |
+|-------|------|----------|-------|-------|-----------|
+| 03    | 01   | 65s      | 2     | 2     | 2026-05-03 |
 
 **Quality:**
 
 - v0.4 baseline: 12 phases, 26 plans, 41 tasks delivered with zero post-ship hotfixes
-- Build time: 31 pages in ~800ms (target: maintain <1s after v1.0)
+- Build time: 32 pages in ~2.2s (local, dev machine); target: maintain <10s after v1.0
 - Zero-JS budget: maintained (only IntersectionObserver, menu toggle, CodeCopyEnhancer allowed)
+- Phase 03 Plan 01: zero deviations, all grep acceptance checks passed, build green on both task boundaries
 
 ## Accumulated Context
 
 ### Key Decisions
 
-_Populated during phase planning and execution._
+- **Phase 03 Plan 01 (2026-05-03):** `--transition-normal` set to `250ms cubic-bezier(0.16, 1, 0.3, 1)` (expo-out) in `src/styles/design-tokens.css` — single-line swap, matches `viktor-vedmich-design/ui_kits/vedmich-dev/app.jsx` Card reference. `.card-glow` is the sole site-wide consumer and inherits automatically.
+- **Phase 03 Plan 01 (2026-05-03):** `.animate-on-scroll-stagger` CSS variant added to `src/styles/global.css` — 10 explicit `:nth-child(n)` rules (0..540ms, 60ms step) + `:nth-child(n+11)` catch-all at 540ms. Explicit-rule form chosen over `calc(60ms * (n - 1))` for portability / greppability / devtools discoverability.
+- **Phase 03 Plan 01 (2026-05-03):** Direct-child combinator `> .animate-on-scroll` (not `> *`) keeps cascade scoped to elements that opt into the animation system.
+- **Phase 03 Plan 01 (2026-05-03):** Reduced-motion guard for stagger children forces `animation-delay: 0 !important` + `opacity: 1 !important` inside the existing `@media (prefers-reduced-motion: reduce)` block (WCAG 2.3.3 / SC 2.2.2).
 
 ### Technical Debt
 

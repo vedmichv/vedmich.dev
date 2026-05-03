@@ -111,7 +111,7 @@ Plans:
 
 Plans:
 **Wave 1** *(parallel — zero file overlap)*
-- [ ] 03-01-PLAN.md — Token + Motion infrastructure: update `--transition-normal` to expo-out curve in design-tokens.css; add `.animate-on-scroll-stagger` variant + reduced-motion guard in global.css (POLISH-04 CSS, POLISH-05 curve)
+- [x] 03-01-PLAN.md — Token + Motion infrastructure: update `--transition-normal` to expo-out curve in design-tokens.css; add `.animate-on-scroll-stagger` variant + reduced-motion guard in global.css (POLISH-04 CSS, POLISH-05 curve)
 - [ ] 03-03-PLAN.md — WR-03 fold: ship `tests/unit/shiki-palette-guard.test.ts` with 8 github-dark hex assertions + document guard pattern in CLAUDE.md (Phase 2 tech-debt closure, folded per D-05)
 
 **Wave 2** *(blocked on Plan 01)*
@@ -210,7 +210,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Rich Media Primitives | 0/? | Not started | - |
 | 2. Code Block Upgrades | 0/? | Not started | - |
-| 3. UI Polish | 0/4 | Planning complete | - |
+| 3. UI Polish | 1/4 | Executing (Plan 01 shipped 2026-05-03) | - |
 | 4. Excalidraw Pipeline | 0/? | Not started | - |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
@@ -284,8 +284,8 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | POLISH-01 | Homepage Polish | Phase 3 | Pending |
 | POLISH-02 | Homepage Polish | Phase 3 | Pending |
 | POLISH-03 | Homepage Polish | Phase 3 | Pending |
-| POLISH-04 | Homepage Polish | Phase 3 | Pending |
-| POLISH-05 | Homepage Polish | Phase 3 | Pending |
+| POLISH-04 | Homepage Polish | Phase 3 | Plan 01 shipped (CSS infrastructure) |
+| POLISH-05 | Homepage Polish | Phase 3 | Plan 01 shipped (curve token) |
 | POLISH-06 | Homepage Polish | Phase 3 | Pending |
 | DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending |
 | DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending |
@@ -309,4 +309,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-03 (Phase 3 planning complete — 4 plans across 3 waves)
+**Last updated:** 2026-05-03 (Phase 3 Plan 01 shipped — motion infrastructure: curve swap + stagger variant)
