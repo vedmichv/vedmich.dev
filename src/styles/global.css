@@ -164,7 +164,7 @@ h1, h2, h3, h4,
     opacity: 1;
   }
   .animate-on-scroll-stagger > .animate-on-scroll {
-    animation-delay: 0 !important;
+    animation-delay: 0ms !important;
     opacity: 1 !important;
   }
 }
