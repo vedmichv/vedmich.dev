@@ -107,7 +107,18 @@ Plans:
 4. All homepage sections audited for spacing/typography/alignment against Deep Signal reference at 1440×900 and 375px mobile — zero nits remain
 5. All i18n keys bilingual (`blog.see_all`, `presentations.see_all` in both `en.json` + `ru.json`)
 
-**Plans:** TBD
+**Plans:** 4 plans across 3 waves (1 → 2 → 3). Wave 1 runs Plans 01 + 03 in parallel.
+
+Plans:
+**Wave 1** *(parallel — zero file overlap)*
+- [ ] 03-01-PLAN.md — Token + Motion infrastructure: update `--transition-normal` to expo-out curve in design-tokens.css; add `.animate-on-scroll-stagger` variant + reduced-motion guard in global.css (POLISH-04 CSS, POLISH-05 curve)
+- [ ] 03-03-PLAN.md — WR-03 fold: ship `tests/unit/shiki-palette-guard.test.ts` with 8 github-dark hex assertions + document guard pattern in CLAUDE.md (Phase 2 tech-debt closure, folded per D-05)
+
+**Wave 2** *(blocked on Plan 01)*
+- [ ] 03-02-PLAN.md — Bottom CTAs + stagger wiring: add `All posts →` to BlogPreview.astro, `All decks →` to Presentations.astro, unify Speaking.astro CTA style with canonical BlogPreview shape; wrap both grids in stagger variant (POLISH-01, 02, 03, 04 wiring, 05 class unification)
+
+**Wave 3** *(blocked on Plans 01 + 02 deploying to live)*
+- [ ] 03-04-PLAN.md — Spacing/typography audit: capture 14 baseline screenshots (7 sections × 2 viewports) via playwright-cli attach-to-real-Chrome on live vedmich.dev; ship AUDIT.md with 5-col findings table; fix each finding as atomic `fix(03): ...` commit with after-screenshot (POLISH-06)
 
 **UI hint:** yes
 
@@ -199,7 +210,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Rich Media Primitives | 0/? | Not started | - |
 | 2. Code Block Upgrades | 0/? | Not started | - |
-| 3. UI Polish | 0/? | Not started | - |
+| 3. UI Polish | 0/4 | Planning complete | - |
 | 4. Excalidraw Pipeline | 0/? | Not started | - |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
@@ -298,4 +309,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-02 (milestone v1.0 Content Platform kickoff)
+**Last updated:** 2026-05-03 (Phase 3 planning complete — 4 plans across 3 waves)
