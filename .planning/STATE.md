@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: Content Platform
 current_phase: 04.1
 status: planning
-last_updated: "2026-05-04T20:21:44.582Z"
+last_updated: "2026-05-04T20:53:45.184Z"
 last_activity: 2026-05-04
 progress:
   total_phases: 8
@@ -32,7 +32,7 @@ progress:
 Phase: 04 (excalidraw-pipeline) — EXECUTING
 Plan: Not started
 Status: Executing Phase 04
-Resume file: .planning/phases/04-excalidraw-pipeline/04-CONTEXT.md
+Resume file: .planning/phases/04.1-excalidraw-pipeline-hardening/04.1-CONTEXT.md
 Last activity: 2026-05-04
 
 Progress: [██████████] 100%
