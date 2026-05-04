@@ -152,7 +152,7 @@ Plans:
 - [x] 04-04-PLAN.md — Author karpenter `split-ownership.excalidraw.json` + meta; run pipeline; insert `<img>` with `loading="lazy"` after the prose-only split-ownership section (line 55 EN / line 53 RU) of `2026-03-20-karpenter-right-sizing.mdx` in both locales; optional stretch-3rd-diagram task (DIAG-05)
 
 **Wave 3** *(blocked on 04-03 + 04-04)*
-- [ ] 04-05-PLAN.md — Ship `diagrams-source/README.md` runbook (5 H2 sections: Authoring / Metadata / Exporting / Embedding / Gotchas); update `.claude/skills/vv-blog-from-vault/references/visuals-routing.md` Priority 1 `excalidraw` row with delivery path; post-phase REQUIREMENTS.md DIAG-05 doc-drift fix per D-06 (DIAG-01 UNCHANGED per D-01e)
+- [x] 04-05-PLAN.md — Ship `diagrams-source/README.md` runbook (5 H2 sections: Authoring / Metadata / Exporting / Embedding / Gotchas); update `.claude/skills/vv-blog-from-vault/references/visuals-routing.md` Priority 1 `excalidraw` row with delivery path; post-phase REQUIREMENTS.md DIAG-05 doc-drift fix per D-06 (DIAG-01 UNCHANGED per D-01e)
 
 ---
 
