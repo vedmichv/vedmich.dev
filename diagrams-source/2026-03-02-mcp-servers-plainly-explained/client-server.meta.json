@@ -1,0 +1,5 @@
+{
+  "title": "MCP client-server architecture",
+  "descEn": "Claude Code (client) connects via JSON-RPC to an MCP server, which fans out to external resources: docs, databases, APIs.",
+  "descRu": "Claude Code (клиент) подключается по JSON-RPC к MCP-серверу, который обращается к внешним ресурсам: docs, DB, API."
+}

@@ -17,9 +17,14 @@ An MCP server exposes capabilities. The client — your IDE, your agent framewor
 
 The server replies with a list of tools. Each tool has a name, a description, and a schema. The client passes the tools to the language model. When the model decides to use a tool, the client calls the server. The server executes the tool and returns a result. The client sends that result back to the model.
 
-```
-[ Client: Claude Code ]  ←→  [ MCP Server ]  ←→  [ External resource: docs / DB / API ]
-```
+<img
+  src="/blog-assets/2026-03-02-mcp-servers-plainly-explained/diagrams/client-server.svg"
+  alt="MCP client-server architecture: Claude Code connects to an MCP Server, which fans out to external resources (docs, databases, APIs)"
+  loading="eager"
+  width="820"
+  height="100"
+  style="max-width: 100%; height: auto;"
+/>
 
 The client is the orchestrator. The server is the integration layer. The model is the brain that decides which tools to call.
 
