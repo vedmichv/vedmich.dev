@@ -156,6 +156,16 @@ Plans:
 
 ---
 
+### Phase 04.1: Excalidraw Pipeline Hardening (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 4
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 04.1 to break down)
+
 ### Phase 5: Slidev Integration
 **Goal:** Serve Slidev presentation decks as first-party routes under `vedmich.dev/slides/<slug>/` via git submodule + CI build, migrate all 6 existing decks from `s.vedmich.dev`, update internal links, configure DNS redirect, and document the "add a new deck" workflow.
 

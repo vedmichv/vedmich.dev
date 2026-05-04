@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Content Platform
-current_phase: 04
-status: ready_to_plan
-last_updated: "2026-05-04T16:10:44.383Z"
-last_activity: 2026-05-04 -- Phase 04 execution started
+current_phase: 04.1
+status: planning
+last_updated: "2026-05-04T20:21:44.582Z"
+last_activity: 2026-05-04
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 4
   total_plans: 21
-  completed_plans: 16
-  percent: 57
+  completed_plans: 21
+  percent: 100
 ---
 
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
-**Current phase:** 5
+**Current phase:** 04.1
 **Status:** Ready to plan
 **Last updated:** 2026-05-03
 
@@ -70,6 +70,10 @@ _None yet — milestone v1.0 just started. Phase numbering reset to 1._
 - Phase 03 Plan 04: 2 atomic fixes shipped (About sm:py-28 + Podcasts bg-surface/gap-5); 3 cross-cutting findings logged as DEFER with rationale (H2 scale 6-file sweep, max-w-6xl 3-file harmonization, About Me→About me copy); zero hex in all 7 homepage components; build green on every boundary, 35/35 unit tests pass; homepage now ~98% reference-aligned
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 04.1 inserted after Phase 4: Excalidraw Pipeline Hardening — remediate 2 CRITICAL security + 3 blocking UX + docs drift per reviews/CONSOLIDATED.md (URGENT)
 
 ### Key Decisions
 
