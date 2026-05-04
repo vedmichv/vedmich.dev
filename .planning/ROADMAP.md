@@ -158,13 +158,28 @@ Plans:
 
 ### Phase 04.1: Excalidraw Pipeline Hardening (INSERTED)
 
-**Goal:** [Urgent work - to be planned]
-**Requirements**: TBD
+**Goal:** Remediate 58 post-phase review findings against the Phase 4 Excalidraw pipeline shipment — 2 CRITICAL + 2 HIGH security (SEC-C01 symlink bypass, SEC-C02 fictional SVGO script-strip, SEC-H03 SSRF via dataURL, SEC-H04 parsererror silent success), 4 blocking UX (white slab on dark prose, mobile label illegibility, MCP banner aspect, Helvetica cross-platform drift), 13 code-quality + test-coverage gaps (idempotency, JSON error UX, meta validation, FILES_BLOB test, escapeXml Unicode, --quiet flag), 20 docs-drift (REQUIREMENTS/ROADMAP/STATE status, runbook missing npm install, runbook Virgil vs Helvetica, CLAUDE.md no Excalidraw mention, Phase 7→5 reference), plus P4 polish (figure/figcaption a11y, forced-colors smoke check).
+
+**Requirements:** DIAG-01, DIAG-02, DIAG-03, DIAG-04, DIAG-05 (all hardened — not shipped anew; 04.1 remediates reviews against the Phase 4 shipment)
+
 **Depends on:** Phase 4
-**Plans:** 0 plans
+
+**Plans:** 6 plans across 4 waves (1 → 2 → 3 → 4)
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 04.1 to break down)
+**Wave 1** *(parallel — zero file overlap)*
+- [ ] 04.1-01-PLAN.md — Security hardening: realpath validatePath + ALLOWED_WRITE_ROOTS + SVGO removeScripts + dataURL whitelist + parsererror detection; 7 new security tests, 3 new hostile fixtures
+- [ ] 04.1-04-PLAN.md — Docs drift sweep: flip REQUIREMENTS / ROADMAP / STATE / PROJECT / CLAUDE.md / runbook (13 DOCS-REVIEW findings closed in 6 files)
+
+**Wave 2** *(blocked on 04.1-01 — both touch scripts/excalidraw-to-svg.mjs)*
+- [ ] 04.1-02-PLAN.md — UX pipeline fixes: SVGO white-rect strip + Helvetica fallback-chain post-SVGO replace; 3 new UX tests
+
+**Wave 3** *(parallel — 04.1-03 and 04.1-05 have zero file overlap; both blocked on 04.1-02)*
+- [ ] 04.1-03-PLAN.md — MCP .excalidraw.json re-author (human step) + SVG re-exports for both posts + figure/figcaption MDX wrap on all 4 posts (bilingual captions)
+- [ ] 04.1-05-PLAN.md — Code quality + test coverage: parseJsonOrThrow + typed meta validator + FILES_BLOB oversize test + byte-stability test + Unicode escapeXml parametric (5 codepoints via escape sequences) + --quiet flag; 11 new tests
+
+**Wave 4** *(blocked on all prior plans)*
+- [ ] 04.1-06-PLAN.md — P4 polish: SEC-L02 closure note (as side-effect of D-03) + forced-colors Playwright smoke check + Phase 04.1 SUMMARY.md with 58-finding closure map
 
 ### Phase 5: Slidev Integration
 **Goal:** Serve Slidev presentation decks as first-party routes under `vedmich.dev/slides/<slug>/` via git submodule + CI build, migrate all 6 existing decks from `s.vedmich.dev`, update internal links, configure DNS redirect, and document the "add a new deck" workflow.
@@ -236,6 +251,7 @@ Plans:
 | 2. Code Block Upgrades | 0/? | Not started | - |
 | 3. UI Polish | 3/4 | Executing (Plans 01 + 02 + 03 shipped 2026-05-03) | - |
 | 4. Excalidraw Pipeline | 0/5 | Planned 2026-05-03 — 5 plans across 4 waves | - |
+| 4.1. Excalidraw Pipeline Hardening | 0/6 | Planned 2026-05-04 — 6 plans across 4 waves, 58 findings in scope | - |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
 | 7. Slidev Codegen (OPTIONAL) | 0/? | Checkpoint-gated | - |
@@ -279,12 +295,13 @@ Plans:
 | Phase 2 | 4-6h | Config + remark plugin/CodeCopyEnhancer + regression test |
 | Phase 3 | 2-3h | CTAs + hover states + stagger animation + audit |
 | Phase 4 | 2-3h | Script + 1-2 diagram placements |
+| Phase 4.1 | 9-11h | Security + UX + quality + docs sweep across 58 review findings |
 | Phase 5 | 4-6h | Submodule + CI + 6 deck migration + DNS + docs |
 | Phase 6 | 6-8h | Schema extension + 2 posts (3-4h each) + skill updates |
 | Phase 7 | 10-15h | Codegen logic + testing (IF triggered) |
 
-**Total base effort (Phases 1-6):** 24-34h
-**Total with codegen (if triggered):** 34-49h
+**Total base effort (Phases 1-6 + 4.1):** 33-45h
+**Total with codegen (if triggered):** 43-60h
 
 ---
 
@@ -311,11 +328,11 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | POLISH-04 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (CSS infrastructure + grid wiring) |
 | POLISH-05 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (curve token + canonical CTA class) |
 | POLISH-06 | Homepage Polish | Phase 3 | Plan 04 shipped (14 baselines + AUDIT.md + 2 atomic fixes: About sm:py-28, Podcasts bg-surface+gap-5) |
-| DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (infra) + 04-02 (script) |
-| DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (budget test) + 04-02 (gate impl) |
-| DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (a11y tests) + 04-02 (injection) + 04-03/04 (canonical path) |
-| DIAG-04 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-03 (MCP swap, EN + RU) |
-| DIAG-05 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-04 (karpenter, EN + RU) |
+| DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (infra) + 04-02 (script); hardened in Phase 04.1 |
+| DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (budget test) + 04-02 (gate impl); hardened in Phase 04.1 |
+| DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (a11y tests) + 04-02 (injection) + 04-03/04 (canonical path); hardened in Phase 04.1 |
+| DIAG-04 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-03 (MCP swap, EN + RU); re-exported in 04.1-03 |
+| DIAG-05 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-04 (karpenter, EN + RU); re-exported in 04.1-03 |
 | SLIDES-01 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-02 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-03 | Slidev Integration | Phase 5 | Pending |
@@ -333,4 +350,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-03 (Phase 4 planned — 5 plans across 4 waves, Wave 2 parallel)
+**Last updated:** 2026-05-04 (Phase 04.1 planned — 6 plans across 4 waves; Phase 4 status flip to Shipped lands in Plan 04.1-04 at execute time)
