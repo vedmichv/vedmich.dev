@@ -142,10 +142,10 @@ Plans:
 
 Plans:
 **Wave 0** *(RED-state foundation)*
-- [ ] 04-01-PLAN.md — Pin `@aldinokemal2104/excalidraw-to-svg@1.1.1` as exact devDep (per D-01d + D-01e); create `tests/fixtures/excalidraw/` with `minimal.excalidraw.json` + `minimal.meta.json` + `oversize.excalidraw.json`; author `tests/unit/excalidraw-to-svg.test.ts` with 9 RED-state stubs (DIAG-01/02/03 + T-04-01 path-traversal)
+- [x] 04-01-PLAN.md — Pin `@aldinokemal2104/excalidraw-to-svg@1.1.1` as exact devDep (per D-01d + D-01e); create `tests/fixtures/excalidraw/` with `minimal.excalidraw.json` + `minimal.meta.json` + `oversize.excalidraw.json`; author `tests/unit/excalidraw-to-svg.test.ts` with 9 RED-state stubs (DIAG-01/02/03 + T-04-01 path-traversal)
 
 **Wave 1** *(blocked on 04-01)*
-- [ ] 04-02-PLAN.md — Implement `scripts/excalidraw-to-svg.mjs`: SVGO `preset-default` + `removeDesc: false`, inject `<title>`+`<desc>` pre-SVGO, viewBox → numeric width/height, 10 KB budget gate, `validatePath` (T-04-01), `validateFilesBlob` (T-04-03), `escapeXml` (T-04-02); turns all 9 Wave-0 tests GREEN
+- [x] 04-02-PLAN.md — Implement `scripts/excalidraw-to-svg.mjs`: SVGO `preset-default` + `removeDesc: false`, inject `<title>`+`<desc>` pre-SVGO, viewBox → numeric width/height, 10 KB budget gate, `validatePath` (T-04-01), `validateFilesBlob` (T-04-03), `escapeXml` (T-04-02); turns all 9 Wave-0 tests GREEN
 
 **Wave 2** *(parallel — 04-03 and 04-04 share zero files; both blocked on 04-02)*
 - [ ] 04-03-PLAN.md — Author MCP `client-server.excalidraw.json` + meta; run pipeline → `public/blog-assets/2026-03-02-mcp-servers-plainly-explained/diagrams/client-server.svg`; swap ASCII `←→` at line 21 in EN + RU locales for `<img>` with `loading="eager"` + numeric width/height + localized alt (DIAG-04)
