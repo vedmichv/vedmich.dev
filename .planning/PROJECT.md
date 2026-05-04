@@ -115,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
-**Last updated:** 2026-05-03 (Phase 3 ui-polish complete — POLISH-01..06 shipped)
+**Last updated:** 2026-05-04 (Phase 4 excalidraw-pipeline complete — DIAG-01..05 shipped; scripts/excalidraw-to-svg.mjs + 2 SVGs embedded in MCP + Karpenter posts)
