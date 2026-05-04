@@ -24,7 +24,7 @@ Rename on copy — turn raw filenames like `c03-mistake1.png` into descriptive k
 |------------------------|-------------|------------------------------|
 | "flow", "sequence", "pipeline", 3+ enumerated steps | `mermaid-pro` | "Use mermaid-pro to generate a flowchart showing X (palette: midnight, platform: astro)." |
 | "architecture", component diagram, subgraphs | `mermaid-pro` | "Use mermaid-pro for an architecture diagram with subgraphs (palette: cloud if AWS content)." |
-| Hand-sketched / whiteboard style | `excalidraw` | "Sketch X in excalidraw style." |
+| Hand-sketched / whiteboard style | `excalidraw` | "Sketch X in excalidraw style." Then: `node scripts/excalidraw-to-svg.mjs diagrams-source/<slug>/<name>.excalidraw.json public/blog-assets/<slug>/diagrams/<name>.svg` (see `diagrams-source/README.md`). |
 | Physical metaphor, hero illustration | `art` | "Use art to generate a prompt for NanoBanana showing X." |
 | Brand-consistent Deep Signal palette | `viktor-vedmich-design` | "Generate visual using viktor-vedmich-design UI kit." |
 | Opinion / reflection / pure prose section | (no visual) | — |
