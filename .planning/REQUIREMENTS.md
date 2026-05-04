@@ -38,7 +38,7 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 - [ ] **DIAG-02**: Integrate SVGO into the same pipeline so emitted diagrams are ≤ 10 KB each — prevents LCP regression per PITFALLS.md.
 - [ ] **DIAG-03**: Establish the `public/blog-assets/<slug>/diagrams/*.svg` convention for committed diagrams, with `title`+`desc` a11y elements injected during export.
 - [ ] **DIAG-04**: Replace the ASCII client-↔-server diagram in the existing MCP blog post with an Excalidraw SVG rendered via the new pipeline (both `en/` and `ru/` locales).
-- [ ] **DIAG-05**: Add 2-3 additional Excalidraw diagrams to existing blog posts (karpenter / manifests / TBD-third) to stress-test the pipeline on real content.
+- [ ] **DIAG-05**: Add 1-2 additional Excalidraw diagrams to existing blog posts (MCP + karpenter + 1-2 stretch) to stress-test the pipeline on real content. `manifests` post is text-only per D-04b (no diagram fit).
 
 ### Slidev Integration
 
