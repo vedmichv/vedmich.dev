@@ -54,6 +54,14 @@ I've debugged this at a customer running 200 EKS clusters. Their monitoring show
 
 The fix: split ownership. Cluster Autoscaler owns system node groups (kube-system, logging, monitoring — anything that should stay on predictable, long-lived on-demand nodes). Karpenter owns everything else.
 
+<img
+  src="/blog-assets/2026-03-20-karpenter-right-sizing/diagrams/split-ownership.svg"
+  alt="Split ownership: Cluster Autoscaler owns system node groups (kube-system, logging, monitoring) on predictable on-demand nodes; Karpenter owns the stateless fleet on dynamically-provisioned nodes with matching taints and tolerations"
+  loading="lazy"
+  width="1020" height="520"
+  style="max-width: 100%; height: auto;"
+/>
+
 Technically, you do this with taints and labels. Your system node group gets `node-role.kubernetes.io/system=true:NoSchedule`. kube-system pods get a matching toleration. Everything else lands on Karpenter-managed nodes. CA and Karpenter now operate on disjoint sets — no more race.
 
 Salesforce uses this pattern across all 1,000+ clusters. CA scales their stateful workloads and system components. Karpenter handles the stateless fleet. Clean separation, zero oscillation.

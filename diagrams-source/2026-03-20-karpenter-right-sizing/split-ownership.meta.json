@@ -1,0 +1,5 @@
+{
+  "title": "Split ownership between Cluster Autoscaler and Karpenter",
+  "descEn": "Cluster Autoscaler owns system node groups (kube-system, logging, monitoring) on predictable on-demand nodes. Karpenter owns the stateless fleet on dynamically-provisioned nodes. Taints and tolerations enforce the boundary — no overlap, no oscillation.",
+  "descRu": "Cluster Autoscaler владеет system node groups (kube-system, logging, monitoring) на on-demand нодах. Karpenter владеет stateless fleet на динамически provision нодах. Taints и tolerations обеспечивают границу — без overlap, без oscillation."
+}
