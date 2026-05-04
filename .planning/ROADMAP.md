@@ -148,8 +148,8 @@ Plans:
 - [x] 04-02-PLAN.md — Implement `scripts/excalidraw-to-svg.mjs`: SVGO `preset-default` + `removeDesc: false`, inject `<title>`+`<desc>` pre-SVGO, viewBox → numeric width/height, 10 KB budget gate, `validatePath` (T-04-01), `validateFilesBlob` (T-04-03), `escapeXml` (T-04-02); turns all 9 Wave-0 tests GREEN
 
 **Wave 2** *(parallel — 04-03 and 04-04 share zero files; both blocked on 04-02)*
-- [ ] 04-03-PLAN.md — Author MCP `client-server.excalidraw.json` + meta; run pipeline → `public/blog-assets/2026-03-02-mcp-servers-plainly-explained/diagrams/client-server.svg`; swap ASCII `←→` at line 21 in EN + RU locales for `<img>` with `loading="eager"` + numeric width/height + localized alt (DIAG-04)
-- [ ] 04-04-PLAN.md — Author karpenter `split-ownership.excalidraw.json` + meta; run pipeline; insert `<img>` with `loading="lazy"` after the prose-only split-ownership section (line 55 EN / line 53 RU) of `2026-03-20-karpenter-right-sizing.mdx` in both locales; optional stretch-3rd-diagram task (DIAG-05)
+- [x] 04-03-PLAN.md — Author MCP `client-server.excalidraw.json` + meta; run pipeline → `public/blog-assets/2026-03-02-mcp-servers-plainly-explained/diagrams/client-server.svg`; swap ASCII `←→` at line 21 in EN + RU locales for `<img>` with `loading="eager"` + numeric width/height + localized alt (DIAG-04)
+- [x] 04-04-PLAN.md — Author karpenter `split-ownership.excalidraw.json` + meta; run pipeline; insert `<img>` with `loading="lazy"` after the prose-only split-ownership section (line 55 EN / line 53 RU) of `2026-03-20-karpenter-right-sizing.mdx` in both locales; optional stretch-3rd-diagram task (DIAG-05)
 
 **Wave 3** *(blocked on 04-03 + 04-04)*
 - [ ] 04-05-PLAN.md — Ship `diagrams-source/README.md` runbook (5 H2 sections: Authoring / Metadata / Exporting / Embedding / Gotchas); update `.claude/skills/vv-blog-from-vault/references/visuals-routing.md` Priority 1 `excalidraw` row with delivery path; post-phase REQUIREMENTS.md DIAG-05 doc-drift fix per D-06 (DIAG-01 UNCHANGED per D-01e)
