@@ -17,25 +17,25 @@ progress:
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
-**Current phase:** 05
-**Status:** Ready to execute
+**Current phase:** 05 (shipped; next up Phase 6)
+**Status:** Phase 5 slidev-integration shipped 2026-05-07 — ready for Phase 6 (Companion Posts)
 **Last updated:** 2026-05-07
 
 ## Project Reference
 
 **Core value:** Turn vedmich.dev from "static site with a handful of posts" into a full content platform — three streams (blog, presentations, companion posts), reusable rich-media primitives reducing Slidev slide lift from ~30 min to <10 min, Excalidraw diagrams, code block upgrades, and Slidev decks served as first-party routes.
 
-**Current focus:** Phase 05 — slidev-integration
+**Current focus:** v1.0 next — Phase 6 Companion Posts
 
 ## Current Position
 
-Phase: 05 (slidev-integration) — EXECUTING
-Plan: 4 of 4
-Status: Ready to execute
-Resume file: 05-04-PLAN.md
-Last activity: 2026-05-07
+Phase: 5 (slidev-integration) — SHIPPED 2026-05-07
+Plan: 4 plans across 3 waves, all shipped
+Status: Phase 5 complete; ready to open Phase 6 (Companion Posts) via /gsd-context-phase 6
+Resume file: .planning/phases/06-companion-posts/06-CONTEXT.md (pending — created on next context session)
+Last activity: 2026-05-07 -- Phase 05 slidev-integration shipped
 
-Progress: [██████████] 100%
+Progress: [██████████] 75% (v1.0 Phases 1-4 + 04.1 + 05 shipped; Phase 6 Companion Posts next; Phase 7 SKIPPED per earlier decision)
 
 ## Completed Phases
 
@@ -44,6 +44,7 @@ Progress: [██████████] 100%
 - **Phase 03: UI Polish** — shipped 2026-05-03 (POLISH-01..06, 4 plans: token/motion infra + bottom CTAs + stagger wiring + 14-row visual audit; WR-03 Shiki palette guard folded in)
 - **Phase 04: Excalidraw Pipeline** — shipped 2026-05-04 (DIAG-01..05, 5 plans: fixtures + script + MCP swap + karpenter + runbook; 2 SVGs embedded; 9 integration tests green; hardening in Phase 04.1)
 - **Phase 04.1: Excalidraw Pipeline Hardening** — shipped 2026-05-07 (DIAG-01..05 hardened, 6 plans across 4 waves: security + UX + MCP re-author + docs + quality + phase close; 37/58 review findings closed, 21 deferred with rationale; 2 CRITICAL + 2 HIGH security threats mitigated; test count 44 → 69)
+- **Phase 05: Slidev Integration** — shipped 2026-05-07 (SLIDES-01/02/04/06 + CONTENT-04 shipped; SLIDES-03 + SLIDES-05 deferred per D-17; 4 plans across 3 waves: submodule + CI empty-whitelist + CLAUDE.md pointer / URL rewrite + i18n + 12 MDX draft:true + empty-state / docs/slides-onboarding.md runbook + vv-slidev skill reference with vault mirror / traceability close. Zero deck migrates in this phase — infrastructure-only per D-01. Homepage Presentations section renders empty-state bilingual copy.)
 
 ## Active Context
 
@@ -103,6 +104,14 @@ Progress: [██████████] 100%
 - **Phase 05 Plan 03 (2026-05-07):** `docs/slides-onboarding.md` = 240 LOC, 10 H2 sections (When-to-use + Prerequisites + 6 Steps + Gotchas + Further reading). All 7 plan-mandated pitfalls surfaced in Gotchas: --base trailing slash, D-13 no-root-copy (404.html/CNAME/index.html), Pitfall 3 no-Slidev-deps in package.json, Pitfall 4 branch=gh-pages invariant, Pitfall 5 cp -R trailing-slash gotcha, Pitfall 7 branch-switch submodule sync, D-03 `slides:` frontmatter retention nuance. Zero hex literals.
 - **Phase 05 Plan 03 (2026-05-07):** `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md` = 46 LOC (inside D-10 target band 30-55). Opens with explicit "single source of truth" declaration pointing at docs/slides-onboarding.md. Content limited to TL;DR + quick-commands + cross-refs; drift bounded by wc -l gate.
 - **Phase 05 Plan 03 (2026-05-07):** Three-way sync completed via explicit-file cp form (Pitfall 5 mitigation — no trailing-slash hazard possible). `diff -q` between live and vault returned empty. Vault commit `8d88cfc` in ~/Documents/ViktorVedmich/ main branch with CLAUDE.md-prescribed message `vault backup: skill vv-slidev — add publish-to-vedmich-dev.md reference`. Vault NOT pushed (personal rhythm, SessionEnd hook handles sync).
+- **Phase 05 Plan 01 (2026-05-07):** Phase 5 scope is pipeline-only per D-01 — zero decks migrate. The 2 live Slurm decks on `vedmichv/slidev:gh-pages` were built with `--base /<slug>/` (matching legacy `s.vedmich.dev` domain, commit `1dfa2ec0` "Fix base path for custom domain s.vedmich.dev") so they cannot serve under `/slides/<slug>/` without a full rebuild — rebuild is user-owned and deferred. CI whitelist in `.github/workflows/deploy.yml` is commented-out per D-12; uncomment when first real deck migrates.
+- **Phase 05 Plan 01 (2026-05-07):** Submodule `slidev/` added via `git submodule add -b gh-pages https://github.com/vedmichv/slidev.git slidev` per D-02 at pinned SHA `1dfa2ec0429a9d84ef41e22e8ac97dccf59e0634`. `.gitmodules` records `branch = gh-pages` — load-bearing per Pitfall 4 (without the flag, `git submodule update --remote` silently follows remote HEAD instead of the named branch). `actions/checkout@v4 with: submodules: recursive` pattern matches Slidev's own GH Pages deploy docs (Context7 `/websites/sli_dev`).
+- **Phase 05 Plan 02 (2026-05-07):** i18n drift resolved — D-15 says `speaking.subtitle` but actual `s.vedmich.dev` string was at `presentations.subtitle` (line 65 both locales). Planner surfaced the drift in 05-RESEARCH.md Pitfall 1; Plan 02 edited `presentations.subtitle` per Pitfall 1 correction. `speaking.subtitle` at line 51 (`30+ technical deep-dives per year. Speaker rating: 4.5–4.7/5.0`) left unchanged — it does not contain the domain reference.
+- **Phase 05 Plan 02 (2026-05-07):** PresentationCard + search-index URL precedence established — `data.slides ?? \`/slides/${slug}/\``. External override via optional `slides:` frontmatter field (Zod-validated URL) wins; internal `/slides/<slug>/` is the fallback. Enables future SpeakerDeck / Notist / legacy `s.vedmich.dev` overrides on a per-deck basis while defaulting to internal hosting for new decks. Symmetric in both files (PresentationCard:12 + search-index.ts:37).
+- **Phase 05 Plan 02 (2026-05-07):** D-03 skeleton preservation + D-14 verification compatibility — all 12 presentation MDX files flipped to `draft: true` but `slides: "https://s.vedmich.dev/<slug>/"` frontmatter preserved for future un-draft. D-14 grep check scoped to `src/i18n/ src/components/ src/data/` (excluding `src/content/presentations/`) to avoid false positives on the 12 retained URLs. Trade-off: ghost decks carry legacy URL until un-draft; Plan 03 runbook Step 5 documents the "remove `slides:` field on un-draft to fall back to internal path" procedure.
+- **Phase 05 Plan 02 (2026-05-07):** Presentations.astro empty-state pattern copied verbatim from BlogPreview.astro (shipped Phase 03 Plan 02). `{totalCount > 0 ? (...) : (<p>Decks coming soon...</p>)}` ternary wraps grid + bottom CTA; top-right `All decks →` link guarded by `{totalCount > 0 && (...)}`. Inline bilingual copy matches BlogPreview pattern. Token-only styling (`text-text-muted`, `animate-on-scroll`) preserved.
+- **Phase 05 Plan 03 (2026-05-07):** Two-surface docs pattern per D-09 — `docs/slides-onboarding.md` in vedmich.dev repo is SSoT (≥150 LOC, 10 H2 sections: intro + When-to-use + Prerequisites + 6 Steps + Gotchas + Further reading). Short 46 LOC skill reference at `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md` opens with SSoT declaration + TL;DR + Quick commands + pointer back to docs/. Drift prevented by LOC cap + explicit SSoT reference in opening sentence.
+- **Phase 05 Plan 04 (2026-05-07):** D-17 deferral pattern — SLIDES-03 (6-deck migration) + SLIDES-05 (`s.vedmich.dev` 301 redirect) both deferred with explicit rationale in bullet deferral-suffix + Traceability table notes. Not cancelled — user-owned timing. 5/7 Phase 5 REQ-IDs shipped (SLIDES-01/02/04/06 + CONTENT-04); 2/7 deferred. `gsd-sdk phase.complete` known-broken, same manual fix as Phase 04.1 Plan 04 — flip bullets, update Traceability rows, advance Last-updated.
 
 ### Technical Debt
 
