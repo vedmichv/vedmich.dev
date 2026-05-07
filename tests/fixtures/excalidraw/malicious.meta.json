@@ -1,0 +1,4 @@
+{
+  "title": "Malicious payload fixture",
+  "descEn": "Security test fixture — element.text contains literal <script> to verify wrapper-side XML escaping; SVGO post-pass must strip any surviving script/event-handler attributes per D-03."
+}
