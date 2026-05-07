@@ -23,7 +23,7 @@
 - [ ] **Phase 1: Rich Media Primitives** — VvStage/VvNode/VvWire/VvPacket Astro components + refactor PodLifecycleAnimation
 - [ ] **Phase 2: Code Block Upgrades** — Shiki transformers + language badge + Deep Signal theme override
 - [x] **Phase 3: UI Polish** — "See all →" CTAs + hover states + section transitions + spacing audit
-- [ ] **Phase 4: Excalidraw Pipeline** — Export script + replace ASCII diagrams + stress-test on 2-3 posts
+- [x] **Phase 4: Excalidraw Pipeline** — Export script + replace ASCII diagrams + stress-test on 2-3 posts (shipped 2026-05-04)
 - [ ] **Phase 5: Slidev Integration** — Git submodule + CI build + migrate 6 decks + DNS decision + onboarding docs
 - [ ] **Phase 6: Companion Posts** — 1 DKT + 1 AWS RU companion post via vv-blog-from-vault skill + schema extension
 - [~] **Phase 7: Slidev → Astro Codegen (OPTIONAL)** — **SKIPPED 2026-05-02**: time-to-port measured at 0.73 min (44s) on AWS three-tier; primitives alone hit the <10 min target, codegen ROI insufficient
@@ -152,34 +152,27 @@ Plans:
 - [x] 04-04-PLAN.md — Author karpenter `split-ownership.excalidraw.json` + meta; run pipeline; insert `<img>` with `loading="lazy"` after the prose-only split-ownership section (line 55 EN / line 53 RU) of `2026-03-20-karpenter-right-sizing.mdx` in both locales; optional stretch-3rd-diagram task (DIAG-05)
 
 **Wave 3** *(blocked on 04-03 + 04-04)*
-- [x] 04-05-PLAN.md — Ship `diagrams-source/README.md` runbook (5 H2 sections: Authoring / Metadata / Exporting / Embedding / Gotchas); update `.claude/skills/vv-blog-from-vault/references/visuals-routing.md` Priority 1 `excalidraw` row with delivery path; post-phase REQUIREMENTS.md DIAG-05 doc-drift fix per D-06 (DIAG-01 UNCHANGED per D-01e)
+- [x] 04-05-PLAN.md — Ship `diagrams-source/README.md` runbook (6 H2 sections: Authoring / Metadata / Exporting / Embedding / Gotchas / Further reading; 118 LOC); update `.claude/skills/vv-blog-from-vault/references/visuals-routing.md` Priority 1 `excalidraw` row with delivery path; post-phase REQUIREMENTS.md DIAG-05 doc-drift fix per D-06 (DIAG-01 UNCHANGED per D-01e)
 
 ---
 
 ### Phase 04.1: Excalidraw Pipeline Hardening (INSERTED)
 
-**Goal:** Remediate 58 post-phase review findings against the Phase 4 Excalidraw pipeline shipment — 2 CRITICAL + 2 HIGH security (SEC-C01 symlink bypass, SEC-C02 fictional SVGO script-strip, SEC-H03 SSRF via dataURL, SEC-H04 parsererror silent success), 4 blocking UX (white slab on dark prose, mobile label illegibility, MCP banner aspect, Helvetica cross-platform drift), 13 code-quality + test-coverage gaps (idempotency, JSON error UX, meta validation, FILES_BLOB test, escapeXml Unicode, --quiet flag), 20 docs-drift (REQUIREMENTS/ROADMAP/STATE status, runbook missing npm install, runbook Virgil vs Helvetica, CLAUDE.md no Excalidraw mention, Phase 7→5 reference), plus P4 polish (figure/figcaption a11y, forced-colors smoke check).
+**Goal:** Remediate 58 post-phase review findings against the Phase 4 Excalidraw pipeline shipment — 2 CRITICAL + 2 HIGH security findings (SEC-C01 symlink bypass, SEC-C02 fictional SVGO script-strip, SEC-H03 SSRF via dataURL, SEC-H04 parsererror silent success), 4 blocking UX findings (white slab on dark prose, mobile label illegibility, MCP banner aspect, Helvetica cross-platform drift), 13 code-quality + test-coverage gaps (idempotency, JSON error UX, meta validation, FILES_BLOB budget test, escapeXml Unicode), 20 docs-drift findings (REQUIREMENTS/ROADMAP/STATE status, runbook missing npm install, runbook Virgil vs Helvetica, CLAUDE.md no Excalidraw mention, Phase 7→5 reference), plus P4 polish (figure/figcaption a11y, forced-colors smoke check).
 
-**Requirements:** DIAG-01, DIAG-02, DIAG-03, DIAG-04, DIAG-05 (all hardened — not shipped anew; 04.1 remediates reviews against the Phase 4 shipment)
+**Requirements:** DIAG-01..05 (hardened, not shipped anew — all 5 already shipped in Phase 4)
 
 **Depends on:** Phase 4
 
-**Plans:** 6 plans across 4 waves (1 → 2 → 3 → 4)
+**Plans:** 6 plans across 4 waves
 
 Plans:
-**Wave 1** *(parallel — zero file overlap)*
-- [ ] 04.1-01-PLAN.md — Security hardening: realpath validatePath + ALLOWED_WRITE_ROOTS + SVGO removeScripts + dataURL whitelist + parsererror detection; 7 new security tests, 3 new hostile fixtures
-- [ ] 04.1-04-PLAN.md — Docs drift sweep: flip REQUIREMENTS / ROADMAP / STATE / PROJECT / CLAUDE.md / runbook (13 DOCS-REVIEW findings closed in 6 files)
-
-**Wave 2** *(blocked on 04.1-01 — both touch scripts/excalidraw-to-svg.mjs)*
-- [ ] 04.1-02-PLAN.md — UX pipeline fixes: SVGO white-rect strip + Helvetica fallback-chain post-SVGO replace; 3 new UX tests
-
-**Wave 3** *(parallel — 04.1-03 and 04.1-05 have zero file overlap; both blocked on 04.1-02)*
-- [ ] 04.1-03-PLAN.md — MCP .excalidraw.json re-author (human step) + SVG re-exports for both posts + figure/figcaption MDX wrap on all 4 posts (bilingual captions)
-- [ ] 04.1-05-PLAN.md — Code quality + test coverage: parseJsonOrThrow + typed meta validator + FILES_BLOB oversize test + byte-stability test + Unicode escapeXml parametric (5 codepoints via escape sequences) + --quiet flag; 11 new tests
-
-**Wave 4** *(blocked on all prior plans)*
-- [ ] 04.1-06-PLAN.md — P4 polish: SEC-L02 closure note (as side-effect of D-03) + forced-colors Playwright smoke check + Phase 04.1 SUMMARY.md with 58-finding closure map
+- [ ] 04.1-01-PLAN.md — Security hardening: realpath validatePath + ALLOWED_WRITE_ROOTS + SVGO removeScripts + dataURL whitelist + parsererror detection (Wave 1)
+- [ ] 04.1-02-PLAN.md — UX pipeline fixes: SVGO white-rect strip + Helvetica fallback chain (Wave 2, serialized after 04.1-01 due to shared script file)
+- [ ] 04.1-03-PLAN.md — MCP re-author + SVG re-exports + figure/figcaption MDX wrap in bilingual MCP + karpenter posts (Wave 3)
+- [ ] 04.1-04-PLAN.md — Docs drift: REQUIREMENTS / ROADMAP / STATE / PROJECT / CLAUDE.md / runbook sweep (Wave 1, docs-only parallel with 04.1-01)
+- [ ] 04.1-05-PLAN.md — Code quality + test coverage: parseJsonOrThrow + meta type validation + FILES_BLOB test + idempotency test + Unicode escapeXml parametric + --quiet flag (Wave 3, parallel with 04.1-03)
+- [ ] 04.1-06-PLAN.md — P4 polish: SEC-L02 closure note + forced-colors Playwright smoke check + Phase 04.1 SUMMARY (Wave 4)
 
 ### Phase 5: Slidev Integration
 **Goal:** Serve Slidev presentation decks as first-party routes under `vedmich.dev/slides/<slug>/` via git submodule + CI build, migrate all 6 existing decks from `s.vedmich.dev`, update internal links, configure DNS redirect, and document the "add a new deck" workflow.
@@ -250,7 +243,7 @@ Plans:
 | 1. Rich Media Primitives | 0/? | Not started | - |
 | 2. Code Block Upgrades | 0/? | Not started | - |
 | 3. UI Polish | 3/4 | Executing (Plans 01 + 02 + 03 shipped 2026-05-03) | - |
-| 4. Excalidraw Pipeline | 0/5 | Planned 2026-05-03 — 5 plans across 4 waves | - |
+| 4. Excalidraw Pipeline | 5/5 | Shipped 2026-05-04 (hardening in Phase 04.1) | 2026-05-04 |
 | 4.1. Excalidraw Pipeline Hardening | 0/6 | Planned 2026-05-04 — 6 plans across 4 waves, 58 findings in scope | - |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
@@ -328,11 +321,11 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | POLISH-04 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (CSS infrastructure + grid wiring) |
 | POLISH-05 | Homepage Polish | Phase 3 | Plans 01 + 02 shipped (curve token + canonical CTA class) |
 | POLISH-06 | Homepage Polish | Phase 3 | Plan 04 shipped (14 baselines + AUDIT.md + 2 atomic fixes: About sm:py-28, Podcasts bg-surface+gap-5) |
-| DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (infra) + 04-02 (script); hardened in Phase 04.1 |
-| DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (budget test) + 04-02 (gate impl); hardened in Phase 04.1 |
-| DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-01 (a11y tests) + 04-02 (injection) + 04-03/04 (canonical path); hardened in Phase 04.1 |
-| DIAG-04 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-03 (MCP swap, EN + RU); re-exported in 04.1-03 |
-| DIAG-05 | Excalidraw Pipeline | Phase 4 | Pending — planned in 04-04 (karpenter, EN + RU); re-exported in 04.1-03 |
+| DIAG-01 | Excalidraw Pipeline | Phase 4 | Shipped — 04-01 fixtures + 04-02 script (178 LOC); hardened in Phase 04.1 |
+| DIAG-02 | Excalidraw Pipeline | Phase 4 | Shipped — budget gate in 04-02; both SVGs ≤ 10 KB (9673 B MCP pre-04.1, 7338 B karpenter pre-04.1); hardened in Phase 04.1 |
+| DIAG-03 | Excalidraw Pipeline | Phase 4 | Shipped — pre-SVGO title+desc injection verified in both SVGs; hardened in Phase 04.1 |
+| DIAG-04 | Excalidraw Pipeline | Phase 4 | Shipped — MCP ASCII → SVG in EN + RU (04-03); hardened in Phase 04.1 |
+| DIAG-05 | Excalidraw Pipeline | Phase 4 | Shipped — karpenter split-ownership in EN + RU (04-04); stretch deferred per D-04c; hardened in Phase 04.1 |
 | SLIDES-01 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-02 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-03 | Slidev Integration | Phase 5 | Pending |
@@ -350,4 +343,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-04 (Phase 04.1 planned — 6 plans across 4 waves; Phase 4 status flip to Shipped lands in Plan 04.1-04 at execute time)
+**Last updated:** 2026-05-04 (Phase 4 excalidraw-pipeline shipped — 5 plans, 2 SVGs embedded in MCP + karpenter posts; Phase 04.1 hardening planned — 6 plans across 4 waves)
