@@ -9,8 +9,8 @@ const { deck } = Astro.props;
 const { data, id } = deck;
 
 const slug = id.replace(/^(en|ru)\//, '');
-const deckUrl = `https://s.vedmich.dev/${slug}/`;
-const displayUrl = `s.vedmich.dev/${slug}`;
+const deckUrl = data.slides ?? `/slides/${slug}/`;
+const displayUrl = `vedmich.dev/slides/${slug}`;
 
 const dateStr = data.date.toISOString().slice(0, 10);
 

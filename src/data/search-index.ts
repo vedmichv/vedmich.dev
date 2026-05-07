@@ -34,7 +34,7 @@ export async function buildSearchIndex(locale: Locale): Promise<SearchItem[]> {
       kind: 'slides',
       title: entry.data.title,
       sub: `${dateStr} · ${entry.data.event}`,
-      url: `https://s.vedmich.dev/${slug}`,
+      url: entry.data.slides ?? `/slides/${slug}/`,
       tags: entry.data.tags,
       body: entry.data.description,
       date: dateStr,
