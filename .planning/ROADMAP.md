@@ -164,11 +164,11 @@ Plans:
 
 **Depends on:** Phase 4
 
-**Plans:** 2/6 plans executed
+**Plans:** 3/6 plans executed
 
 Plans:
 - [x] 04.1-01-PLAN.md — Security hardening: realpath validatePath + ALLOWED_WRITE_ROOTS + SVGO removeScripts + dataURL whitelist + parsererror detection (Wave 1)
-- [ ] 04.1-02-PLAN.md — UX pipeline fixes: SVGO white-rect strip + Helvetica fallback chain (Wave 2, serialized after 04.1-01 due to shared script file)
+- [x] 04.1-02-PLAN.md — UX pipeline fixes: SVGO white-rect strip + Helvetica fallback chain (Wave 2, serialized after 04.1-01 due to shared script file)
 - [ ] 04.1-03-PLAN.md — MCP re-author + SVG re-exports + figure/figcaption MDX wrap in bilingual MCP + karpenter posts (Wave 3)
 - [x] 04.1-04-PLAN.md — Docs drift: REQUIREMENTS / ROADMAP / STATE / PROJECT / CLAUDE.md / runbook sweep (Wave 1, docs-only parallel with 04.1-01)
 - [ ] 04.1-05-PLAN.md — Code quality + test coverage: parseJsonOrThrow + meta type validation + FILES_BLOB test + idempotency test + Unicode escapeXml parametric + --quiet flag (Wave 3, parallel with 04.1-03)
