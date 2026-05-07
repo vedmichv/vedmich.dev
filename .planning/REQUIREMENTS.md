@@ -34,11 +34,11 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 
 ### Excalidraw Pipeline
 
-- [ ] **DIAG-01**: Ship `scripts/excalidraw-to-svg.mjs` that converts `.excalidraw.json → .svg` via `@aldinokemal2104/excalidraw-to-svg` (build-time, zero runtime JS).
-- [ ] **DIAG-02**: Integrate SVGO into the same pipeline so emitted diagrams are ≤ 10 KB each — prevents LCP regression per PITFALLS.md.
-- [ ] **DIAG-03**: Establish the `public/blog-assets/<slug>/diagrams/*.svg` convention for committed diagrams, with `title`+`desc` a11y elements injected during export.
-- [ ] **DIAG-04**: Replace the ASCII client-↔-server diagram in the existing MCP blog post with an Excalidraw SVG rendered via the new pipeline (both `en/` and `ru/` locales).
-- [ ] **DIAG-05**: Add 1-2 additional Excalidraw diagrams to existing blog posts (MCP + karpenter + 1-2 stretch) to stress-test the pipeline on real content. `manifests` post is text-only per D-04b (no diagram fit).
+- [x] **DIAG-01**: Ship `scripts/excalidraw-to-svg.mjs` that converts `.excalidraw.json → .svg` via `@aldinokemal2104/excalidraw-to-svg` (build-time, zero runtime JS).
+- [x] **DIAG-02**: Integrate SVGO into the same pipeline so emitted diagrams are ≤ 10 KB each — prevents LCP regression per PITFALLS.md.
+- [x] **DIAG-03**: Establish the `public/blog-assets/<slug>/diagrams/*.svg` convention for committed diagrams, with `title`+`desc` a11y elements injected during export.
+- [x] **DIAG-04**: Replace the ASCII client-↔-server diagram in the existing MCP blog post with an Excalidraw SVG rendered via the new pipeline (both `en/` and `ru/` locales).
+- [x] **DIAG-05**: Add 1-2 additional Excalidraw diagrams to existing blog posts (MCP + karpenter + 1-2 stretch) to stress-test the pipeline on real content. `manifests` post is text-only per D-04b (no diagram fit).
 
 ### Slidev Integration
 
@@ -128,11 +128,11 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 | POLISH-04 | Homepage Polish | Phase 3 | Plan 01 shipped CSS infrastructure (stagger variant + reduced-motion guard); Plan 02 wires to grids |
 | POLISH-05 | Homepage Polish | Phase 3 | Plan 01 shipped curve token (D-02b expo-out); D-02 scoped out translate-Y + amber underline from original text |
 | POLISH-06 | Homepage Polish | Phase 3 | Pending |
-| DIAG-01 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-02 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-03 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-04 | Excalidraw Pipeline | Phase 4 | Pending |
-| DIAG-05 | Excalidraw Pipeline | Phase 4 | Pending |
+| DIAG-01 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
+| DIAG-02 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
+| DIAG-03 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
+| DIAG-04 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
+| DIAG-05 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
 | SLIDES-01 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-02 | Slidev Integration | Phase 5 | Pending |
 | SLIDES-03 | Slidev Integration | Phase 5 | Pending |
