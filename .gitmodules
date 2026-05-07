@@ -1,0 +1,4 @@
+[submodule "slidev"]
+	path = slidev
+	url = https://github.com/vedmichv/slidev.git
+	branch = gh-pages
