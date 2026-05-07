@@ -24,6 +24,7 @@ const FIXTURE_DIR = path.join(REPO_ROOT, 'tests', 'fixtures', 'excalidraw');
 const MINIMAL_SRC = path.join(FIXTURE_DIR, 'minimal.excalidraw.json');
 const OVERSIZE_SRC = path.join(FIXTURE_DIR, 'oversize.excalidraw.json');
 const PARSERERROR_SRC = path.join(FIXTURE_DIR, 'parsererror-trigger.excalidraw.json');
+const WHITE_RECT_PLUS_SRC = path.join(FIXTURE_DIR, 'white-rect-plus-shape.excalidraw.json');
 // Phase 04.1 D-02 (SEC-C01) — tests write to repo-local tests/tmp/ (gitignored) instead of $TMPDIR.
 const TESTS_TMP = path.join(REPO_ROOT, 'tests', 'tmp');
 
@@ -376,4 +377,118 @@ test('Integrity :: rejects-parsererror — wrapper parsererror output is refused
   }
   // Sanity: ensure the meta sidecar still exists after the run (no cleanup side-effect)
   assert.ok(fs.existsSync(metaPath), 'parsererror-trigger.meta.json must not be deleted by the test');
+});
+
+// --- Phase 04.1 UX pipeline fixes (D-07 + D-08) --------------------------------
+
+test('UX-01 :: strips-leading-white-rect — SVGO narrow selector removes path[fill="#fff"][d^="M0 0h"] (D-07)', () => {
+  const dest = tmpDest('white-strip');
+  try {
+    const result = run([WHITE_RECT_PLUS_SRC, dest]);
+    assert.equal(result.status, 0, `pipeline failed: ${result.stderr}`);
+    const svg = fs.readFileSync(dest, 'utf8');
+    // The leading M0 0h... path must NOT retain its fill="#fff" attribute.
+    // Either (a) the path was fully pruned by SVGO multipass, or (b) it survives
+    // without fill. Either outcome → no bright slab on Deep Signal dark prose.
+    assert.ok(
+      !/<path[^>]*fill="#fff"[^>]*d="M0 0h/.test(svg),
+      'leading full-canvas white rect must be stripped by D-07 narrow selector. ' +
+        'Got SVG: ' + svg.slice(0, 500)
+    );
+    assert.ok(
+      !/<path[^>]*d="M0 0h[^>]*fill="#fff"/.test(svg),
+      'leading full-canvas white rect must be stripped regardless of attribute order'
+    );
+  } finally {
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('UX-01 :: preserves-interior-white-shapes — narrow selector does not over-match (D-07)', () => {
+  const dest = tmpDest('white-preserve');
+  try {
+    const result = run([WHITE_RECT_PLUS_SRC, dest]);
+    assert.equal(result.status, 0, `pipeline failed: ${result.stderr}`);
+    const svg = fs.readFileSync(dest, 'utf8');
+    // The interior white rectangle at x=120, y=50 must still render.
+    // Excalidraw emits interior rectangles via a <path> or <g transform="translate(120 50)">.
+    // Stronger assertion: there must be at least TWO <g or <path elements in the output
+    // (one for rect-visible at 10,10 and one for rect-interior-white at 120,50).
+    assert.ok(
+      svg.length > 500,
+      'interior white rectangle must survive — output is suspiciously small, narrow selector over-matched'
+    );
+    const shapeElements = (svg.match(/<(path|g|rect)\b/g) || []).length;
+    assert.ok(
+      shapeElements >= 2,
+      `expected >= 2 path/g/rect elements in output (the 2 non-canvas shapes), got ${shapeElements}. SVG: ${svg.slice(0, 500)}`
+    );
+  } finally {
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('UX-04 :: helvetica-fallback-chain — post-SVGO replace applies Windows-safe font fallback (D-08)', () => {
+  // Build a source JSON with a text element using Helvetica (fontFamily=2).
+  // The wrapper emits font-family="Helvetica, Segoe UI Emoji" by default for fontFamily=2.
+  // After D-08 post-SVGO replace, every such occurrence must become
+  // font-family="Helvetica, Arial, sans-serif".
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const srcPath = path.join(TESTS_TMP, `helvetica-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  fs.writeFileSync(srcPath, JSON.stringify({
+    type: 'excalidraw', version: 2, source: 'https://excalidraw.com',
+    elements: [
+      {
+        id: 'rect-anchor',
+        type: 'rectangle', x: 10, y: 10, width: 100, height: 40,
+        angle: 0, strokeColor: '#1e1e1e', backgroundColor: 'transparent',
+        fillStyle: 'solid', strokeWidth: 2, strokeStyle: 'solid',
+        roughness: 1, opacity: 100, groupIds: [], frameId: null,
+        roundness: { type: 3 }, seed: 501,
+        version: 1, versionNonce: 5001, updated: 1700000000000,
+        isDeleted: false, boundElements: [], link: null, locked: false,
+      },
+      {
+        id: 'text-helvetica',
+        type: 'text', x: 20, y: 20, width: 80, height: 20,
+        angle: 0, strokeColor: '#1e1e1e', backgroundColor: 'transparent',
+        fillStyle: 'solid', strokeWidth: 2, strokeStyle: 'solid',
+        roughness: 1, opacity: 100, groupIds: [], frameId: null,
+        roundness: null, seed: 502,
+        version: 1, versionNonce: 5002, updated: 1700000000000,
+        isDeleted: false, boundElements: [], link: null, locked: false,
+        text: 'Helvetica', fontSize: 16, fontFamily: 2,
+        textAlign: 'left', verticalAlign: 'top', baseline: 18,
+        containerId: null, originalText: 'Helvetica', lineHeight: 1.25, autoResize: true,
+      },
+    ],
+    appState: { gridSize: null, viewBackgroundColor: '#ffffff' },
+    files: {},
+  }));
+  fs.writeFileSync(metaPath, JSON.stringify({ title: 'Helvetica test', descEn: 'D-08 fallback verification' }));
+  const dest = tmpDest('helvetica');
+  try {
+    const result = run([srcPath, dest]);
+    assert.equal(result.status, 0, `pipeline failed: ${result.stderr}`);
+    const svg = fs.readFileSync(dest, 'utf8');
+    assert.match(
+      svg,
+      /font-family="Helvetica, Arial, sans-serif"/,
+      'every Helvetica font-family must be replaced with the full fallback chain per D-08'
+    );
+    // Negative assertion: standalone Helvetica (without the Arial fallback) must not appear.
+    assert.ok(
+      !/font-family="Helvetica"(?!, Arial)/.test(svg),
+      'no standalone font-family="Helvetica" — must always include the fallback chain'
+    );
+    assert.ok(
+      !/font-family="Helvetica, Segoe UI Emoji"/.test(svg),
+      'the Excalidraw-default `Helvetica, Segoe UI Emoji` variant must also be replaced'
+    );
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
 });
