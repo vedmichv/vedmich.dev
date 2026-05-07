@@ -313,7 +313,7 @@ These need a PR + visual review:
 
 Current presentations are hosted at `s.vedmich.dev` (repo `vedmichv/slidev`).
 
-**Phase 7 (future):** Migrate Slidev builds into `public/slides/` so presentations live at `vedmich.dev/slides/`.
+**v1.0 Phase 5 (planned):** Migrate Slidev builds into `public/slides/` so presentations live at `vedmich.dev/slides/<slug>/`. See `.planning/ROADMAP.md §Phase 5: Slidev Integration`.
 
 | Presentation | Current URL | Theme |
 |---|---|---|
@@ -323,6 +323,19 @@ Current presentations are hosted at `s.vedmich.dev` (repo `vedmichv/slidev`).
 
 Slidev repos: `vedmichv/slidev`, `DKT-AI/slidev`
 Theme repos: `vedmichv/slidev-theme-slurm`, `DKT-AI/slidev-theme-dkt`
+
+---
+
+## Excalidraw Diagram Pipeline — LIVE (since 2026-05-04)
+
+Hand-sketched diagrams ship as build-time-exported static SVGs via `@aldinokemal2104/excalidraw-to-svg@1.1.1`. Source `.excalidraw.json` lives at `diagrams-source/<slug>/`, optimized SVG ships to `public/blog-assets/<slug>/diagrams/*.svg`, embedded via `<figure><img><figcaption>` in bilingual MDX. Zero runtime JS.
+
+Current consumers: MCP post (`2026-03-02-mcp-servers-plainly-explained`) + Karpenter post (`2026-03-20-karpenter-right-sizing`).
+
+**Runbook:** `diagrams-source/README.md`
+**Script:** `scripts/excalidraw-to-svg.mjs`
+**Tests:** `tests/unit/excalidraw-to-svg.test.ts`
+**Boundary invariant:** `@aldinokemal2104/excalidraw-to-svg` is a devDep — never import from `src/`.
 
 ---
 
