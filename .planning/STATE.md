@@ -2,40 +2,40 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Content Platform
-current_phase: 04.1
-status: executing
-last_updated: "2026-05-07T10:14:49.712Z"
-last_activity: 2026-05-07 -- Phase 04.1 execution started
+current_phase: 5
+status: ready_to_plan
+last_updated: "2026-05-07T16:05:00.000Z"
+last_activity: 2026-05-07 -- Phase 04.1 complete (37/58 findings closed, 21 deferred with rationale)
 progress:
   total_phases: 8
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 27
   completed_plans: 21
-  percent: 78
+  percent: 63
 ---
 
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
-**Current phase:** 04.1
-**Status:** Executing Phase 04.1 Wave 1
+**Current phase:** 5
+**Status:** Ready to plan
 **Last updated:** 2026-05-07
 
 ## Project Reference
 
 **Core value:** Turn vedmich.dev from "static site with a handful of posts" into a full content platform — three streams (blog, presentations, companion posts), reusable rich-media primitives reducing Slidev slide lift from ~30 min to <10 min, Excalidraw diagrams, code block upgrades, and Slidev decks served as first-party routes.
 
-**Current focus:** Phase 04.1 — excalidraw-pipeline-hardening
+**Current focus:** Phase 5 — slidev-integration
 
 ## Current Position
 
-Phase: 04.1 (excalidraw-pipeline-hardening) — EXECUTING
-Plan: 1 of 6 (Wave 1 complete — 04.1-01 + 04.1-04)
-Status: Executing Phase 04.1 Wave 1 (plans 04.1-01 + 04.1-04 completed in parallel; 04.1-02 next in Wave 2)
-Resume file: .planning/phases/04.1-excalidraw-pipeline-hardening/04.1-CONTEXT.md
-Last activity: 2026-05-07 -- Phase 04.1 Wave 1 complete
+Phase: 5 (slidev-integration) — READY TO PLAN
+Plan: Not started
+Status: Ready to plan Phase 5
+Resume file: .planning/ROADMAP.md
+Last activity: 2026-05-07 -- Phase 04.1 complete
 
-Progress: [██████████] 100% (v1.0 Phases 1-4 shipped; Phase 04.1 hardening ready)
+Progress: [██████████] 63% (v1.0 Phases 1-4 + 04.1 shipped; Phase 5 Slidev next)
 
 ## Completed Phases
 
@@ -43,6 +43,7 @@ Progress: [██████████] 100% (v1.0 Phases 1-4 shipped; Phase 
 - **Phase 02: Code Block Upgrades** — shipped (Shiki language badges + `// [!code highlight]` transformer + Deep Signal github-dark palette + CodeCopyEnhancer rewrite + 8-hex palette guard test, 6 plans across 6 waves; CODE-01..05)
 - **Phase 03: UI Polish** — shipped 2026-05-03 (POLISH-01..06, 4 plans: token/motion infra + bottom CTAs + stagger wiring + 14-row visual audit; WR-03 Shiki palette guard folded in)
 - **Phase 04: Excalidraw Pipeline** — shipped 2026-05-04 (DIAG-01..05, 5 plans: fixtures + script + MCP swap + karpenter + runbook; 2 SVGs embedded; 9 integration tests green; hardening in Phase 04.1)
+- **Phase 04.1: Excalidraw Pipeline Hardening** — shipped 2026-05-07 (DIAG-01..05 hardened, 6 plans across 4 waves: security + UX + MCP re-author + docs + quality + phase close; 37/58 review findings closed, 21 deferred with rationale; 2 CRITICAL + 2 HIGH security threats mitigated; test count 44 → 69)
 
 ## Active Context
 

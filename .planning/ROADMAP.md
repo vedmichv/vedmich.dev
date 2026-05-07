@@ -156,7 +156,7 @@ Plans:
 
 ---
 
-### Phase 04.1: Excalidraw Pipeline Hardening (INSERTED)
+### Phase 04.1: Excalidraw Pipeline Hardening (SHIPPED 2026-05-07)
 
 **Goal:** Remediate 58 post-phase review findings against the Phase 4 Excalidraw pipeline shipment — 2 CRITICAL + 2 HIGH security findings (SEC-C01 symlink bypass, SEC-C02 fictional SVGO script-strip, SEC-H03 SSRF via dataURL, SEC-H04 parsererror silent success), 4 blocking UX findings (white slab on dark prose, mobile label illegibility, MCP banner aspect, Helvetica cross-platform drift), 13 code-quality + test-coverage gaps (idempotency, JSON error UX, meta validation, FILES_BLOB budget test, escapeXml Unicode), 20 docs-drift findings (REQUIREMENTS/ROADMAP/STATE status, runbook missing npm install, runbook Virgil vs Helvetica, CLAUDE.md no Excalidraw mention, Phase 7→5 reference), plus P4 polish (figure/figcaption a11y, forced-colors smoke check).
 
@@ -244,7 +244,7 @@ Plans:
 | 2. Code Block Upgrades | 0/? | Not started | - |
 | 3. UI Polish | 3/4 | Executing (Plans 01 + 02 + 03 shipped 2026-05-03) | - |
 | 4. Excalidraw Pipeline | 5/5 | Shipped 2026-05-04 (hardening in Phase 04.1) | 2026-05-04 |
-| 4.1. Excalidraw Pipeline Hardening | 0/6 | Planned 2026-05-04 — 6 plans across 4 waves, 58 findings in scope | - |
+| 4.1. Excalidraw Pipeline Hardening | 6/6 | Shipped 2026-05-07 — 6 plans across 4 waves, 37/58 findings closed, 21 deferred with rationale | 2026-05-07 |
 | 5. Slidev Integration | 0/? | Not started | - |
 | 6. Companion Posts | 0/? | Not started | - |
 | 7. Slidev Codegen (OPTIONAL) | 0/? | Checkpoint-gated | - |
@@ -343,4 +343,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-04 (Phase 4 excalidraw-pipeline shipped — 5 plans, 2 SVGs embedded in MCP + karpenter posts; Phase 04.1 hardening planned — 6 plans across 4 waves)
+**Last updated:** 2026-05-07 (Phase 4 excalidraw-pipeline shipped 2026-05-04 — 5 plans, 2 SVGs embedded in MCP + karpenter posts; Phase 04.1 hardening shipped 2026-05-07 — 6 plans across 4 waves, 37/58 review findings closed, 21 deferred; test suite 44 → 69; next: Phase 5 Slidev Integration)
