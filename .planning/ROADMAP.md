@@ -198,7 +198,7 @@ Plans:
 - [x] 05-02-PLAN.md — PresentationCard + search-index URL rewrite (`data.slides ?? /slides/<slug>/` precedence) + i18n presentations.subtitle en+ru + 12 MDX frontmatter `draft: true` + Presentations empty-state (SLIDES-04)
 
 **Wave 2** *(blocked on Plan 01)*
-- [ ] 05-03-PLAN.md — `docs/slides-onboarding.md` runbook (≥150 LOC, 8+ H2 sections) + `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md` skill reference (30-50 LOC) + vault mirror + vault commit (SLIDES-06, CONTENT-04)
+- [x] 05-03-PLAN.md — `docs/slides-onboarding.md` runbook (≥150 LOC, 8+ H2 sections) + `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md` skill reference (30-50 LOC) + vault mirror + vault commit (SLIDES-06, CONTENT-04)
 
 **Wave 3** *(blocked on Plans 01 + 02 + 03)*
 - [ ] 05-04-PLAN.md — Traceability close: REQUIREMENTS / ROADMAP / STATE flipped for 5 shipped + 2 deferred REQ-IDs per D-17; final 9-gate phase-close smoke sweep (SLIDES-03 + SLIDES-05 deferred rows)

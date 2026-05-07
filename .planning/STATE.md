@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: Content Platform
 current_phase: 05
 status: executing
-last_updated: "2026-05-07T19:33:50.756Z"
+last_updated: "2026-05-07T19:42:24.549Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 31
-  completed_plans: 30
-  percent: 97
+  completed_plans: 31
+  percent: 100
 ---
 
 # STATE.md
@@ -30,12 +30,12 @@ progress:
 ## Current Position
 
 Phase: 05 (slidev-integration) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
-Resume file: None
+Resume file: 05-04-PLAN.md
 Last activity: 2026-05-07
 
-Progress: [██████████] 97%
+Progress: [██████████] 100%
 
 ## Completed Phases
 
@@ -76,6 +76,7 @@ Progress: [██████████] 97%
 
 | Phase 05 P01 | 5m43s | 3 tasks | 4 files |
 | Phase 05 P02 | 3m44s | 4 tasks | 17 files |
+| Phase 05 P03 | 3m19s | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,9 @@ Progress: [██████████] 97%
 - **Phase 03 Plan 04 (2026-05-03):** Two atomic `fix(03-04): ...` commits: **8ceb39e** — `About.astro` cross-section padding rhythm (`py-20 px-6` → `py-20 sm:py-28 px-6`, +64px desktop section height); **bd589c5** — `Podcasts.astro` card bg + grid gap alignment (both cards `bg-bg` → `bg-surface`, grid `gap-6` → `gap-5` per reference `app.jsx:161,426`). Single-source-file per commit; AUDIT.md + after PNGs co-committed per plan acceptance criteria.
 - **Phase 03 Plan 04 (2026-05-03):** Three cross-cutting findings DEFER'd with rationale: (DEFER-1) H2 scale drift `text-3xl font-bold` vs `text-[28px] font-semibold` in 6 files — checkpoint-worthy subjective call; (DEFER-2) "About Me" vs "About me" i18n casing — copy/translation scope; (DEFER-3) `max-w-6xl` vs `max-w-[1120px]` section-width harmonization in 3 files. Each DEFER has future-phase pointer.
 - **Phase 03 Plan 04 (2026-05-03):** Three-commit atomic fix pattern pioneered — `fix-A` + AUDIT-with-PENDING-1 placeholder, `fix-B` + AUDIT-with-A-SHA-resolved + PENDING-2 placeholder, `docs-AUDIT-finalize` with both SHAs resolved. Avoids `git amend`, preserves one-source-file-per-commit atomicity. Reusable pattern for future audit phases.
+- **Phase 05 Plan 03 (2026-05-07):** `docs/slides-onboarding.md` = 240 LOC, 10 H2 sections (When-to-use + Prerequisites + 6 Steps + Gotchas + Further reading). All 7 plan-mandated pitfalls surfaced in Gotchas: --base trailing slash, D-13 no-root-copy (404.html/CNAME/index.html), Pitfall 3 no-Slidev-deps in package.json, Pitfall 4 branch=gh-pages invariant, Pitfall 5 cp -R trailing-slash gotcha, Pitfall 7 branch-switch submodule sync, D-03 `slides:` frontmatter retention nuance. Zero hex literals.
+- **Phase 05 Plan 03 (2026-05-07):** `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md` = 46 LOC (inside D-10 target band 30-55). Opens with explicit "single source of truth" declaration pointing at docs/slides-onboarding.md. Content limited to TL;DR + quick-commands + cross-refs; drift bounded by wc -l gate.
+- **Phase 05 Plan 03 (2026-05-07):** Three-way sync completed via explicit-file cp form (Pitfall 5 mitigation — no trailing-slash hazard possible). `diff -q` between live and vault returned empty. Vault commit `8d88cfc` in ~/Documents/ViktorVedmich/ main branch with CLAUDE.md-prescribed message `vault backup: skill vv-slidev — add publish-to-vedmich-dev.md reference`. Vault NOT pushed (personal rhythm, SessionEnd hook handles sync).
 
 ### Technical Debt
 

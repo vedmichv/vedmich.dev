@@ -47,7 +47,7 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 - [ ] **SLIDES-03**: Migrate all 6 existing decks from `s.vedmich.dev` to `vedmich.dev/slides/<slug>/` — each deck must resolve assets correctly under the sub-path (curl check, not just preview).
 - [x] **SLIDES-04**: Update every `src/data/social.ts` `presentations[].slug` entry + any in-content links so PresentationCard points at `/slides/<slug>/`, not `s.vedmich.dev/<slug>/`.
 - [ ] **SLIDES-05**: Configure the `s.vedmich.dev` CNAME to serve a 301 redirect to `vedmich.dev/slides/<slug>/` — preserves external backlinks during the transition.
-- [ ] **SLIDES-06**: Author a `docs/slides-onboarding.md` runbook covering "how to add a new deck": submodule update, `social.ts` entry, build verification, deploy, visual check.
+- [x] **SLIDES-06**: Author a `docs/slides-onboarding.md` runbook covering "how to add a new deck": submodule update, `social.ts` entry, build verification, deploy, visual check.
 
 ### Slidev → Astro Codegen (Optional — Checkpoint-Gated)
 
@@ -67,7 +67,7 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 - [ ] **CONTENT-01**: Extend `src/content.config.ts` blog schema with optional `episode_number`, `episode_duration`, `listen_url` fields for companion posts (no regression on existing 4 posts).
 - [ ] **CONTENT-02**: Ship 1 DKT episode companion blog post (EN + RU locales, 2 files) via the `vv-blog-from-vault` skill — specific episode chosen during `/gsd-discuss-phase`.
 - [ ] **CONTENT-03**: Ship 1 AWS RU podcast companion blog post (EN + RU locales, 2 files) via the `vv-blog-from-vault` skill — specific episode chosen during `/gsd-discuss-phase`.
-- [ ] **CONTENT-04**: Update the `vv-slidev` skill (lives at `~/.claude/skills/vv-slidev/`) with a `references/publish-to-vedmich-dev.md` page documenting the "publish a new deck to vedmich.dev/slides/<slug>/" workflow (submodule update, social.ts entry, deploy). Mirror the update into the vault backup per the three-way-sync rule.
+- [x] **CONTENT-04**: Update the `vv-slidev` skill (lives at `~/.claude/skills/vv-slidev/`) with a `references/publish-to-vedmich-dev.md` page documenting the "publish a new deck to vedmich.dev/slides/<slug>/" workflow (submodule update, social.ts entry, deploy). Mirror the update into the vault backup per the three-way-sync rule.
 - [ ] **CONTENT-05**: Extend the `vv-blog-from-vault` skill with a `references/primitives-usage.md` page covering VvStage/VvNode/VvWire/VvPacket, plus an update to `references/visuals-routing.md` elevating primitives to "Priority 2" (reuse-first) so companion posts favor primitives over hand-coded SVG. Mirror the update into the vault backup.
 
 ---
