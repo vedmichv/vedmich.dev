@@ -2,7 +2,28 @@
 
 Build-time export of `.excalidraw.json` hand-sketched diagrams to optimized SVG, embedded via `<img>` in MDX with `<title>`/`<desc>` a11y. Zero runtime JS — the wrapper + SVGO run only when an author re-exports a diagram; shipped SVG is a committed static asset.
 
-**Ship status:** Phase 4 (milestone v1.0). Consumers: `2026-03-02-mcp-servers-plainly-explained` (MCP post), `2026-03-20-karpenter-right-sizing` (karpenter split-ownership). Future consumers: companion posts (Phase 6) + any post where a hand-sketched metaphor fits.
+**Ship status:** Phase 4 (milestone v1.0, hardened in Phase 04.1). Consumers: `2026-03-02-mcp-servers-plainly-explained` (MCP post), `2026-03-20-karpenter-right-sizing` (karpenter split-ownership). Future consumers: companion posts (Phase 6) + any post where a hand-sketched metaphor fits.
+
+***
+
+## Prerequisites
+
+The pipeline depends on `@aldinokemal2104/excalidraw-to-svg@1.1.1` (exact pin — devDep) and `svgo@^4` (transitive).
+
+First-time setup:
+```bash
+npm install  # pulls in the wrapper + svgo from package.json:devDependencies
+```
+
+Verify the pin:
+```bash
+node -p "require('./package.json').devDependencies['@aldinokemal2104/excalidraw-to-svg']"
+# → 1.1.1
+```
+
+Additional requirements:
+- Node.js 20+
+- Excalidraw desktop app OR excalidraw.com for authoring `.excalidraw.json` source files
 
 ***
 
@@ -95,7 +116,11 @@ In the target MDX or MD post, insert an HTML `<img>` block at the intended posit
 
 ## Gotchas
 
-1. **Virgil-only text keeps the budget.** The wrapper auto-embeds whichever Excalidraw fonts your diagram uses. Cascadia + Comic Shanns + Lilita One together can push even a small diagram over 10 KB. If you want mixed fonts, verify the SVG byte count and simplify if needed.
+1. **Font choice is the dominant byte driver.** The wrapper auto-embeds each Excalidraw font your diagram uses as an inline base64 TTF subset. Virgil alone is ~9.5 KB — at ≥ 8 elements, a Virgil diagram overruns the 10 KB budget no matter how few labels it has. Two thresholds:
+   - **≤ 10 elements** → Virgil is fine (hand-sketched aesthetic, Excalidraw default, pairs with `fontFamily: 1`). MCP client-server ships in Virgil.
+   - **> 10 elements** → switch the diagram to Helvetica in Excalidraw (`fontFamily: 3`). The pipeline auto-appends `Arial, sans-serif` fallback chain via post-SVGO string replace, so Windows readers (no Helvetica installed) get Arial — metrics close enough that label boxes hold. Karpenter split-ownership ships in Helvetica at ~7.4 KB.
+   - **Cross-platform smoke check:** after shipping a Helvetica diagram, screenshot on Windows Chrome if available — Arial should render in place of Helvetica without overflow.
+   - If you need mixed fonts in one diagram (rare), verify SVG byte count post-export and simplify until under budget.
 
 2. **Meta file required — no silent a11y regression.** The script errors out if `<name>.meta.json` is missing OR if `title` / `descEn` are empty. Never comment out the check.
 
@@ -109,10 +134,21 @@ In the target MDX or MD post, insert an HTML `<img>` block at the intended posit
 
 ***
 
+## Determinism caveat
+
+The SVG's rough-edge jitter is driven by each element's `seed` field in the source JSON. Excalidraw assigns fresh seeds when you open an existing diagram and make edits. To keep `git diff` on SVG outputs minimal:
+
+- Commit the `.excalidraw.json` first, then run the pipeline, then commit the SVG.
+- If you re-export from Excalidraw UI after an edit session, expect the SVG to change visually-equivalently but byte-differently — `seed` / `versionNonce` churn is not a bug.
+- Never hand-touch `seed` values; they drive the `rough.js` jitter pattern per element. Stripping/normalizing them would flatten the hand-drawn feel (deterministic-per-element-id instead of pseudo-random).
+- The unit test `Idempotency :: byte-stable-on-rerun` only holds for the `tests/fixtures/excalidraw/minimal.excalidraw.json` fixture (hardcoded seeds 1-5). Real-world diagrams re-exported from Excalidraw will NOT be byte-stable across edit sessions.
+
+***
+
 ## Further reading
 
 - **`scripts/excalidraw-to-svg.mjs`** — the pipeline script; CLI contract + SVGO config + path-traversal guard.
-- **`tests/unit/excalidraw-to-svg.test.ts`** — 9 integration tests covering DIAG-01/02/03 + T-04-01 path-traversal.
+- **`tests/unit/excalidraw-to-svg.test.ts`** — ~30 integration tests covering DIAG-01/02/03 + T-04-01 path-traversal + Phase 04.1 security hardenings (symlink bypass, SVGO script strip, dataURL scheme whitelist, parsererror detection) + UX fixes (white-rect strip, Helvetica fallback chain) + code-quality (JSON error UX, meta type validation, Unicode escapeXml parametric, byte-stability idempotency, --quiet flag).
 - **`.planning/phases/04-excalidraw-pipeline/04-RESEARCH.md`** — library choice rationale, SVGO pitfalls, security domain.
 - **`CLAUDE.md` §Architecture** — zero-JS-by-default principle; why this pipeline is build-time-only.
 - **`.claude/skills/vv-blog-from-vault/references/visuals-routing.md`** — when to route a diagram to `excalidraw` skill vs `mermaid-pro`.
