@@ -2,22 +2,22 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Content Platform
-current_phase: 5
+current_phase: 05
 status: executing
-last_updated: "2026-05-07T19:01:50.662Z"
-last_activity: 2026-05-07 -- Phase 05 planning complete
+last_updated: "2026-05-07T19:26:26.243Z"
+last_activity: 2026-05-07
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 31
-  completed_plans: 28
-  percent: 90
+  completed_plans: 29
+  percent: 94
 ---
 
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
-**Current phase:** 5
+**Current phase:** 05
 **Status:** Ready to execute
 **Last updated:** 2026-05-07
 
@@ -25,17 +25,17 @@ progress:
 
 **Core value:** Turn vedmich.dev from "static site with a handful of posts" into a full content platform — three streams (blog, presentations, companion posts), reusable rich-media primitives reducing Slidev slide lift from ~30 min to <10 min, Excalidraw diagrams, code block upgrades, and Slidev decks served as first-party routes.
 
-**Current focus:** Phase 5 — slidev-integration
+**Current focus:** Phase 05 — slidev-integration
 
 ## Current Position
 
-Phase: 5 (slidev-integration) — READY TO PLAN
-Plan: Not started
+Phase: 05 (slidev-integration) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Resume file: .planning/phases/05-slidev-integration/05-CONTEXT.md
-Last activity: 2026-05-07 -- Phase 05 planning complete
+Resume file: None
+Last activity: 2026-05-07
 
-Progress: [██████████] 63% (v1.0 Phases 1-4 + 04.1 shipped; Phase 5 Slidev next)
+Progress: [█████████░] 94%
 
 ## Completed Phases
 
@@ -73,6 +73,8 @@ Progress: [██████████] 63% (v1.0 Phases 1-4 + 04.1 shipped; 
 - Phase 03 Plan 03: 1 auto-fixed deviation (Rule 1 Bug — plan's `echo $FOO` fixture didn't produce `#FFAB70` under shiki@3.23.0; swapped to `echo $1` which does); 8/8 new assertions pass, total unit-test count 27 → 35
 - Phase 03 Plan 02: zero deviations, all 19 grep acceptance checks passed, build green on all three task boundaries, en.json/ru.json/BlogCard.astro/PresentationCard.astro byte-identical to HEAD~3
 - Phase 03 Plan 04: 2 atomic fixes shipped (About sm:py-28 + Podcasts bg-surface/gap-5); 3 cross-cutting findings logged as DEFER with rationale (H2 scale 6-file sweep, max-w-6xl 3-file harmonization, About Me→About me copy); zero hex in all 7 homepage components; build green on every boundary, 35/35 unit tests pass; homepage now ~98% reference-aligned
+
+| Phase 05 P01 | 5m43s | 3 tasks | 4 files |
 
 ## Accumulated Context
 

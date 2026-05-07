@@ -194,7 +194,7 @@ Plans:
 
 Plans:
 **Wave 1** *(parallel — zero file overlap)*
-- [ ] 05-01-PLAN.md — Submodule + CI pipeline (empty whitelist per D-12) + CLAUDE.md §Slidev Integration pointer block (SLIDES-01, SLIDES-02)
+- [x] 05-01-PLAN.md — Submodule + CI pipeline (empty whitelist per D-12) + CLAUDE.md §Slidev Integration pointer block (SLIDES-01, SLIDES-02)
 - [ ] 05-02-PLAN.md — PresentationCard + search-index URL rewrite (`data.slides ?? /slides/<slug>/` precedence) + i18n presentations.subtitle en+ru + 12 MDX frontmatter `draft: true` + Presentations empty-state (SLIDES-04)
 
 **Wave 2** *(blocked on Plan 01)*

@@ -42,8 +42,8 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 
 ### Slidev Integration
 
-- [ ] **SLIDES-01**: Add `vedmichv/slidev` as a git submodule at `slidev/` and extend `.github/workflows/deploy.yml` to build every deck with `slidev build --base /slides/<slug>/` and copy the output into `dist/slides/<slug>/` before `actions/deploy-pages@v4`.
-- [ ] **SLIDES-02**: Merge the Slidev build + Astro build into a single GH Actions job to avoid the `actions/deploy-pages` race-condition pitfall (two workflows targeting the same GH Pages lease).
+- [x] **SLIDES-01**: Add `vedmichv/slidev` as a git submodule at `slidev/` and extend `.github/workflows/deploy.yml` to build every deck with `slidev build --base /slides/<slug>/` and copy the output into `dist/slides/<slug>/` before `actions/deploy-pages@v4`.
+- [x] **SLIDES-02**: Merge the Slidev build + Astro build into a single GH Actions job to avoid the `actions/deploy-pages` race-condition pitfall (two workflows targeting the same GH Pages lease).
 - [ ] **SLIDES-03**: Migrate all 6 existing decks from `s.vedmich.dev` to `vedmich.dev/slides/<slug>/` — each deck must resolve assets correctly under the sub-path (curl check, not just preview).
 - [ ] **SLIDES-04**: Update every `src/data/social.ts` `presentations[].slug` entry + any in-content links so PresentationCard points at `/slides/<slug>/`, not `s.vedmich.dev/<slug>/`.
 - [ ] **SLIDES-05**: Configure the `s.vedmich.dev` CNAME to serve a 301 redirect to `vedmich.dev/slides/<slug>/` — preserves external backlinks during the transition.
