@@ -190,7 +190,18 @@ Plans:
 6. `docs/slides-onboarding.md` runbook authored covering "how to add a new deck": submodule update, `social.ts` entry, build verification, deploy, visual check
 7. `vv-slidev` skill updated with `references/publish-to-vedmich-dev.md` documenting the workflow (mirrored to vault backup per three-way-sync rule)
 
-**Plans:** TBD
+**Plans:** 4 plans across 3 waves (1 → 2 → 3). Wave 1 runs Plans 01 + 02 in parallel (zero shared files).
+
+Plans:
+**Wave 1** *(parallel — zero file overlap)*
+- [ ] 05-01-PLAN.md — Submodule + CI pipeline (empty whitelist per D-12) + CLAUDE.md §Slidev Integration pointer block (SLIDES-01, SLIDES-02)
+- [ ] 05-02-PLAN.md — PresentationCard + search-index URL rewrite (`data.slides ?? /slides/<slug>/` precedence) + i18n presentations.subtitle en+ru + 12 MDX frontmatter `draft: true` + Presentations empty-state (SLIDES-04)
+
+**Wave 2** *(blocked on Plan 01)*
+- [ ] 05-03-PLAN.md — `docs/slides-onboarding.md` runbook (≥150 LOC, 8+ H2 sections) + `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md` skill reference (30-50 LOC) + vault mirror + vault commit (SLIDES-06, CONTENT-04)
+
+**Wave 3** *(blocked on Plans 01 + 02 + 03)*
+- [ ] 05-04-PLAN.md — Traceability close: REQUIREMENTS / ROADMAP / STATE flipped for 5 shipped + 2 deferred REQ-IDs per D-17; final 9-gate phase-close smoke sweep (SLIDES-03 + SLIDES-05 deferred rows)
 
 ---
 
@@ -245,7 +256,7 @@ Plans:
 | 3. UI Polish | 3/4 | Executing (Plans 01 + 02 + 03 shipped 2026-05-03) | - |
 | 4. Excalidraw Pipeline | 5/5 | Shipped 2026-05-04 (hardening in Phase 04.1) | 2026-05-04 |
 | 4.1. Excalidraw Pipeline Hardening | 6/6 | Shipped 2026-05-07 — 6 plans across 4 waves, 37/58 findings closed, 21 deferred with rationale | 2026-05-07 |
-| 5. Slidev Integration | 0/? | Not started | - |
+| 5. Slidev Integration | 0/4 | Planned 2026-05-07 — 4 plans across 3 waves (Wave 1 parallel: 05-01 + 05-02; Wave 2: 05-03; Wave 3: 05-04) | - |
 | 6. Companion Posts | 0/? | Not started | - |
 | 7. Slidev Codegen (OPTIONAL) | 0/? | Checkpoint-gated | - |
 
@@ -326,16 +337,16 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | DIAG-03 | Excalidraw Pipeline | Phase 4 | Shipped — pre-SVGO title+desc injection verified in both SVGs; hardened in Phase 04.1 |
 | DIAG-04 | Excalidraw Pipeline | Phase 4 | Shipped — MCP ASCII → SVG in EN + RU (04-03); hardened in Phase 04.1 |
 | DIAG-05 | Excalidraw Pipeline | Phase 4 | Shipped — karpenter split-ownership in EN + RU (04-04); stretch deferred per D-04c; hardened in Phase 04.1 |
-| SLIDES-01 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-02 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-03 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-04 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-05 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-06 | Slidev Integration | Phase 5 | Pending |
+| SLIDES-01 | Slidev Integration | Phase 5 | Pending — planned in 05-01 (submodule + CI + CLAUDE.md) |
+| SLIDES-02 | Slidev Integration | Phase 5 | Pending — planned in 05-01 (single-job topology preserved) |
+| SLIDES-03 | Slidev Integration | Phase 5 | Pending — deferred per 05-CONTEXT.md §D-17 (0/6 decks migrate; tracked in 05-04 traceability closure) |
+| SLIDES-04 | Slidev Integration | Phase 5 | Pending — planned in 05-02 (PresentationCard + search-index + i18n + 12 MDX draft:true + empty-state) |
+| SLIDES-05 | Slidev Integration | Phase 5 | Pending — deferred per 05-CONTEXT.md §D-17 (user closes s.vedmich.dev manually; tracked in 05-04 traceability closure) |
+| SLIDES-06 | Slidev Integration | Phase 5 | Pending — planned in 05-03 (docs/slides-onboarding.md ≥150 LOC runbook) |
 | CONTENT-01 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CONTENT-02 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CONTENT-03 | Companion Posts + Skill Updates | Phase 6 | Pending |
-| CONTENT-04 | Companion Posts + Skill Updates | Phase 5 | Pending |
+| CONTENT-04 | Companion Posts + Skill Updates | Phase 5 | Pending — planned in 05-03 (vv-slidev skill reference + three-way-sync vault mirror) |
 | CONTENT-05 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CODEGEN-01 | Codegen (optional) | Phase 7 | Checkpoint-gated |
 
@@ -343,4 +354,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-07 (Phase 4 excalidraw-pipeline shipped 2026-05-04 — 5 plans, 2 SVGs embedded in MCP + karpenter posts; Phase 04.1 hardening shipped 2026-05-07 — 6 plans across 4 waves, 37/58 review findings closed, 21 deferred; test suite 44 → 69; next: Phase 5 Slidev Integration)
+**Last updated:** 2026-05-07 (Phase 5 slidev-integration planned — 4 plans across 3 waves: Wave 1 parallel 05-01 + 05-02 / Wave 2 05-03 / Wave 3 05-04; SLIDES-01/02/04/06 + CONTENT-04 plan to ship, SLIDES-03/05 deferred per D-17)
