@@ -44,9 +44,9 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 
 - [x] **SLIDES-01**: Add `vedmichv/slidev` as a git submodule at `slidev/` and extend `.github/workflows/deploy.yml` to build every deck with `slidev build --base /slides/<slug>/` and copy the output into `dist/slides/<slug>/` before `actions/deploy-pages@v4`.
 - [x] **SLIDES-02**: Merge the Slidev build + Astro build into a single GH Actions job to avoid the `actions/deploy-pages` race-condition pitfall (two workflows targeting the same GH Pages lease).
-- [ ] **SLIDES-03**: Migrate all 6 existing decks from `s.vedmich.dev` to `vedmich.dev/slides/<slug>/` — each deck must resolve assets correctly under the sub-path (curl check, not just preview).
-- [x] **SLIDES-04**: Update every `src/data/social.ts` `presentations[].slug` entry + any in-content links so PresentationCard points at `/slides/<slug>/`, not `s.vedmich.dev/<slug>/`.
-- [ ] **SLIDES-05**: Configure the `s.vedmich.dev` CNAME to serve a 301 redirect to `vedmich.dev/slides/<slug>/` — preserves external backlinks during the transition.
+- [ ] **SLIDES-03** *(deferred to post-Phase-5 per Phase 5 D-17 — 0/6 decks migrate in Phase 5; user owns deck migration timing; 2 live decks `slurm-prompt-engineering` + `slurm-ai-demo` require rebuild with `--base /slides/<slug>/` in theme repo, out of Phase 5 scope)*: Migrate all 6 existing decks from `s.vedmich.dev` to `vedmich.dev/slides/<slug>/` — each deck must resolve assets correctly under the sub-path (curl check, not just preview).
+- [x] **SLIDES-04**: Update every `src/data/social.ts` `presentations[].slug` entry + any in-content links so PresentationCard points at `/slides/<slug>/`, not `s.vedmich.dev/<slug>/`. *(Note: data source migrated from `src/data/social.ts` to `src/content/presentations/*.md` content collection — Phase 5 edits `PresentationCard.astro` + `search-index.ts` URL builders instead, with `data.slides ?? \`/slides/${slug}/\`` precedence per D-04/D-16 to preserve external-override capability.)*
+- [ ] **SLIDES-05** *(deferred to post-Phase-5 per Phase 5 D-17 — user will close `s.vedmich.dev` CNAME manually; 3 redirect options documented in CONTEXT.md §Deferred Ideas)*: Configure the `s.vedmich.dev` CNAME to serve a 301 redirect to `vedmich.dev/slides/<slug>/` — preserves external backlinks during the transition.
 - [x] **SLIDES-06**: Author a `docs/slides-onboarding.md` runbook covering "how to add a new deck": submodule update, `social.ts` entry, build verification, deploy, visual check.
 
 ### Slidev → Astro Codegen (Optional — Checkpoint-Gated)
@@ -133,16 +133,16 @@ Turn vedmich.dev from "static site with a handful of posts" into a full content 
 | DIAG-03 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
 | DIAG-04 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
 | DIAG-05 | Excalidraw Pipeline | Phase 4 | Shipped 2026-05-04 (hardened in Phase 04.1) |
-| SLIDES-01 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-02 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-03 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-04 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-05 | Slidev Integration | Phase 5 | Pending |
-| SLIDES-06 | Slidev Integration | Phase 5 | Pending |
+| SLIDES-01 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
+| SLIDES-02 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
+| SLIDES-03 | Slidev Integration | Phase 5 | Deferred to post-Phase-5 (per Phase 5 D-17 — user owns deck migration timing) |
+| SLIDES-04 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
+| SLIDES-05 | Slidev Integration | Phase 5 | Deferred to post-Phase-5 (per Phase 5 D-17 — user closes s.vedmich.dev CNAME manually) |
+| SLIDES-06 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
 | CONTENT-01 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CONTENT-02 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CONTENT-03 | Companion Posts + Skill Updates | Phase 6 | Pending |
-| CONTENT-04 | Companion Posts + Skill Updates | Phase 5 | Pending |
+| CONTENT-04 | Companion Posts + Skill Updates | Phase 5 | Shipped 2026-05-07 |
 | CONTENT-05 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CODEGEN-01 | Codegen (optional) | Phase 7 | Checkpoint-gated |
 
