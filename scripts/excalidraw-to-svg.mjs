@@ -2,7 +2,10 @@
 // Source: Phase 4 (Excalidraw Pipeline) — CONTEXT.md D-02c script contract + D-01e library
 //         Phase 04.1 (Hardening) — CONTEXT.md D-02..D-06 (security) + D-07..D-08 (UX) + D-11..D-17 (quality)
 // One-shot diagram export: .excalidraw.json → optimized SVG with <title>/<desc> a11y.
-// Re-runnable via `node scripts/excalidraw-to-svg.mjs <src> <dest>`.
+// Usage: `node scripts/excalidraw-to-svg.mjs <src> <dest> [--quiet]`
+// Re-runnable for byte-identical output ONLY when the source .excalidraw.json is stable.
+// Excalidraw UI re-exports regenerate `seed`/`versionNonce` on every edit session and will
+// produce visually-identical but byte-different SVGs. See diagrams-source/README.md §Determinism.
 // Output is committed to public/blog-assets/<slug>/diagrams/; NOT run on every build.
 
 import fs from 'node:fs/promises';
@@ -85,6 +88,19 @@ function escapeXml(str) {
   }[c]));
 }
 
+// D-11 (Phase 04.1 Q-02) — wrap JSON.parse with a file-aware error. Raw SyntaxError
+// from JSON.parse doesn't name the source file, and both meta + source use the same
+// catch — author fat-fingered a comma, doesn't know which file to open.
+function parseJsonOrThrow(text, pathForErr) {
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    throw new Error(
+      `failed to parse JSON in ${path.relative(REPO_ROOT, pathForErr)}: ${err.message}`
+    );
+  }
+}
+
 // T-04-01 + T-04.1-01 (SEC-C01) — reject paths that escape ALLOWED_WRITE_ROOTS.
 // Defense against symlink-bypass: we walk up to the first existing ancestor,
 // fs.realpathSync() it (which dereferences any symlinks in the existing portion),
@@ -136,9 +152,12 @@ function validateFilesBlob(diagram) {
 }
 
 async function main() {
-  const [, , srcPathArg, destPathArg] = process.argv;
+  // D-17 — --quiet is a positional-independent flag. Filter it out of argv-after-node-script
+  // so the actual src/dest positional args resolve correctly regardless of ordering.
+  const argv = process.argv.slice(2).filter((a) => a !== '--quiet');
+  const [srcPathArg, destPathArg] = argv;
   if (!srcPathArg || !destPathArg) {
-    console.error('Usage: node scripts/excalidraw-to-svg.mjs <source.excalidraw.json> <dest.svg>');
+    console.error('Usage: node scripts/excalidraw-to-svg.mjs <source.excalidraw.json> <dest.svg> [--quiet]');
     process.exit(1);
   }
 
@@ -160,15 +179,31 @@ async function main() {
     );
   }
 
-  const meta = JSON.parse(await fs.readFile(metaPath, 'utf8'));
-  if (!meta.title || !meta.descEn) {
+  const meta = parseJsonOrThrow(await fs.readFile(metaPath, 'utf8'), metaPath);
+  // D-12 (Phase 04.1 Q-03/Q-04) — typed validation. Catches whitespace-only,
+  // non-string (object/array/number), and the common `{title: {en: "..."}}`
+  // author mistake that silently produces `<title>[object Object]</title>`.
+  for (const key of ['title', 'descEn']) {
+    const v = meta[key];
+    if (typeof v !== 'string' || v.trim().length === 0) {
+      throw new Error(
+        `meta.${key} in ${path.relative(REPO_ROOT, metaPath)} must be a non-empty string ` +
+          `(got: ${JSON.stringify(v)}). If you meant a multi-locale object like ` +
+          `{ en: "..." }, flatten it to a string — use meta.descRu for the RU variant.`
+      );
+    }
+  }
+  if (
+    meta.descRu !== undefined &&
+    (typeof meta.descRu !== 'string' || meta.descRu.trim().length === 0)
+  ) {
     throw new Error(
-      `meta missing required keys: ${path.relative(REPO_ROOT, metaPath)} must have title + descEn`
+      `meta.descRu in ${path.relative(REPO_ROOT, metaPath)} must be a non-empty string if present`
     );
   }
 
   // DIAG-01 — parse source JSON
-  const diagram = JSON.parse(await fs.readFile(srcPath, 'utf8'));
+  const diagram = parseJsonOrThrow(await fs.readFile(srcPath, 'utf8'), srcPath);
 
   // T-04-03 — validate files blob
   validateFilesBlob(diagram);
@@ -235,12 +270,17 @@ async function main() {
   await fs.mkdir(path.dirname(destPath), { recursive: true });
   await fs.writeFile(destPath, withFallback, 'utf8');
 
-  console.log(`✓ ${path.relative(REPO_ROOT, destPath)} (${bytes} B)`);
-  if (intrinsicWidth && intrinsicHeight) {
-    console.log(`  intrinsic: ${intrinsicWidth}x${intrinsicHeight}`);
+  // D-17 (Phase 04.1 Q-13) — --quiet flag: suppress success stdout for batch loops.
+  // Error stderr path below stays verbose regardless. Exit codes unchanged.
+  const quiet = process.argv.includes('--quiet');
+  if (!quiet) {
+    console.log(`✓ ${path.relative(REPO_ROOT, destPath)} (${bytes} B)`);
+    if (intrinsicWidth && intrinsicHeight) {
+      console.log(`  intrinsic: ${intrinsicWidth}x${intrinsicHeight}`);
+    }
+    console.log(`  title: ${meta.title}`);
+    console.log(`  desc: ${meta.descEn}`);
   }
-  console.log(`  title: ${meta.title}`);
-  console.log(`  desc: ${meta.descEn}`);
 }
 
 main()
