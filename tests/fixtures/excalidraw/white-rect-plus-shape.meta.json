@@ -1,0 +1,4 @@
+{
+  "title": "White-rect narrow-selector test",
+  "descEn": "Diagram has viewBackgroundColor=#ffffff (Excalidraw emits leading <path fill='#fff' d='M0 0h...'/> full-canvas rect) PLUS an interior white-filled rectangle at x=120,y=50. Verifies D-07's narrow selector strips only the leading M0 0h... rect and preserves interior white shapes."
+}
