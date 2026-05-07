@@ -23,9 +23,13 @@ const SCRIPT = path.join(REPO_ROOT, 'scripts', 'excalidraw-to-svg.mjs');
 const FIXTURE_DIR = path.join(REPO_ROOT, 'tests', 'fixtures', 'excalidraw');
 const MINIMAL_SRC = path.join(FIXTURE_DIR, 'minimal.excalidraw.json');
 const OVERSIZE_SRC = path.join(FIXTURE_DIR, 'oversize.excalidraw.json');
+const PARSERERROR_SRC = path.join(FIXTURE_DIR, 'parsererror-trigger.excalidraw.json');
+// Phase 04.1 D-02 (SEC-C01) — tests write to repo-local tests/tmp/ (gitignored) instead of $TMPDIR.
+const TESTS_TMP = path.join(REPO_ROOT, 'tests', 'tmp');
 
 function tmpDest(label: string): string {
-  return path.join(os.tmpdir(), `excal-test-${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}.svg`);
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  return path.join(TESTS_TMP, `excal-test-${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}.svg`);
 }
 
 function run(args: string[]) {
@@ -45,7 +49,10 @@ test('DIAG-01 :: exports-valid-svg — script produces well-formed SVG from mini
 
 test('DIAG-01 :: errors-on-missing-meta — script exits 1 when meta sidecar is absent', () => {
   // Point at a fixture path whose sibling .meta.json does not exist.
-  const orphanSrc = path.join(os.tmpdir(), `orphan-${Date.now()}.excalidraw.json`);
+  // Phase 04.1 D-02: orphan src must live under ALLOWED_WRITE_ROOTS (tests/tmp/), not $TMPDIR —
+  // otherwise validatePath rejects before the meta-existence gate is reached.
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const orphanSrc = path.join(TESTS_TMP, `orphan-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
   fs.copyFileSync(MINIMAL_SRC, orphanSrc);
   // Deliberately do NOT create orphan.meta.json.
   const dest = tmpDest('orphan');
