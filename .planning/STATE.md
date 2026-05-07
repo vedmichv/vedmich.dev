@@ -18,8 +18,8 @@ progress:
 
 **Current milestone:** v1.0 — Content Platform
 **Current phase:** 04.1
-**Status:** Executing Phase 04.1
-**Last updated:** 2026-05-03
+**Status:** Executing Phase 04.1 Wave 1
+**Last updated:** 2026-05-07
 
 ## Project Reference
 
@@ -30,19 +30,23 @@ progress:
 ## Current Position
 
 Phase: 04.1 (excalidraw-pipeline-hardening) — EXECUTING
-Plan: 1 of 6
-Status: Executing Phase 04.1
+Plan: 1 of 6 (Wave 1 complete — 04.1-01 + 04.1-04)
+Status: Executing Phase 04.1 Wave 1 (plans 04.1-01 + 04.1-04 completed in parallel; 04.1-02 next in Wave 2)
 Resume file: .planning/phases/04.1-excalidraw-pipeline-hardening/04.1-CONTEXT.md
-Last activity: 2026-05-07 -- Phase 04.1 execution started
+Last activity: 2026-05-07 -- Phase 04.1 Wave 1 complete
 
-Progress: [██████████] 100%
+Progress: [██████████] 100% (v1.0 Phases 1-4 shipped; Phase 04.1 hardening ready)
 
 ## Completed Phases
 
-_None yet — milestone v1.0 just started. Phase numbering reset to 1._
+- **Phase 01: Rich Media Primitives** — shipped v1.0 kickoff (VvStage/VvNode/VvWire/VvPacket Astro primitives + PodLifecycleAnimation refactor + README, 6 plans across 5 waves; PRIMS-01..06)
+- **Phase 02: Code Block Upgrades** — shipped (Shiki language badges + `// [!code highlight]` transformer + Deep Signal github-dark palette + CodeCopyEnhancer rewrite + 8-hex palette guard test, 6 plans across 6 waves; CODE-01..05)
+- **Phase 03: UI Polish** — shipped 2026-05-03 (POLISH-01..06, 4 plans: token/motion infra + bottom CTAs + stagger wiring + 14-row visual audit; WR-03 Shiki palette guard folded in)
+- **Phase 04: Excalidraw Pipeline** — shipped 2026-05-04 (DIAG-01..05, 5 plans: fixtures + script + MCP swap + karpenter + runbook; 2 SVGs embedded; 9 integration tests green; hardening in Phase 04.1)
 
 ## Active Context
 
+- **Known issue:** `gsd-sdk phase.complete` does not propagate to REQUIREMENTS/ROADMAP Traceability tables. Manual fix per phase until SDK patches — Phase 04.1 Plan 04 applies the fix. See `.planning/phases/04.1-excalidraw-pipeline-hardening/04.1-CONTEXT.md §D-18`.
 - Milestone v0.4 Reference Design Audit shipped 2026-05-01 (12 phases, 26 plans, 41 tasks).
 - v1.0 scope defined from `.planning/notes/milestone-v0.5-content-platform.md` + `.planning/notes/rich-media-integration.md`, expanded during kickoff to add Slidev integration + polish streams.
 - Reference artifact: `/Users/viktor/.claude/skills/viktor-vedmich-design/ui_kits/vedmich-dev/app.jsx`.
