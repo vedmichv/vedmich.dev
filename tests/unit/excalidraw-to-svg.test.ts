@@ -25,6 +25,8 @@ const MINIMAL_SRC = path.join(FIXTURE_DIR, 'minimal.excalidraw.json');
 const OVERSIZE_SRC = path.join(FIXTURE_DIR, 'oversize.excalidraw.json');
 const PARSERERROR_SRC = path.join(FIXTURE_DIR, 'parsererror-trigger.excalidraw.json');
 const WHITE_RECT_PLUS_SRC = path.join(FIXTURE_DIR, 'white-rect-plus-shape.excalidraw.json');
+const MALFORMED_SOURCE_SRC = path.join(FIXTURE_DIR, 'malformed-source.excalidraw.json');
+const MALFORMED_META_SIBLING = path.join(FIXTURE_DIR, 'malformed-meta.meta.json');
 // Phase 04.1 D-02 (SEC-C01) — tests write to repo-local tests/tmp/ (gitignored) instead of $TMPDIR.
 const TESTS_TMP = path.join(REPO_ROOT, 'tests', 'tmp');
 
@@ -489,6 +491,240 @@ test('UX-04 :: helvetica-fallback-chain — post-SVGO replace applies Windows-sa
   } finally {
     if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
     if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+// --- Phase 04.1 Code quality + test coverage (D-11..D-17) ---------------------
+
+test('Quality :: malformed-json-source — pipeline rejects syntactically-broken source with file-aware error (D-11)', () => {
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  // Copy malformed-source fixture + a valid meta sibling to a temp path.
+  const srcPath = path.join(TESTS_TMP, `mjs-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  fs.copyFileSync(MALFORMED_SOURCE_SRC, srcPath);
+  fs.copyFileSync(path.join(FIXTURE_DIR, 'minimal.meta.json'), metaPath);
+  const dest = tmpDest('malformed-src');
+  try {
+    const result = run([srcPath, dest]);
+    assert.notEqual(result.status, 0, 'script must refuse malformed source JSON');
+    assert.match(result.stderr || '', /failed to parse JSON/i, 'error must mention parse failure');
+    assert.match(result.stderr || '', /\.excalidraw\.json/i, 'error must name the offending file extension');
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('Quality :: malformed-json-meta — pipeline rejects syntactically-broken meta with file-aware error (D-11)', () => {
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const srcPath = path.join(TESTS_TMP, `mjm-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  // Valid source, malformed meta.
+  fs.copyFileSync(MINIMAL_SRC, srcPath);
+  fs.copyFileSync(MALFORMED_META_SIBLING, metaPath);
+  const dest = tmpDest('malformed-meta');
+  try {
+    const result = run([srcPath, dest]);
+    assert.notEqual(result.status, 0, 'script must refuse malformed meta JSON');
+    assert.match(result.stderr || '', /failed to parse JSON/i);
+    assert.match(result.stderr || '', /\.meta\.json/i, 'error must name the meta file extension');
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('Quality :: rejects-empty-string-title (D-12)', () => {
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const srcPath = path.join(TESTS_TMP, `empty-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  fs.copyFileSync(MINIMAL_SRC, srcPath);
+  fs.writeFileSync(metaPath, JSON.stringify({ title: '', descEn: 'y' }));
+  const dest = tmpDest('empty-title');
+  try {
+    const result = run([srcPath, dest]);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr || '', /meta\.title.*non-empty string/i);
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('Quality :: rejects-whitespace-title (D-12)', () => {
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const srcPath = path.join(TESTS_TMP, `ws-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  fs.copyFileSync(MINIMAL_SRC, srcPath);
+  fs.writeFileSync(metaPath, JSON.stringify({ title: '   ', descEn: 'y' }));
+  const dest = tmpDest('ws-title');
+  try {
+    const result = run([srcPath, dest]);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr || '', /meta\.title.*non-empty string/i);
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('Quality :: rejects-object-title — catches the {en: "..."} author mistake (D-12)', () => {
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const srcPath = path.join(TESTS_TMP, `obj-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  fs.copyFileSync(MINIMAL_SRC, srcPath);
+  fs.writeFileSync(metaPath, JSON.stringify({ title: { en: 'x' }, descEn: 'y' }));
+  const dest = tmpDest('obj-title');
+  try {
+    const result = run([srcPath, dest]);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr || '', /meta\.title.*non-empty string/i);
+    // Error should quote the bad value via JSON.stringify so author sees the shape.
+    assert.match(result.stderr || '', /"en":"x"/);
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('Quality :: oversize-files-blob — 110 KB base64 dataURL rejected on size (D-13)', () => {
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const srcPath = path.join(TESTS_TMP, `oversize-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  const bigBase64 = 'A'.repeat(110 * 1024); // 110 KB payload, > 100 KB cap
+  fs.writeFileSync(srcPath, JSON.stringify({
+    type: 'excalidraw', version: 2, source: 'https://excalidraw.com',
+    elements: [{
+      id: 'r1', type: 'rectangle', x: 10, y: 10, width: 100, height: 50,
+      angle: 0, strokeColor: '#1e1e1e', backgroundColor: 'transparent',
+      fillStyle: 'solid', strokeWidth: 2, strokeStyle: 'solid', roughness: 1,
+      opacity: 100, groupIds: [], frameId: null, roundness: { type: 3 },
+      seed: 1, version: 1, versionNonce: 1, updated: 1700000000000,
+      isDeleted: false, boundElements: [], link: null, locked: false,
+    }],
+    appState: { gridSize: null, viewBackgroundColor: '#ffffff' },
+    files: { f1: { id: 'f1', mimeType: 'image/png', dataURL: `data:image/png;base64,${bigBase64}` } },
+  }));
+  fs.writeFileSync(metaPath, JSON.stringify({ title: 'oversize', descEn: 'test' }));
+  const dest = tmpDest('oversize-files');
+  try {
+    const result = run([srcPath, dest]);
+    assert.notEqual(result.status, 0, 'script must refuse files blob > 100 KB');
+    assert.match(
+      result.stderr || '',
+      /files blob.*exceeds|100.*cap|102400/i,
+      'error must mention blob/cap/size'
+    );
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
+test('Idempotency :: byte-stable-on-rerun — two runs on minimal fixture produce identical SVG bytes (D-14)', () => {
+  // This test holds only for deterministic-seed fixtures. Real-world diagrams
+  // re-exported from Excalidraw UI will NOT be byte-stable — see
+  // diagrams-source/README.md §Determinism caveat.
+  const destA = tmpDest('idem-a');
+  const destB = tmpDest('idem-b');
+  try {
+    const resA = run([MINIMAL_SRC, destA]);
+    const resB = run([MINIMAL_SRC, destB]);
+    assert.equal(resA.status, 0, `run A failed: ${resA.stderr}`);
+    assert.equal(resB.status, 0, `run B failed: ${resB.stderr}`);
+    const a = fs.readFileSync(destA);
+    const b = fs.readFileSync(destB);
+    assert.ok(
+      a.equals(b),
+      'two runs on minimal.excalidraw.json must produce byte-identical output ' +
+        '(hardcoded seeds 1-5 make the rough.js jitter deterministic)'
+    );
+  } finally {
+    if (fs.existsSync(destA)) fs.unlinkSync(destA);
+    if (fs.existsSync(destB)) fs.unlinkSync(destB);
+  }
+});
+
+// D-15 (Q-12) — parametric Unicode coverage. Each codepoint gets its own test
+// so a failure points at the specific character class. CODEPOINTS ENCODED VIA
+// \u{...} / \u.... ESCAPE SEQUENCES ONLY — never raw invisible bytes in this file.
+// This keeps the file diff-reviewable (RTL / ZWJ / combining marks would otherwise
+// render invisible in a text editor) and trips zero injection-scanner heuristics.
+// Per 04.1-CONTEXT.md §D-15: "never paste raw invisible bytes into the fixture or the test".
+
+function runUnicodeTest(label: string, codepointSeq: string, testName: string) {
+  fs.mkdirSync(TESTS_TMP, { recursive: true });
+  const srcPath = path.join(TESTS_TMP, `u-${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}.excalidraw.json`);
+  const metaPath = srcPath.replace(/\.excalidraw\.json$/, '.meta.json');
+  fs.copyFileSync(MINIMAL_SRC, srcPath);
+  fs.writeFileSync(metaPath, JSON.stringify({
+    title: `Unicode pinning test ${codepointSeq}`,
+    descEn: `Codepoint under test: ${codepointSeq} (${testName})`,
+  }));
+  const dest = tmpDest(`u-${label}`);
+  try {
+    const result = run([srcPath, dest]);
+    assert.equal(result.status, 0, `pipeline failed on ${testName}: ${result.stderr}`);
+    const svg = fs.readFileSync(dest, 'utf8');
+    assert.ok(
+      svg.includes(codepointSeq),
+      `${testName} must survive escapeXml + SVGO round-trip into <title>/<desc>`
+    );
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+}
+
+test('escapeXml :: emoji rocket U+1F680 passes through unchanged (D-15)', () => {
+  // U+1F680 ROCKET (supplementary plane, 4-byte UTF-8, surrogate pair in UTF-16)
+  runUnicodeTest('emoji', '\u{1F680}', 'U+1F680 rocket emoji');
+});
+
+test('escapeXml :: RTL mark U+200F passes through unchanged (D-15)', () => {
+  // U+200F RIGHT-TO-LEFT MARK (format control, invisible — escape form only!)
+  runUnicodeTest('rtl', '\u200F', 'U+200F right-to-left mark');
+});
+
+test('escapeXml :: zero-width joiner U+200D passes through unchanged (D-15)', () => {
+  // U+200D ZERO WIDTH JOINER (format control, invisible — escape form only!)
+  runUnicodeTest('zwj', '\u200D', 'U+200D zero-width joiner');
+});
+
+test('escapeXml :: combining acute U+0301 passes through unchanged (D-15)', () => {
+  // U+0301 COMBINING ACUTE ACCENT, appended to LATIN SMALL LETTER E (U+0065)
+  // to form the canonical decomposition of 'é'. Escape form keeps the combining
+  // mark reviewable; composed form 'é' would render as one glyph but be ambiguous
+  // between U+00E9 (precomposed) and U+0065+U+0301 (decomposed).
+  runUnicodeTest('acute', 'e\u0301', 'U+0065+U+0301 e + combining acute');
+});
+
+test('escapeXml :: CJK ideographs U+4E2D U+6587 pass through unchanged (D-15)', () => {
+  // U+4E2D + U+6587 = "Chinese language" (the two CJK ideographs for zhong+wen). Escape form keeps the bytes
+  // consistent across editors that may normalize or re-encode CJK regions.
+  runUnicodeTest('cjk', '\u4E2D\u6587', 'U+4E2D U+6587 CJK ideographs');
+});
+
+test('Quality :: quiet-flag-suppresses-stdout (D-17)', () => {
+  const dest = tmpDest('quiet');
+  try {
+    const result = run([MINIMAL_SRC, dest, '--quiet']);
+    assert.equal(result.status, 0, `pipeline failed: ${result.stderr}`);
+    // Quiet mode — no success lines. Accept empty OR newline-only stdout.
+    assert.ok(
+      (result.stdout || '').trim().length === 0,
+      `--quiet must suppress success stdout. Got: ${JSON.stringify(result.stdout)}`
+    );
+    assert.ok(fs.existsSync(dest), 'output SVG must still be written');
+  } finally {
     if (fs.existsSync(dest)) fs.unlinkSync(dest);
   }
 });
