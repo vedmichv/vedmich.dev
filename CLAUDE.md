@@ -120,7 +120,7 @@ Migration from Electric Horizon (cyan) → Deep Signal (teal + amber) completed 
 3. **Podcasts** — DKT (91+ eps, 10K+ subs) + AWS RU Podcast (65+ eps, 70K+ listens)
 4. **Speaking** — timeline by year: re:Invent, Summits, Code Europe, Community Days
 5. **Book** — "Cracking the Kubernetes Interview" + Amazon link
-6. **Presentations** — grid cards linking to s.vedmich.dev Slidev decks
+6. **Presentations** — grid cards linking to `/slides/<slug>/` (future; Phase 5 ships infrastructure only — all decks currently `draft: true`) or optional external URL via frontmatter `slides:` override
 7. **Blog** — latest 3 posts from Content Collection
 8. **Contact** — social links grid
 
@@ -267,7 +267,7 @@ qmd search "CKA RBAC practice"
    ```ts
    { title: '...', slug: 'deck-slug', description: '...', tags: ['AI', 'DevOps'] }
    ```
-2. The `slug` must match the Slidev deployment path (e.g. `s.vedmich.dev/<slug>/`).
+2. The `slug` must match the internal path (`/slides/<slug>/`) for decks hosted on vedmich.dev, OR the frontmatter `slides:` URL for external-hosted decks (SpeakerDeck, Notist, or the legacy `s.vedmich.dev` surface during the transition).
 3. `git commit -m "Add <Talk Name> presentation"` → `git push origin main`.
 4. GH Actions deploys in ~2 min. Verify live at `vedmich.dev/en/#presentations`.
 
@@ -309,20 +309,20 @@ These need a PR + visual review:
 
 ---
 
-## Slidev Presentations Integration
+## Slidev Integration — INFRASTRUCTURE READY (since 2026-05-07)
 
-Current presentations are hosted at `s.vedmich.dev` (repo `vedmichv/slidev`).
+Slidev presentation decks ship as pre-built SPA artifacts via git submodule (`vedmichv/slidev:gh-pages`), copied into `dist/slides/<slug>/` at CI time via an explicit-whitelist `cp -r` step in `.github/workflows/deploy.yml`. Zero runtime JS on the main site; `/slides/<slug>/` serves a pre-built Slidev SPA whose internal Vue Router handles intra-deck navigation.
 
-**v1.0 Phase 5 (planned):** Migrate Slidev builds into `public/slides/` so presentations live at `vedmich.dev/slides/<slug>/`. See `.planning/ROADMAP.md §Phase 5: Slidev Integration`.
+Current `/slides/*` consumers: **none** — whitelist intentionally empty until first deck migrates. The 6 MDX entries in `src/content/presentations/{en,ru}/` are `draft: true` and hidden from homepage + `/presentations/` index. The legacy `s.vedmich.dev` artifact surface stays live (CNAME intact) until user closes it manually (SLIDES-05 deferred — see `.planning/phases/05-slidev-integration/05-CONTEXT.md §D-17`).
 
-| Presentation | Current URL | Theme |
-|---|---|---|
-| Prompt Engineering for DevOps | `s.vedmich.dev/slurm-prompt-engineering/` | slidev-theme-slurm |
-| Slurm AI Demo | `s.vedmich.dev/slurm-ai-demo/` | slidev-theme-slurm |
-| DKT demos | `dkt-ai.github.io/slidev/dkt-demo/` | slidev-theme-dkt |
+**Runbook:** `docs/slides-onboarding.md`
+**Submodule:** `slidev/` → `vedmichv/slidev:gh-pages` (pinned SHA, bumped via `git submodule update --remote --merge slidev`)
+**CI step:** `.github/workflows/deploy.yml` → `Copy Slidev decks to dist/slides` (whitelist commented-out)
+**Skill:** `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md`
+**Boundary invariant:** `package.json` must NOT depend on `@slidev/cli`, `vue`, or `slidev-theme-*` — decks are pre-built artifacts, never built in main-site CI.
 
-Slidev repos: `vedmichv/slidev`, `DKT-AI/slidev`
-Theme repos: `vedmichv/slidev-theme-slurm`, `DKT-AI/slidev-theme-dkt`
+Slidev theme repos (deck authoring): `vedmichv/slidev-theme-slurm`, `vedmichv/slidev-theme-vv`, `DKT-AI/slidev-theme-dkt`.
+Slidev artifact repos (gh-pages hosts): `vedmichv/slidev`, `DKT-AI/slidev`.
 
 ---
 
@@ -412,7 +412,7 @@ npm run preview   # Preview built site locally
 |--------|------|-------|
 | `vedmich.dev` | A | 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153 |
 | `www.vedmich.dev` | CNAME | `vedmichv.github.io` |
-| `s.vedmich.dev` | CNAME | `vedmichv.github.io` (Slidev presentations, keep) |
+| `s.vedmich.dev` | CNAME | `vedmichv.github.io` (legacy Slidev artifact surface — user-owned closure pending per SLIDES-05 deferral; Phase 5 migrates hosting to `vedmich.dev/slides/<slug>/`, see `.planning/phases/05-slidev-integration/05-CONTEXT.md §D-17`) |
 
 ---
 
