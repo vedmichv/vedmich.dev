@@ -1,0 +1,4 @@
+{
+  "title": "Parsererror trigger",
+  "descEn": "Element.link contains unescaped < which trips JSDOM DOMParser inside the wrapper. Before D-05 fix, pipeline writes 116 B <parsererror> document. After fix, pipeline exits non-zero with stderr naming the source path."
+}

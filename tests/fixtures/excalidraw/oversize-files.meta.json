@@ -1,0 +1,4 @@
+{
+  "title": "Oversize files fixture (stub)",
+  "descEn": "Base shape for testing the 100 KB FILES_BLOB_BUDGET cap. Tests build the oversize variant inline via programmatic base64 padding (110 KB of 'A') per D-13 to avoid committing a ~110 KB fixture into git."
+}

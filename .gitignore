@@ -37,6 +37,9 @@ after-*.png
 .claude/skills/playwright-cli/
 .claude/settings.local.json
 
+# Excalidraw pipeline test scratch (Phase 04.1 D-02) — tests write here instead of $TMPDIR
+tests/tmp/
+
 # Visual verification screenshots (live/local/ref captures)
 live-*.png
 local-*.png
