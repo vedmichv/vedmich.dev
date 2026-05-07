@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Content Platform
 current_phase: 5
-status: ready_to_plan
-last_updated: "2026-05-07T16:05:00.000Z"
-last_activity: 2026-05-07 -- Phase 04.1 complete (37/58 findings closed, 21 deferred with rationale)
+status: planning
+last_updated: "2026-05-07T17:29:49.298Z"
+last_activity: 2026-05-07 -- Phase 04.1 complete
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 27
-  completed_plans: 21
-  percent: 63
+  completed_plans: 28
+  percent: 100
 ---
 
 # STATE.md
@@ -32,7 +32,7 @@ progress:
 Phase: 5 (slidev-integration) — READY TO PLAN
 Plan: Not started
 Status: Ready to plan Phase 5
-Resume file: .planning/ROADMAP.md
+Resume file: .planning/phases/05-slidev-integration/05-CONTEXT.md
 Last activity: 2026-05-07 -- Phase 04.1 complete
 
 Progress: [██████████] 63% (v1.0 Phases 1-4 + 04.1 shipped; Phase 5 Slidev next)
