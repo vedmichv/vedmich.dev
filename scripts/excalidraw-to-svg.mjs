@@ -39,6 +39,14 @@ const ALLOWED_DATAURL_PREFIX = /^data:image\/(png|jpeg|gif);base64,/;
 // removal uses removeAttributesBySelector because SVGO v4 has no removeOnEvents plugin.
 // Order matters: removeScripts first (deletes whole <script> elements) → then attribute strip
 // (ensures a <script onload="…"> is gone before its onload has a chance to be "un-orphaned").
+// D-07 (Phase 04.1 UX-01) — strip the leading Excalidraw viewBackgroundColor white rect.
+// Narrow selector path[fill="#fff"][d^="M0 0h"] matches only the full-canvas
+// `M0 0h<W>v<H>H0z` path Excalidraw emits for viewBackgroundColor:"#ffffff".
+// Interior white shapes (label backgrounds, callouts) have `d` starting with
+// coordinates like "M100 50..." and survive the selector. The stripped-fill path
+// becomes a candidate for preset-default's useless-defs pruning on the multipass
+// sweep. Even if it survives without a fill, a fill-less path is invisible on the
+// Deep Signal dark prose surface — same visual result as removal.
 const SVGO_CONFIG = {
   multipass: true,
   plugins: [
@@ -56,6 +64,14 @@ const SVGO_CONFIG = {
           { selector: '[onmouseover]', attributes: 'onmouseover' },
           { selector: '[onerror]',     attributes: 'onerror' },
           { selector: '[onfocus]',     attributes: 'onfocus' },
+        ],
+      },
+    },
+    {
+      name: 'removeAttributesBySelector',
+      params: {
+        selectors: [
+          { selector: 'path[fill="#fff"][d^="M0 0h"]', attributes: 'fill' },
         ],
       },
     },
@@ -191,11 +207,22 @@ async function main() {
   const intrinsicWidth = viewBoxMatch ? Math.round(parseFloat(viewBoxMatch[3])) : null;
   const intrinsicHeight = viewBoxMatch ? Math.round(parseFloat(viewBoxMatch[4])) : null;
 
-  // DIAG-02 — optimize with SVGO preset-default + removeDesc: false
+  // DIAG-02 — optimize with SVGO preset-default + removeDesc: false + script/event/white-rect strips
   const { data: optimized } = optimize(svgString, SVGO_CONFIG);
 
+  // D-08 (Phase 04.1 UX-04) — Helvetica fallback chain. System-font Helvetica is
+  // not installed on Windows; without an explicit fallback the browser picks a
+  // platform default with different metrics that overflow Excalidraw's
+  // pre-computed label boxes. The replace handles both the standalone `Helvetica`
+  // variant AND the Excalidraw-default `Helvetica, Segoe UI Emoji` variant.
+  // Virgil-embedded SVGs (fontFamily=1 in Excalidraw) are unaffected.
+  const withFallback = optimized.replace(
+    /font-family="Helvetica(, Segoe UI Emoji)?"/g,
+    'font-family="Helvetica, Arial, sans-serif"'
+  );
+
   // DIAG-02 hard gate — enforce 10 KB budget
-  const bytes = Buffer.byteLength(optimized, 'utf8');
+  const bytes = Buffer.byteLength(withFallback, 'utf8');
   if (bytes > SIZE_BUDGET) {
     console.error(
       `SVG is ${bytes} B (${(bytes / 1024).toFixed(1)} KB), exceeds 10 KB budget.`
@@ -206,7 +233,7 @@ async function main() {
 
   // DIAG-03 — write to canonical destPath (under REPO_ROOT per T-04-01 guard above)
   await fs.mkdir(path.dirname(destPath), { recursive: true });
-  await fs.writeFile(destPath, optimized, 'utf8');
+  await fs.writeFile(destPath, withFallback, 'utf8');
 
   console.log(`✓ ${path.relative(REPO_ROOT, destPath)} (${bytes} B)`);
   if (intrinsicWidth && intrinsicHeight) {
