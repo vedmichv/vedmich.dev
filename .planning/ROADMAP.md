@@ -164,7 +164,7 @@ Plans:
 
 **Depends on:** Phase 4
 
-**Plans:** 5/6 plans executed
+**Plans:** 7/6 plans complete
 
 Plans:
 - [x] 04.1-01-PLAN.md — Security hardening: realpath validatePath + ALLOWED_WRITE_ROOTS + SVGO removeScripts + dataURL whitelist + parsererror detection (Wave 1)
@@ -172,7 +172,7 @@ Plans:
 - [x] 04.1-03-PLAN.md — MCP re-author + SVG re-exports + figure/figcaption MDX wrap in bilingual MCP + karpenter posts (Wave 3)
 - [x] 04.1-04-PLAN.md — Docs drift: REQUIREMENTS / ROADMAP / STATE / PROJECT / CLAUDE.md / runbook sweep (Wave 1, docs-only parallel with 04.1-01)
 - [x] 04.1-05-PLAN.md — Code quality + test coverage: parseJsonOrThrow + meta type validation + FILES_BLOB test + idempotency test + Unicode escapeXml parametric + --quiet flag (Wave 3, parallel with 04.1-03)
-- [ ] 04.1-06-PLAN.md — P4 polish: SEC-L02 closure note + forced-colors Playwright smoke check + Phase 04.1 SUMMARY (Wave 4)
+- [x] 04.1-06-PLAN.md — P4 polish: SEC-L02 closure note + forced-colors Playwright smoke check + Phase 04.1 SUMMARY (Wave 4) (completed 2026-05-07)
 
 ### Phase 5: Slidev Integration
 **Goal:** Serve Slidev presentation decks as first-party routes under `vedmich.dev/slides/<slug>/` via git submodule + CI build, migrate all 6 existing decks from `s.vedmich.dev`, update internal links, configure DNS redirect, and document the "add a new deck" workflow.
