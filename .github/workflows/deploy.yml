@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -32,6 +34,17 @@ jobs:
 
       - name: Build Astro
         run: npm run build
+
+      - name: Copy Slidev decks to dist/slides
+        run: |
+          mkdir -p dist/slides
+          # Whitelist — uncomment a line as each deck migrates to vedmich.dev/slides/<slug>/.
+          # The deck must be pre-built in vedmichv/slidev:gh-pages with
+          # `slidev build --base /slides/<slug>/` (NOT just --base /<slug>/).
+          # See docs/slides-onboarding.md for the full flow.
+          # for slug in slurm-prompt-engineering slurm-ai-demo; do
+          #   cp -r slidev/$slug dist/slides/
+          # done
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
