@@ -713,6 +713,49 @@ test('escapeXml :: CJK ideographs U+4E2D U+6587 pass through unchanged (D-15)', 
   runUnicodeTest('cjk', '\u4E2D\u6587', 'U+4E2D U+6587 CJK ideographs');
 });
 
+test('Security :: replacement-string-injection rejected in meta.title (CR-01)', () => {
+  // CR-01 regression — pre-fix, String.replace's 3-arg form interprets `$&`, `$1`, `$$`
+  // as replacement patterns when the replacement is a string. A committed meta.json with
+  // `title: "$&"` would re-inject the matched `<svg ...>` tag into <title>, breaking the
+  // defense-in-depth escapeXml guarantee.
+  const srcPath = path.join(FIXTURE_DIR, 'cr01-injection.excalidraw.json');
+  const metaPath = path.join(FIXTURE_DIR, 'cr01-injection.meta.json');
+  fs.writeFileSync(srcPath, JSON.stringify({
+    type: 'excalidraw',
+    version: 2,
+    source: 'https://excalidraw.com',
+    elements: [{ id: 'r', type: 'rectangle', x: 0, y: 0, width: 20, height: 20, strokeColor: '#000000', backgroundColor: 'transparent', fillStyle: 'solid', strokeWidth: 1, strokeStyle: 'solid', roughness: 0, opacity: 100, groupIds: [], seed: 1, versionNonce: 1, version: 1, frameId: null, roundness: null, boundElements: null, updated: 1, link: null, locked: false }],
+    appState: { viewBackgroundColor: null, gridSize: null }
+  }));
+  fs.writeFileSync(metaPath, JSON.stringify({
+    title: '$& pwnd $1',
+    descEn: 'description',
+  }));
+  const dest = tmpDest('cr01');
+  try {
+    const result = run([srcPath, dest]);
+    assert.equal(result.status, 0, `pipeline failed: ${result.stderr}`);
+    const svg = fs.readFileSync(dest, 'utf8');
+    // Expected: literal "$& pwnd $1" should survive into <title> verbatim
+    assert.ok(
+      svg.includes('$&amp; pwnd $1') || svg.includes('$&amp;') && svg.includes('$1'),
+      `literal $& and $1 must survive escapeXml as replacement callback; got title context: ${svg.match(/<title>[^<]+<\/title>/)?.[0]}`
+    );
+    // Negative: re-injected <svg tag should NOT appear inside <title>
+    const titleMatch = svg.match(/<title>([^<]+)<\/title>/);
+    if (titleMatch) {
+      assert.ok(
+        !titleMatch[1].includes('<svg'),
+        `CR-01 regression: <svg> tag re-injected into <title> via $& pattern. Title: ${titleMatch[1]}`
+      );
+    }
+  } finally {
+    if (fs.existsSync(srcPath)) fs.unlinkSync(srcPath);
+    if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath);
+    if (fs.existsSync(dest)) fs.unlinkSync(dest);
+  }
+});
+
 test('Quality :: quiet-flag-suppresses-stdout (D-17)', () => {
   const dest = tmpDest('quiet');
   try {

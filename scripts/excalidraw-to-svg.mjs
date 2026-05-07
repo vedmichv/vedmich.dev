@@ -228,11 +228,15 @@ async function main() {
 
   // DIAG-03 + Pitfall 5 — inject <title> + <desc> PRE-SVGO
   // T-04-02 — escape meta strings before injection
+  // CR-01 (Phase 04.1 post-review) — use callback form so `$&`/`$1`/`$$` in the
+  // escaped XML strings are NOT interpreted as replacement patterns by
+  // String.prototype.replace. Pre-fix, a committed meta.json with `title: "foo $&"`
+  // could re-inject the matched `<svg ...>` tag into <title>.
   const titleXml = escapeXml(meta.title);
   const descXml = escapeXml(meta.descEn);
   svgString = svgString.replace(
     /<svg([^>]*)>/,
-    `<svg$1><title>${titleXml}</title><desc>${descXml}</desc>`
+    (_match, attrs) => `<svg${attrs}><title>${titleXml}</title><desc>${descXml}</desc>`
   );
 
   // D-03d — parse viewBox → explicit numeric width/height (for stdout print)
