@@ -25,28 +25,39 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
   <div class="max-w-[1120px] mx-auto px-6">
     <div class="flex items-baseline justify-between gap-6 mb-2 animate-on-scroll">
       <h2 class="font-display text-3xl font-bold">{i.presentations.title}</h2>
-      <a
-        href={`/${locale}/presentations`}
-        class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
-      >
-        {i.presentations.all_decks} →
-      </a>
-    </div>
-    <p class="text-text-muted mb-12 animate-on-scroll">{subtitle}</p>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-on-scroll-stagger">
-      {homepageDecks.map((deck) => (
-        <PresentationCard deck={deck} />
-      ))}
+      {totalCount > 0 && (
+        <a
+          href={`/${locale}/presentations`}
+          class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
+        >
+          {i.presentations.all_decks} →
+        </a>
+      )}
     </div>
 
-    <div class="mt-10 animate-on-scroll">
-      <a
-        href={`/${locale}/presentations`}
-        class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
-      >
-        {i.presentations.all_decks} →
-      </a>
-    </div>
+    {totalCount > 0 ? (
+      <>
+        <p class="text-text-muted mb-12 animate-on-scroll">{subtitle}</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-on-scroll-stagger">
+          {homepageDecks.map((deck) => (
+            <PresentationCard deck={deck} />
+          ))}
+        </div>
+
+        <div class="mt-10 animate-on-scroll">
+          <a
+            href={`/${locale}/presentations`}
+            class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
+          >
+            {i.presentations.all_decks} →
+          </a>
+        </div>
+      </>
+    ) : (
+      <p class="text-text-muted animate-on-scroll">
+        {locale === 'ru' ? 'Слайды появятся скоро...' : 'Decks coming soon...'}
+      </p>
+    )}
   </div>
 </section>
