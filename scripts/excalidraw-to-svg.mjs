@@ -2,7 +2,10 @@
 // Source: Phase 4 (Excalidraw Pipeline) — CONTEXT.md D-02c script contract + D-01e library
 //         Phase 04.1 (Hardening) — CONTEXT.md D-02..D-06 (security) + D-07..D-08 (UX) + D-11..D-17 (quality)
 // One-shot diagram export: .excalidraw.json → optimized SVG with <title>/<desc> a11y.
-// Re-runnable via `node scripts/excalidraw-to-svg.mjs <src> <dest>`.
+// Usage: `node scripts/excalidraw-to-svg.mjs <src> <dest> [--quiet]`
+// Re-runnable for byte-identical output ONLY when the source .excalidraw.json is stable.
+// Excalidraw UI re-exports regenerate `seed`/`versionNonce` on every edit session and will
+// produce visually-identical but byte-different SVGs. See diagrams-source/README.md §Determinism.
 // Output is committed to public/blog-assets/<slug>/diagrams/; NOT run on every build.
 
 import fs from 'node:fs/promises';
@@ -149,9 +152,12 @@ function validateFilesBlob(diagram) {
 }
 
 async function main() {
-  const [, , srcPathArg, destPathArg] = process.argv;
+  // D-17 — --quiet is a positional-independent flag. Filter it out of argv-after-node-script
+  // so the actual src/dest positional args resolve correctly regardless of ordering.
+  const argv = process.argv.slice(2).filter((a) => a !== '--quiet');
+  const [srcPathArg, destPathArg] = argv;
   if (!srcPathArg || !destPathArg) {
-    console.error('Usage: node scripts/excalidraw-to-svg.mjs <source.excalidraw.json> <dest.svg>');
+    console.error('Usage: node scripts/excalidraw-to-svg.mjs <source.excalidraw.json> <dest.svg> [--quiet]');
     process.exit(1);
   }
 
@@ -264,12 +270,17 @@ async function main() {
   await fs.mkdir(path.dirname(destPath), { recursive: true });
   await fs.writeFile(destPath, withFallback, 'utf8');
 
-  console.log(`✓ ${path.relative(REPO_ROOT, destPath)} (${bytes} B)`);
-  if (intrinsicWidth && intrinsicHeight) {
-    console.log(`  intrinsic: ${intrinsicWidth}x${intrinsicHeight}`);
+  // D-17 (Phase 04.1 Q-13) — --quiet flag: suppress success stdout for batch loops.
+  // Error stderr path below stays verbose regardless. Exit codes unchanged.
+  const quiet = process.argv.includes('--quiet');
+  if (!quiet) {
+    console.log(`✓ ${path.relative(REPO_ROOT, destPath)} (${bytes} B)`);
+    if (intrinsicWidth && intrinsicHeight) {
+      console.log(`  intrinsic: ${intrinsicWidth}x${intrinsicHeight}`);
+    }
+    console.log(`  title: ${meta.title}`);
+    console.log(`  desc: ${meta.descEn}`);
   }
-  console.log(`  title: ${meta.title}`);
-  console.log(`  desc: ${meta.descEn}`);
 }
 
 main()
