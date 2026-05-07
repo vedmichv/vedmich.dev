@@ -3,22 +3,22 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Content Platform
 current_phase: 5
-status: shipped
+status: ready_to_plan
 last_updated: "2026-05-07T19:53:29.574Z"
 last_activity: 2026-05-07 -- Phase 05 slidev-integration shipped
 progress:
   total_phases: 8
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 31
   completed_plans: 32
-  percent: 100
+  percent: 88
 ---
 
 # STATE.md
 
 **Current milestone:** v1.0 — Content Platform
-**Current phase:** 05 (shipped; next up Phase 6)
-**Status:** Phase 5 slidev-integration shipped 2026-05-07 — ready for Phase 6 (Companion Posts)
+**Current phase:** 6
+**Status:** Ready to plan
 **Last updated:** 2026-05-07
 
 ## Project Reference
@@ -30,10 +30,10 @@ progress:
 ## Current Position
 
 Phase: 5 (slidev-integration) — SHIPPED 2026-05-07
-Plan: 4 plans across 3 waves, all shipped
+Plan: Not started
 Status: Phase 5 complete; ready to open Phase 6 (Companion Posts) via /gsd-context-phase 6
 Resume file: None
-Last activity: 2026-05-07 -- Phase 05 slidev-integration shipped
+Last activity: 2026-05-07
 
 Progress: [██████████] 100%
 
