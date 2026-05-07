@@ -24,7 +24,7 @@
 - [ ] **Phase 2: Code Block Upgrades** — Shiki transformers + language badge + Deep Signal theme override
 - [x] **Phase 3: UI Polish** — "See all →" CTAs + hover states + section transitions + spacing audit
 - [x] **Phase 4: Excalidraw Pipeline** — Export script + replace ASCII diagrams + stress-test on 2-3 posts (shipped 2026-05-04)
-- [ ] **Phase 5: Slidev Integration** — Git submodule + CI build + migrate 6 decks + DNS decision + onboarding docs
+- [x] **Phase 5: Slidev Integration** — Git submodule + CI pipeline + PresentationCard URL rewrite + 12 MDX draft:true + onboarding runbook + vv-slidev skill reference (shipped 2026-05-07; SLIDES-03 + SLIDES-05 deferred per D-17)
 - [ ] **Phase 6: Companion Posts** — 1 DKT + 1 AWS RU companion post via vv-blog-from-vault skill + schema extension
 - [~] **Phase 7: Slidev → Astro Codegen (OPTIONAL)** — **SKIPPED 2026-05-02**: time-to-port measured at 0.73 min (44s) on AWS three-tier; primitives alone hit the <10 min target, codegen ROI insufficient
 
@@ -190,7 +190,7 @@ Plans:
 6. `docs/slides-onboarding.md` runbook authored covering "how to add a new deck": submodule update, `social.ts` entry, build verification, deploy, visual check
 7. `vv-slidev` skill updated with `references/publish-to-vedmich-dev.md` documenting the workflow (mirrored to vault backup per three-way-sync rule)
 
-**Plans:** 4 plans across 3 waves (1 → 2 → 3). Wave 1 runs Plans 01 + 02 in parallel (zero shared files).
+**Plans:** 4 plans across 3 waves — shipped 2026-05-07. SLIDES-01/02/04/06 + CONTENT-04 shipped; SLIDES-03 + SLIDES-05 deferred per D-17.
 
 Plans:
 **Wave 1** *(parallel — zero file overlap)*
@@ -201,7 +201,7 @@ Plans:
 - [x] 05-03-PLAN.md — `docs/slides-onboarding.md` runbook (≥150 LOC, 8+ H2 sections) + `~/.claude/skills/vv-slidev/references/publish-to-vedmich-dev.md` skill reference (30-50 LOC) + vault mirror + vault commit (SLIDES-06, CONTENT-04)
 
 **Wave 3** *(blocked on Plans 01 + 02 + 03)*
-- [ ] 05-04-PLAN.md — Traceability close: REQUIREMENTS / ROADMAP / STATE flipped for 5 shipped + 2 deferred REQ-IDs per D-17; final 9-gate phase-close smoke sweep (SLIDES-03 + SLIDES-05 deferred rows)
+- [x] 05-04-PLAN.md — Traceability close: REQUIREMENTS / ROADMAP / STATE flipped for 5 shipped + 2 deferred REQ-IDs per D-17; final 9-gate phase-close smoke sweep (SLIDES-03 + SLIDES-05 deferred rows)
 
 ---
 
@@ -256,7 +256,7 @@ Plans:
 | 3. UI Polish | 3/4 | Executing (Plans 01 + 02 + 03 shipped 2026-05-03) | - |
 | 4. Excalidraw Pipeline | 5/5 | Shipped 2026-05-04 (hardening in Phase 04.1) | 2026-05-04 |
 | 4.1. Excalidraw Pipeline Hardening | 6/6 | Shipped 2026-05-07 — 6 plans across 4 waves, 37/58 findings closed, 21 deferred with rationale | 2026-05-07 |
-| 5. Slidev Integration | 0/4 | Planned 2026-05-07 — 4 plans across 3 waves (Wave 1 parallel: 05-01 + 05-02; Wave 2: 05-03; Wave 3: 05-04) | - |
+| 5. Slidev Integration | 4/4 | Shipped 2026-05-07 — 4 plans across 3 waves, SLIDES-01/02/04/06 + CONTENT-04 shipped; SLIDES-03/05 deferred per D-17 | 2026-05-07 |
 | 6. Companion Posts | 0/? | Not started | - |
 | 7. Slidev Codegen (OPTIONAL) | 0/? | Checkpoint-gated | - |
 
@@ -337,16 +337,16 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 | DIAG-03 | Excalidraw Pipeline | Phase 4 | Shipped — pre-SVGO title+desc injection verified in both SVGs; hardened in Phase 04.1 |
 | DIAG-04 | Excalidraw Pipeline | Phase 4 | Shipped — MCP ASCII → SVG in EN + RU (04-03); hardened in Phase 04.1 |
 | DIAG-05 | Excalidraw Pipeline | Phase 4 | Shipped — karpenter split-ownership in EN + RU (04-04); stretch deferred per D-04c; hardened in Phase 04.1 |
-| SLIDES-01 | Slidev Integration | Phase 5 | Pending — planned in 05-01 (submodule + CI + CLAUDE.md) |
-| SLIDES-02 | Slidev Integration | Phase 5 | Pending — planned in 05-01 (single-job topology preserved) |
-| SLIDES-03 | Slidev Integration | Phase 5 | Pending — deferred per 05-CONTEXT.md §D-17 (0/6 decks migrate; tracked in 05-04 traceability closure) |
-| SLIDES-04 | Slidev Integration | Phase 5 | Pending — planned in 05-02 (PresentationCard + search-index + i18n + 12 MDX draft:true + empty-state) |
-| SLIDES-05 | Slidev Integration | Phase 5 | Pending — deferred per 05-CONTEXT.md §D-17 (user closes s.vedmich.dev manually; tracked in 05-04 traceability closure) |
-| SLIDES-06 | Slidev Integration | Phase 5 | Pending — planned in 05-03 (docs/slides-onboarding.md ≥150 LOC runbook) |
+| SLIDES-01 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
+| SLIDES-02 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
+| SLIDES-03 | Slidev Integration | Phase 5 | Deferred per D-17 (0/6 decks migrate; user-owned timing) |
+| SLIDES-04 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
+| SLIDES-05 | Slidev Integration | Phase 5 | Deferred per D-17 (user closes s.vedmich.dev manually) |
+| SLIDES-06 | Slidev Integration | Phase 5 | Shipped 2026-05-07 |
 | CONTENT-01 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CONTENT-02 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CONTENT-03 | Companion Posts + Skill Updates | Phase 6 | Pending |
-| CONTENT-04 | Companion Posts + Skill Updates | Phase 5 | Pending — planned in 05-03 (vv-slidev skill reference + three-way-sync vault mirror) |
+| CONTENT-04 | Companion Posts + Skill Updates | Phase 5 | Shipped 2026-05-07 |
 | CONTENT-05 | Companion Posts + Skill Updates | Phase 6 | Pending |
 | CODEGEN-01 | Codegen (optional) | Phase 7 | Checkpoint-gated |
 
@@ -354,4 +354,4 @@ All 32 v1.0 requirements + 1 optional (CODEGEN-01) mapped:
 
 ---
 
-**Last updated:** 2026-05-07 (Phase 5 slidev-integration planned — 4 plans across 3 waves: Wave 1 parallel 05-01 + 05-02 / Wave 2 05-03 / Wave 3 05-04; SLIDES-01/02/04/06 + CONTENT-04 plan to ship, SLIDES-03/05 deferred per D-17)
+**Last updated:** 2026-05-07 (Phase 5 slidev-integration shipped 2026-05-07 — 4 plans across 3 waves: submodule + CI (empty whitelist) + URL rewrite + 12 MDX draft:true + docs/slides-onboarding.md runbook + vv-slidev skill reference with vault mirror; SLIDES-01/02/04/06 + CONTENT-04 shipped, SLIDES-03/05 deferred per D-17; next: Phase 6 Companion Posts)
