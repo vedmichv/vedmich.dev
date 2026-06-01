@@ -249,9 +249,15 @@ ci_equiv_gate() {
   CURRENT_STEP="ci-gate"
   log "CI-equivalent gate (Astro build + replicate whitelist cp + base grep)…"
   ( cd "$SITE_REPO" && npm run build ) || die "astro build failed — NOT pushing"
-  local sd="$SITE_REPO/dist/slides/$SLUG"
-  rm -rf -- "$sd"; mkdir -p "$sd"; cp -R "$SUBMODULE/$SLUG/." "$sd/"
-  [ -f "$sd/index.html" ] && [ -f "$sd/404.html" ] || die "submodule copy missing index/404 for $SLUG"
+  local sd="$SITE_REPO/dist/slides/$SLUG" src
+  if [ -d "$SUBMODULE/$SLUG" ]; then
+    src="$SUBMODULE/$SLUG"            # real run: the pinned artifact CI will actually serve
+  else
+    src="$DIST"                       # dry-run / pre-bump: the freshly-built, same-base deck
+    warn "ci-gate: submodule lacks $SLUG (not bumped yet) — validating freshly-built dist instead"
+  fi
+  rm -rf -- "$sd"; mkdir -p "$sd"; cp -R "$src/." "$sd/"
+  [ -f "$sd/index.html" ] && [ -f "$sd/404.html" ] || die "deck copy missing index/404 for $SLUG (src=$src)"
   assert_base "$sd/index.html"
   # the uncommented whitelist for-loop must still be valid bash
   uv run --with pyyaml python3 - "$SITE_REPO/.github/workflows/deploy.yml" <<'PY' > /tmp/wl.check.sh || die "cannot extract whitelist run block"
