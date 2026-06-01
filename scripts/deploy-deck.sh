@@ -137,10 +137,44 @@ step_build() {
   log "build + base gate OK"
 }
 
+PUSHED=""   # gh-pages SHA after step 2
+
+step_publish_ghpages() {
+  CURRENT_STEP="publish-ghpages"
+  local dest="$GHPAGES_REPO/$SLUG" snap=""
+  # snapshot the existing slot for rollback (B1)
+  if [ -d "$dest" ]; then
+    snap="$(mktemp -d)/snap.tgz"
+    run "snapshot existing /$SLUG for rollback" -- \
+      sh -c "tar -czf '$snap' -C '$GHPAGES_REPO' '$SLUG'"
+    note_rollback "restore gh-pages slot: rm -rf '$dest' && tar -xzf '$snap' -C '$GHPAGES_REPO' && (cd '$GHPAGES_REPO' && git add '$SLUG' && git commit -m 'rollback $SLUG')"
+  fi
+  # contents-form copy (NEVER nests dist/) — G2
+  run "swap dist into /$SLUG slot" -- sh -c "rm -rf -- '$dest'; mkdir -p '$dest'; cp -R '$DIST/.' '$dest/'"
+  if [ "$DRYRUN" -eq 0 ]; then
+    [ -f "$dest/index.html" ] && [ ! -d "$dest/dist" ] || die "cp shape wrong (nested dist?) at $dest"
+  fi
+  # cutover: drop the legacy card from the gh-pages root index.html (D-9)
+  if [ "$CUTOVER" -eq 1 ] && grep -q "\"\\./$SLUG/\"" "$GHPAGES_REPO/index.html" 2>/dev/null; then
+    run "remove legacy /$SLUG card from gh-pages root index.html" -- \
+      sh -c "awk 'BEGIN{skip=0} /<a class=\"card\" href=\"\\.\\/$SLUG\\/\">/{skip=1} skip&&/<\\/a>/{skip=0;next} !skip{print}' '$GHPAGES_REPO/index.html' > '$GHPAGES_REPO/index.html.tmp' && mv -- '$GHPAGES_REPO/index.html.tmp' '$GHPAGES_REPO/index.html'"
+  fi
+  # commit + push (path-specific: slug, plus index.html only when cutover)
+  run "stage gh-pages changes" -- sh -c "cd '$GHPAGES_REPO' && git add '$SLUG' $( [ "$CUTOVER" -eq 1 ] && echo index.html )"
+  run "commit gh-pages" -- sh -c "cd '$GHPAGES_REPO' && (git diff --cached --quiet || git commit -m 'deploy: $SLUG --base /slides/$SLUG/')"
+  run "push gh-pages" -- sh -c "cd '$GHPAGES_REPO' && git push origin gh-pages"
+  if [ "$DRYRUN" -eq 0 ]; then
+    PUSHED="$(git -C "$GHPAGES_REPO" rev-parse HEAD)"
+    note_rollback "revert gh-pages: (cd '$GHPAGES_REPO' && git revert --no-edit $PUSHED && git push origin gh-pages)"
+    log "gh-pages published @ ${PUSHED:0:9}"
+  fi
+}
+
 main() {
   parse_args "$@"
   log "deploy-deck: slug=$SLUG theme=$THEME dry-run=$DRYRUN no-undraft=$NO_UNDRAFT cutover=$CUTOVER"
   preflight
   step_build
+  step_publish_ghpages
 }
 main "$@"
