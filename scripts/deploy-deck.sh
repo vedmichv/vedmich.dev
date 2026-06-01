@@ -112,9 +112,35 @@ preflight() {
   log "preflight OK (oldpin=${OLDPIN:0:9})"
 }
 
+DIST=""   # set by step_build
+
+assert_base() {
+  local index="$1"
+  [ -f "$index" ] || die "no index.html at $index (build failed?)"
+  [ "$(count_root_assets "$index")" -ge 1 ] || die "no root-absolute assets in $index (broken build?)"
+  local v; v="$(base_violations "$index" "/slides/$SLUG/")"
+  [ -z "$v" ] || die "base check FAILED — assets not under /slides/$SLUG/:"$'\n'"$v"
+}
+
+step_build() {
+  CURRENT_STEP="build"
+  DIST="$THEME_REPO/presentations/$SLUG/dist"
+  # The build ALWAYS runs — even in --dry-run — because the base check is the cheapest catch of
+  # the most expensive mistake, and dist/ is gitignored (verified .gitignore:2) so it can't poison
+  # the next run's cleanliness preflight. This is the one intentional exception to run()'s skip.
+  rm -rf -- "$DIST"
+  log "build deck (base /slides/$SLUG/)"
+  ( cd "$THEME_REPO" && pnpm exec slidev build "presentations/$SLUG/slides.md" --base "/slides/$SLUG/" ) \
+    || die "slidev build failed"
+  assert_base "$DIST/index.html"
+  [ -f "$DIST/404.html" ] && assert_base "$DIST/404.html" || warn "no 404.html in dist (deep-link fallback)"
+  log "build + base gate OK"
+}
+
 main() {
   parse_args "$@"
   log "deploy-deck: slug=$SLUG theme=$THEME dry-run=$DRYRUN no-undraft=$NO_UNDRAFT cutover=$CUTOVER"
   preflight
+  step_build
 }
 main "$@"
