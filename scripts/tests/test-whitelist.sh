@@ -26,3 +26,15 @@ test_whitelist_yaml_still_parses() {
   assert_ok uv run --with pyyaml python3 -c "import yaml,sys; yaml.safe_load(open('$tmp'))"
   rm -f "$tmp"
 }
+test_whitelist_add_no_sentinel_returns_2() {
+  local tmp; tmp=$(mktemp); printf 'no sentinel\n' > "$tmp"
+  whitelist_add "$tmp" vv-demo; assert_eq "$?" 2
+  rm -f "$tmp"
+}
+test_whitelist_token_boundary() {
+  local tmp; tmp=$(mktemp); cp "$FXSRC" "$tmp"
+  whitelist_add "$tmp" vv-demo
+  assert_fail whitelist_has "$tmp" vv-demo-evil
+  assert_fail whitelist_has "$tmp" vv-dem
+  rm -f "$tmp"
+}

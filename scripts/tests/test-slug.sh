@@ -14,6 +14,9 @@ test_slug_invalid() {
   assert_fail validate_slug a/b
   assert_fail validate_slug .
   assert_fail validate_slug UPPER
+  assert_fail validate_slug MixedCase
+  assert_fail validate_slug "café"
+  assert_fail validate_slug a_b
   assert_fail validate_slug "$(printf 'ab\ncd')"
   assert_fail validate_slug "$(printf 'ab\tcd')"
 }
