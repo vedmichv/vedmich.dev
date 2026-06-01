@@ -66,9 +66,52 @@ parse_args() {
   [ "$THEME" = "slidev-theme-vv" ] || die "--theme must be slidev-theme-vv (slurm deferred — D-8)"
 }
 
+# Captured in preflight for later steps / drag-detection.
+OLDPIN=""
+
+preflight() {
+  CURRENT_STEP="preflight"
+  log "preflight (read-only)…"
+  # 1. repos exist
+  for d in "$THEME_REPO" "$GHPAGES_REPO" "$SITE_REPO" "$SUBMODULE"; do
+    [ -d "$d/.git" ] || [ -f "$d/.git" ] || die "missing git repo: $d"
+  done
+  # 2. theme deck exists
+  [ -f "$THEME_REPO/presentations/$SLUG/slides.md" ] || die "deck not found: presentations/$SLUG/slides.md"
+  # 3. scoped cleanliness — theme: only the deck source (repo has untracked scratch)
+  [ -z "$(git -C "$THEME_REPO" status --porcelain "presentations/$SLUG/")" ] \
+    || die "theme working tree dirty under presentations/$SLUG/ — commit/stash first"
+  #    site: clean ignoring submodule pointer; submodule checked separately
+  [ -z "$(git -C "$SITE_REPO" status --porcelain --ignore-submodules=dirty)" ] \
+    || die "site working tree dirty — commit/stash first"
+  [ -z "$(git -C "$SUBMODULE" status --porcelain)" ] \
+    || die "submodule working tree dirty"
+  # 4. submodule wiring
+  [ "$(git -C "$SITE_REPO" config -f .gitmodules --get submodule.slidev.branch)" = "gh-pages" ] \
+    || die ".gitmodules submodule.slidev.branch must be gh-pages"
+  git -C "$SUBMODULE" ls-remote --exit-code origin gh-pages >/dev/null 2>&1 \
+    || die "submodule remote gh-pages unreachable"
+  case "$(git -C "$SITE_REPO" submodule status slidev | cut -c1)" in
+    '-'|'+'|'U') die "submodule not cleanly initialized (run: git submodule update --init)";;
+  esac
+  OLDPIN="$(git -C "$SITE_REPO" rev-parse :slidev)"
+  # 5. gh-pages repo really on gh-pages
+  [ "$(git -C "$GHPAGES_REPO" symbolic-ref --short HEAD)" = "gh-pages" ] \
+    || die "$GHPAGES_REPO is not on the gh-pages branch"
+  # 6. base-collision guard (B1): slug already on gh-pages at a different base?
+  local existing="$GHPAGES_REPO/$SLUG/index.html"
+  if [ -f "$existing" ]; then
+    if [ -n "$(base_violations "$existing" "/slides/$SLUG/")" ]; then
+      [ "$CUTOVER" -eq 1 ] || die "gh-pages /$SLUG/ is built for a DIFFERENT base (legacy s.vedmich.dev). Re-run with --cutover to migrate it to /slides/$SLUG/ (this overwrites the legacy surface)."
+      warn "--cutover: will overwrite legacy /$SLUG/ surface and remove its root-index card"
+    fi
+  fi
+  log "preflight OK (oldpin=${OLDPIN:0:9})"
+}
+
 main() {
   parse_args "$@"
   log "deploy-deck: slug=$SLUG theme=$THEME dry-run=$DRYRUN no-undraft=$NO_UNDRAFT cutover=$CUTOVER"
-  # preflight + steps wired in later tasks
+  preflight
 }
 main "$@"
