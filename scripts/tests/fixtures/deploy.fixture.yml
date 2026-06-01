@@ -1,0 +1,7 @@
+      - name: Copy Slidev decks to dist/slides
+        run: |
+          mkdir -p dist/slides
+          SLIDES_WHITELIST=""  # DEPLOY_DECK_SENTINEL
+          for slug in $SLIDES_WHITELIST; do
+            cp -r "slidev/$slug" dist/slides/
+          done

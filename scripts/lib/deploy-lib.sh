@@ -46,3 +46,28 @@ base_violations() {
     | grep -vE '^/(aws-icons|modules)/' \
     | grep -vE "^${esc}" || true
 }
+
+# whitelist_has <deploy_yml> <slug> → 0 if slug present in the sentinel SLIDES_WHITELIST line.
+whitelist_has() {
+  local file="$1" slug="$2" cur
+  cur=$(grep -E '# DEPLOY_DECK_SENTINEL' "$file" \
+        | sed -E 's/^[[:space:]]*SLIDES_WHITELIST="([^"]*)".*/\1/')
+  case " $cur " in *" $slug "*) return 0 ;; *) return 1 ;; esac
+}
+
+# whitelist_add <deploy_yml> <slug> → idempotently append slug to the sentinel SLIDES_WHITELIST
+# line, preserving leading indentation. Returns 2 if the sentinel line is missing.
+whitelist_add() {
+  local file="$1" slug="$2" line cur newval tmp
+  line=$(grep -nE '# DEPLOY_DECK_SENTINEL' "$file" | head -1 | cut -d: -f1)
+  [ -n "$line" ] || return 2
+  cur=$(sed -n "${line}p" "$file" | sed -E 's/^[[:space:]]*SLIDES_WHITELIST="([^"]*)".*/\1/')
+  case " $cur " in *" $slug "*) return 0 ;; esac
+  if [ -z "$cur" ]; then newval="$slug"; else newval="$cur $slug"; fi
+  tmp=$(mktemp)
+  awk -v ln="$line" -v val="$newval" '
+    NR==ln { match($0,/^[[:space:]]*/);
+             printf "%sSLIDES_WHITELIST=\"%s\"  # DEPLOY_DECK_SENTINEL\n", substr($0,1,RLENGTH), val; next }
+    { print }' "$file" > "$tmp"
+  mv -- "$tmp" "$file"
+}
