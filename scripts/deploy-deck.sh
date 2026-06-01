@@ -260,13 +260,15 @@ ci_equiv_gate() {
   [ -f "$sd/index.html" ] && [ -f "$sd/404.html" ] || die "deck copy missing index/404 for $SLUG (src=$src)"
   assert_base "$sd/index.html"
   # the uncommented whitelist for-loop must still be valid bash
-  uv run --with pyyaml python3 - "$SITE_REPO/.github/workflows/deploy.yml" <<'PY' > /tmp/wl.check.sh || die "cannot extract whitelist run block"
+  local wlf; wlf="$(mktemp)"
+  uv run --with pyyaml python3 - "$SITE_REPO/.github/workflows/deploy.yml" > "$wlf" <<'PY' || { rm -f "$wlf"; die "cannot extract whitelist run block"; }
 import yaml,sys
 d=yaml.safe_load(open(sys.argv[1]))
 s=[x for x in d['jobs']['build']['steps'] if x.get('name','').startswith('Copy Slidev')][0]
 sys.stdout.write(s['run'])
 PY
-  bash -n /tmp/wl.check.sh || die "whitelist run-block is not valid bash"
+  bash -n "$wlf" || { rm -f "$wlf"; die "whitelist run-block is not valid bash"; }
+  rm -f "$wlf"
   log "CI-equivalent gate OK"
 }
 
@@ -288,12 +290,31 @@ step_finalize() {
     i=$((i+1)); sleep 10
   done
   [ "$st" = "completed" ] || warn "Pages run not 'completed' after ~10min (status='$st') — verifying live anyway"
-  # live verification — root + a discovered hashed asset (deck 404.html proves deep-link base)
-  local code; code="$(curl -s -o /dev/null -w '%{http_code}' "https://vedmich.dev/slides/$SLUG/")"
+  # status=completed includes failure/cancelled — read the conclusion too (I2): a FAILED build can
+  # leave the OLD deploy live → root 200 → false "LIVE OK". The live curl is still the real test,
+  # but warn loudly so a green-looking run with a stale surface isn't mistaken for success.
+  local concl; concl="$(gh run list --repo vedmichv/vedmich.dev --commit "$sha" --json conclusion --jq '.[0].conclusion' 2>/dev/null || echo '')"
+  [ "$concl" = "success" ] || warn "Pages run conclusion='$concl' (not success) — the live curl below is the real test; a 200 may be the PREVIOUS deploy if the build failed"
+  # live verification. The root-200 check is the HARD gate (auto-revert on miss); the asset/404
+  # checks below are intentionally SOFT (warn-only) — best-effort deep-link confirmation, not gates.
+  # CDN-lag grace (I1): poll the edge for ~90s before treating a non-200 as a real failure, so a
+  # transient 404/503 at the edge can't auto-revert a GOOD deploy. M1: `|| echo '000'` keeps a curl
+  # connection-failure in-band (no generic ERR-trap abort mid-verification).
+  local code="000" tries=0
+  while [ "$tries" -lt 6 ]; do
+    code="$(curl -s -o /dev/null -w '%{http_code}' "https://vedmich.dev/slides/$SLUG/" || echo '000')"
+    [ "$code" = "200" ] && break
+    tries=$((tries+1)); log "live root $code (try $tries/6) — waiting for CDN…"; sleep 15
+  done
   if [ "$code" != "200" ]; then
-    warn "live root returned $code — auto-reverting"
-    git -C "$SITE_REPO" revert --no-edit "$sha" && git -C "$SITE_REPO" push origin main
-    die "deploy verification failed (root $code); reverted $sha"
+    warn "live root returned $code after grace window — auto-reverting $sha"
+    if ! git -C "$SITE_REPO" revert --no-edit "$sha"; then
+      die "AUTO-REVERT FAILED: 'git revert $sha' did not apply (tree not clean / not revertible). The BAD deploy is STILL LIVE at https://vedmich.dev/slides/$SLUG/. Manual fix: resolve the revert, then 'git -C $SITE_REPO push origin main'."
+    fi
+    if ! git -C "$SITE_REPO" push origin main; then
+      die "AUTO-REVERT HALF-DONE: revert commit created LOCALLY but 'git push origin main' FAILED. The BAD deploy is STILL LIVE. Run: 'git -C $SITE_REPO push origin main' (revert already committed — do NOT revert again)."
+    fi
+    die "deploy verification FAILED (root $code); reverted $sha and pushed — recovery deploy QUEUED (expect 2-5 min per concurrency: pages)."
   fi
   local asset; asset="$(curl -s "https://vedmich.dev/slides/$SLUG/" | grep -oE '/slides/'"$SLUG"'/assets/[^"]+\.(js|css)' | head -1)"
   [ -n "$asset" ] && [ "$(curl -s -o /dev/null -w '%{http_code}' "https://vedmich.dev$asset")" = "200" ] \
