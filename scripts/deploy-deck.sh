@@ -142,12 +142,15 @@ PUSHED=""   # gh-pages SHA after step 2
 step_publish_ghpages() {
   CURRENT_STEP="publish-ghpages"
   local dest="$GHPAGES_REPO/$SLUG" snap=""
-  # snapshot the existing slot for rollback (B1)
-  if [ -d "$dest" ]; then
+  # snapshot the existing slot for rollback (B1). Gated behind non-dry-run so the dry-run
+  # leaves zero side effects (no mktemp dir, no phantom rollback note). The tarball lives in a
+  # per-run $(mktemp -d) — reboot-scoped, NOT durable; the rollback note is good only this session.
+  if [ "$DRYRUN" -eq 0 ] && [ -d "$dest" ]; then
     snap="$(mktemp -d)/snap.tgz"
-    run "snapshot existing /$SLUG for rollback" -- \
-      sh -c "tar -czf '$snap' -C '$GHPAGES_REPO' '$SLUG'"
+    tar -czf "$snap" -C "$GHPAGES_REPO" "$SLUG" || die "snapshot failed for /$SLUG"
     note_rollback "restore gh-pages slot: rm -rf '$dest' && tar -xzf '$snap' -C '$GHPAGES_REPO' && (cd '$GHPAGES_REPO' && git add '$SLUG' && git commit -m 'rollback $SLUG')"
+  elif [ "$DRYRUN" -eq 1 ] && [ -d "$dest" ]; then
+    printf '  [dry-run] snapshot existing /%s for rollback (tar to a tempdir)\n' "$SLUG"
   fi
   # contents-form copy (NEVER nests dist/) — G2
   run "swap dist into /$SLUG slot" -- sh -c "rm -rf -- '$dest'; mkdir -p '$dest'; cp -R '$DIST/.' '$dest/'"
