@@ -18,9 +18,12 @@ validate_slug() {
 
 # count_root_assets <index_html> → integer count of root-absolute src/href URLs
 # (protocol-relative // excluded). Used to ABORT on an empty/broken build.
+# Fail-closed: missing OR unreadable index ([ -r ]) → 0 (caller aborts the deploy).
+# Only DOUBLE-quoted attrs are matched — Vite/Slidev always emit double quotes.
+# Every "nothing to count" outcome (no file, no matches, all protocol-relative) collapses to 0 by design.
 count_root_assets() {
   local index="$1"
-  [ -f "$index" ] || { echo 0; return 0; }
+  [ -r "$index" ] || { echo 0; return 0; }
   grep -oE '(src|href)="/[^"]*"' "$index" \
     | grep -vE '="//' \
     | grep -c . | tr -d ' '
@@ -30,12 +33,16 @@ count_root_assets() {
 # does NOT sit under <expected_base>, excluding protocol-relative and the two deck-root public
 # dirs (/aws-icons/, /modules/) that legitimately live at deck root even when correctly based.
 # Empty output = OK. Always exits 0 (caller inspects the output).
+# Fail-closed: missing OR unreadable index ([ -r ]) → "NO_INDEX" (non-empty → caller treats as a violation).
+# Only DOUBLE-quoted attrs are matched — Vite/Slidev always emit double quotes.
+# PRECONDITION: <expected_base> must end in '/'. It is regex-escaped below, but callers derive it from a validate_slug'd slug.
 base_violations() {
   local index="$1" base="$2"
-  [ -f "$index" ] || { echo "NO_INDEX"; return 0; }
+  [ -r "$index" ] || { echo "NO_INDEX"; return 0; }
+  local esc; esc=$(printf '%s' "$base" | sed -E 's/[][(){}.^$*+?|\\/]/\\&/g')
   grep -oE '(src|href)="/[^"]*"' "$index" \
     | sed -E 's/^(src|href)="//; s/"$//' \
     | grep -vE '^//' \
     | grep -vE '^/(aws-icons|modules)/' \
-    | grep -vE "^${base}" || true
+    | grep -vE "^${esc}" || true
 }
