@@ -208,6 +208,28 @@ step_whitelist() {
   log "whitelist updated"
 }
 
+step_undraft() {
+  CURRENT_STEP="undraft"
+  if [ "$NO_UNDRAFT" -eq 1 ]; then log "step 5 skipped (--no-undraft): no homepage card for $SLUG"; return 0; fi
+  local en="$SITE_REPO/src/content/presentations/en/$SLUG.md"
+  local ru="$SITE_REPO/src/content/presentations/ru/$SLUG.md"
+  # bilingual parity PRECONDITION: both must exist and both be draft:true (CREATE path is out of
+  # autopilot scope — author the cards manually first, then re-run; see slides-onboarding.md Step 5)
+  { [ -f "$en" ] && [ -f "$ru" ]; } || die "missing MDX card(s) for $SLUG (en/ru). Create both (draft:true) first, or pass --no-undraft."
+  grep -q '^draft: true' "$en" && grep -q '^draft: true' "$ru" \
+    || { log "both cards already published (idempotent)"; return 0; }
+  if [ "$DRYRUN" -eq 1 ]; then printf '  [dry-run] un-draft + strip slides: in en/ru %s.md\n' "$SLUG"; return 0; fi
+  local t
+  for f in "$en" "$ru"; do
+    t="$(mktemp)"
+    sed -E '/^draft: true$/s/true/false/; /^slides:[[:space:]]*"https:\/\/s\.vedmich\.dev\//d' "$f" > "$t"
+    grep -q '^draft: false' "$t" || die "un-draft failed for $f"
+    mv -- "$t" "$f"
+  done
+  note_rollback "re-draft cards: git -C '$SITE_REPO' checkout -- src/content/presentations/{en,ru}/$SLUG.md"
+  log "un-drafted en/ru $SLUG (slides: override stripped)"
+}
+
 main() {
   parse_args "$@"
   log "deploy-deck: slug=$SLUG theme=$THEME dry-run=$DRYRUN no-undraft=$NO_UNDRAFT cutover=$CUTOVER"
@@ -216,5 +238,6 @@ main() {
   step_publish_ghpages
   step_bump_submodule
   step_whitelist
+  step_undraft
 }
 main "$@"
