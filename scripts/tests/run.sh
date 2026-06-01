@@ -8,11 +8,15 @@ assert_eq()   { if [ "$1" = "$2" ]; then PASS=$((PASS+1)); else FAIL=$((FAIL+1))
 assert_empty(){ if [ -z "$1" ]; then PASS=$((PASS+1)); else FAIL=$((FAIL+1)); echo "  FAIL(empty): got[$1]"; fi; }
 assert_nonempty(){ if [ -n "$1" ]; then PASS=$((PASS+1)); else FAIL=$((FAIL+1)); echo "  FAIL(nonempty)"; fi; }
 DIR="$(cd "$(dirname "$0")" && pwd)"
+# set -u / a sourced error would kill the runner before the summary prints, hiding all
+# later tests behind one typo. This trap guarantees the abort is always visible.
+trap 'echo "── ABORTED before completion (set -u/sourced error)"' EXIT
 for f in "$DIR"/test-*.sh; do
   echo "── $(basename "$f")"
   # shellcheck disable=SC1090
   . "$f"
   for fn in $(declare -F | awk '{print $3}' | grep '^test_'); do "$fn"; unset -f "$fn"; done
 done
+trap - EXIT
 echo "── total: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
