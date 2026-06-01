@@ -94,12 +94,15 @@ preflight() {
   case "$(git -C "$SITE_REPO" submodule status slidev | cut -c1)" in
     '-'|'+'|'U') die "submodule not cleanly initialized (run: git submodule update --init)";;
   esac
-  OLDPIN="$(git -C "$SITE_REPO" rev-parse :slidev)"
+  OLDPIN="$(git -C "$SITE_REPO" rev-parse :slidev 2>/dev/null)" || die "cannot read staged submodule pin (:slidev) — run: git submodule update --init"
   # 5. gh-pages repo really on gh-pages
   [ "$(git -C "$GHPAGES_REPO" symbolic-ref --short HEAD)" = "gh-pages" ] \
     || die "$GHPAGES_REPO is not on the gh-pages branch"
   # 6. base-collision guard (B1): slug already on gh-pages at a different base?
   local existing="$GHPAGES_REPO/$SLUG/index.html"
+  if [ -f "$existing" ] && [ ! -r "$existing" ]; then
+    die "gh-pages index exists but is unreadable: $existing (check permissions)"
+  fi
   if [ -f "$existing" ]; then
     if [ -n "$(base_violations "$existing" "/slides/$SLUG/")" ]; then
       [ "$CUTOVER" -eq 1 ] || die "gh-pages /$SLUG/ is built for a DIFFERENT base (legacy s.vedmich.dev). Re-run with --cutover to migrate it to /slides/$SLUG/ (this overwrites the legacy surface)."
