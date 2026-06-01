@@ -4,6 +4,8 @@ End-to-end runbook for publishing a Slidev deck as a first-party route under `ve
 
 **Ship status:** Phase 5 (milestone v1.0) — infrastructure ready, whitelist intentionally empty until first deck migrates. Current `/slides/*` consumers: none.
 
+> **Canonical sources (D-10):** the executable HOW is `scripts/deploy-deck.sh` (its seams ARE the process); this file is the canonical prose WHY + manual fallback. A process change edits **`deploy-deck.sh` + this file only** — the `vedmich-dev` skill, `vv-slidev/references/deployment.md`, and `publish-to-vedmich-dev.md` are thin pointers and must not restate the 6 steps.
+
 ***
 
 ## When to use this flow
@@ -176,12 +178,19 @@ open dist/slides/<slug>/index.html
 
 The `cp -r slidev/<slug> dist/slides/` here is a local preview only — CI does this automatically on push once the whitelist is active. The `open` command launches the built deck in your default browser; click through a few slides, try presenter mode (`/presenter/`), and confirm assets load.
 
-Push + deploy:
+Push + deploy (autopilot policy D-6 — direct to `main`, gated by a local CI-equivalent build):
 
 ```bash
-git push origin <feature-branch>
-# Open PR, merge after CI goes green.
+# CI-equivalent gate BEFORE pushing (the Astro build alone is blind to the slides pipeline):
+npm run build
+mkdir -p dist/slides && cp -R slidev/<slug>/. dist/slides/<slug>/
+test -f dist/slides/<slug>/index.html && test -f dist/slides/<slug>/404.html
+grep -oE '(src|href)="/[^"]*"' dist/slides/<slug>/index.html | grep -vE '^(src|href)="//|/(aws-icons|modules)/' | grep -vqE '"/slides/<slug>/' || echo "base OK"
+
+git push origin main   # auto-deploys; main is unprotected
 ```
+
+`deploy-deck.sh` performs exactly this gate automatically. The manual PR route is retained only as a fallback when `main` is later branch-protected (the script aborts and says so).
 
 Post-deploy curl checks (run after GitHub Actions finishes):
 
