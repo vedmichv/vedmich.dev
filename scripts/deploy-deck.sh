@@ -179,9 +179,13 @@ step_bump_submodule() {
   run "fetch gh-pages in submodule" -- git -C "$SUBMODULE" fetch origin gh-pages
   run "checkout pushed SHA in submodule" -- git -C "$SUBMODULE" checkout --quiet "$PUSHED"
   # drag-detection GATE — only our slug (+ allowed root files) may differ vs OLDPIN
+  # Drag-gate: the diff baseline is OLDPIN (the LAST pinned submodule SHA), not gh-pages-pre-push.
+  # So if a co-tenant deck (slurm/dkt) was pushed to gh-pages since the last pin bump, this
+  # correctly ABORTS — we only want OUR slug (+ cutover index.html) in the pointer bump. A legit
+  # abort here means: bump the pin deliberately. Do NOT widen this filter to "fix" it.
   if git -C "$SUBMODULE" cat-file -e "$OLDPIN" 2>/dev/null; then
     local drag
-    drag="$(git -C "$SUBMODULE" diff --name-only "$OLDPIN" "$PUSHED" | grep -vE "^$SLUG/|^(CNAME|404.html|index.html)\$" || true)"
+    drag="$(git -C "$SUBMODULE" diff --name-only "$OLDPIN" "$PUSHED" | grep -vE "^$SLUG/|^(CNAME|404\.html|index\.html)\$" || true)"
     [ -z "$drag" ] || die "submodule bump would drag co-tenant changes:"$'\n'"$drag"
   else
     warn "oldpin $OLDPIN not in submodule history (force-push?) — skipping drag check"
