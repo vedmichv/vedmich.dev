@@ -245,6 +245,58 @@ step_undraft() {
   log "un-drafted en/ru $SLUG (slides: override stripped)"
 }
 
+ci_equiv_gate() {
+  CURRENT_STEP="ci-gate"
+  log "CI-equivalent gate (Astro build + replicate whitelist cp + base grep)…"
+  ( cd "$SITE_REPO" && npm run build ) || die "astro build failed — NOT pushing"
+  local sd="$SITE_REPO/dist/slides/$SLUG"
+  rm -rf -- "$sd"; mkdir -p "$sd"; cp -R "$SUBMODULE/$SLUG/." "$sd/"
+  [ -f "$sd/index.html" ] && [ -f "$sd/404.html" ] || die "submodule copy missing index/404 for $SLUG"
+  assert_base "$sd/index.html"
+  # the uncommented whitelist for-loop must still be valid bash
+  uv run --with pyyaml python3 - "$SITE_REPO/.github/workflows/deploy.yml" <<'PY' > /tmp/wl.check.sh || die "cannot extract whitelist run block"
+import yaml,sys
+d=yaml.safe_load(open(sys.argv[1]))
+s=[x for x in d['jobs']['build']['steps'] if x.get('name','').startswith('Copy Slidev')][0]
+sys.stdout.write(s['run'])
+PY
+  bash -n /tmp/wl.check.sh || die "whitelist run-block is not valid bash"
+  log "CI-equivalent gate OK"
+}
+
+step_finalize() {
+  CURRENT_STEP="finalize"
+  ci_equiv_gate
+  if [ "$DRYRUN" -eq 1 ]; then printf '  [dry-run] commit+push main, poll Pages, curl /slides/%s/\n' "$SLUG"; return 0; fi
+  run "commit site (submodule bump + whitelist)" -- \
+    sh -c "cd '$SITE_REPO' && git add slidev .github/workflows/deploy.yml && (git diff --cached --quiet || git commit -m 'deploy(slides): $SLUG → /slides/$SLUG/')"
+  local sha; sha="$(git -C "$SITE_REPO" rev-parse HEAD)"
+  run "push main" -- git -C "$SITE_REPO" push origin main
+  note_rollback "revert site commit: (cd '$SITE_REPO' && git revert --no-edit $sha && git push origin main)"
+  # poll Pages keyed on THIS sha (no `timeout`; bounded loop)
+  log "waiting for Pages build of $sha…"
+  local i=0 st=""
+  while [ "$i" -lt 60 ]; do
+    st="$(gh run list --repo vedmichv/vedmich.dev --commit "$sha" --json status --jq '.[0].status' 2>/dev/null || echo '')"
+    [ "$st" = "completed" ] && break
+    i=$((i+1)); sleep 10
+  done
+  [ "$st" = "completed" ] || warn "Pages run not 'completed' after ~10min (status='$st') — verifying live anyway"
+  # live verification — root + a discovered hashed asset (deck 404.html proves deep-link base)
+  local code; code="$(curl -s -o /dev/null -w '%{http_code}' "https://vedmich.dev/slides/$SLUG/")"
+  if [ "$code" != "200" ]; then
+    warn "live root returned $code — auto-reverting"
+    git -C "$SITE_REPO" revert --no-edit "$sha" && git -C "$SITE_REPO" push origin main
+    die "deploy verification failed (root $code); reverted $sha"
+  fi
+  local asset; asset="$(curl -s "https://vedmich.dev/slides/$SLUG/" | grep -oE '/slides/'"$SLUG"'/assets/[^"]+\.(js|css)' | head -1)"
+  [ -n "$asset" ] && [ "$(curl -s -o /dev/null -w '%{http_code}' "https://vedmich.dev$asset")" = "200" ] \
+    || warn "could not confirm a hashed asset 200 (asset='$asset')"
+  curl -s "https://vedmich.dev/slides/$SLUG/404.html" | grep -q "/slides/$SLUG/" \
+    || warn "deck 404.html base not confirmed (deep-link fallback)"
+  log "LIVE OK → https://vedmich.dev/slides/$SLUG/"
+}
+
 main() {
   parse_args "$@"
   log "deploy-deck: slug=$SLUG theme=$THEME dry-run=$DRYRUN no-undraft=$NO_UNDRAFT cutover=$CUTOVER"
@@ -254,5 +306,7 @@ main() {
   step_bump_submodule
   step_whitelist
   step_undraft
+  step_finalize
+  log "done."
 }
 main "$@"
