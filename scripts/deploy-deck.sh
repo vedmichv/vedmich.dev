@@ -216,17 +216,32 @@ step_undraft() {
   # bilingual parity PRECONDITION: both must exist and both be draft:true (CREATE path is out of
   # autopilot scope — author the cards manually first, then re-run; see slides-onboarding.md Step 5)
   { [ -f "$en" ] && [ -f "$ru" ]; } || die "missing MDX card(s) for $SLUG (en/ru). Create both (draft:true) first, or pass --no-undraft."
-  grep -q '^draft: true' "$en" && grep -q '^draft: true' "$ru" \
-    || { log "both cards already published (idempotent)"; return 0; }
+  # three-way parity gate (I1): both-published → idempotent no-op; MIXED → die (never silently
+  # leave one locale un-published); both-draft → proceed to un-draft. Trailing-space tolerant (M1).
+  local en_draft=0 ru_draft=0
+  grep -Eq '^draft:[[:space:]]+true[[:space:]]*$' "$en" && en_draft=1
+  grep -Eq '^draft:[[:space:]]+true[[:space:]]*$' "$ru" && ru_draft=1
+  if [ "$en_draft" -eq 0 ] && [ "$ru_draft" -eq 0 ]; then
+    log "both cards already published (idempotent)"; return 0
+  fi
+  [ "$en_draft" -eq 1 ] && [ "$ru_draft" -eq 1 ] \
+    || die "MIXED draft state for $SLUG (en draft=$en_draft, ru draft=$ru_draft) — fix both to draft:true (or both false) before deploying"
   if [ "$DRYRUN" -eq 1 ]; then printf '  [dry-run] un-draft + strip slides: in en/ru %s.md\n' "$SLUG"; return 0; fi
-  local t
-  for f in "$en" "$ru"; do
-    t="$(mktemp)"
-    sed -E '/^draft: true$/s/true/false/; /^slides:[[:space:]]*"https:\/\/s\.vedmich\.dev\//d' "$f" > "$t"
-    grep -q '^draft: false' "$t" || die "un-draft failed for $f"
-    mv -- "$t" "$f"
-  done
-  note_rollback "re-draft cards: git -C '$SITE_REPO' checkout -- src/content/presentations/{en,ru}/$SLUG.md"
+  # all-or-nothing (C1): record rollback BEFORE any mv, sed BOTH to temps, validate BOTH, then mv
+  # BOTH. A mid-loop failure can no longer leave en=false / ru=true with no recovery hint.
+  note_rollback "re-draft cards: git -C '$SITE_REPO' checkout -- src/content/presentations/en/$SLUG.md src/content/presentations/ru/$SLUG.md"
+  local ten tru
+  ten="$(mktemp)"; tru="$(mktemp)"
+  # slides: strip is vv-only (parse_args rejects other themes today; keep this in mind when slurm
+  # lands — only strip the legacy s.vedmich.dev override). (M2)
+  sed -E '/^draft:[[:space:]]+true[[:space:]]*$/s/true/false/; /^slides:[[:space:]]*"https:\/\/s\.vedmich\.dev\//d' "$en" > "$ten"
+  sed -E '/^draft:[[:space:]]+true[[:space:]]*$/s/true/false/; /^slides:[[:space:]]*"https:\/\/s\.vedmich\.dev\//d' "$ru" > "$tru"
+  # post-check uses the SAME whitespace-tolerant matcher as the gate (M1): a multi-space
+  # 'draft:   true' becomes 'draft:   false', which a hardcoded '^draft: false' would miss → false die.
+  grep -Eq '^draft:[[:space:]]+false[[:space:]]*$' "$ten" || { rm -f "$ten" "$tru"; die "un-draft failed for $en"; }
+  grep -Eq '^draft:[[:space:]]+false[[:space:]]*$' "$tru" || { rm -f "$ten" "$tru"; die "un-draft failed for $ru"; }
+  mv -- "$ten" "$en"
+  mv -- "$tru" "$ru"
   log "un-drafted en/ru $SLUG (slides: override stripped)"
 }
 
