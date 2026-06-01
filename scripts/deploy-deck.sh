@@ -173,11 +173,44 @@ step_publish_ghpages() {
   fi
 }
 
+step_bump_submodule() {
+  CURRENT_STEP="bump-submodule"
+  [ "$DRYRUN" -eq 1 ] && { printf '  [dry-run] submodule: fetch + checkout %s + drag-gate\n' "${PUSHED:-<pushed>}"; return 0; }
+  run "fetch gh-pages in submodule" -- git -C "$SUBMODULE" fetch origin gh-pages
+  run "checkout pushed SHA in submodule" -- git -C "$SUBMODULE" checkout --quiet "$PUSHED"
+  # drag-detection GATE — only our slug (+ allowed root files) may differ vs OLDPIN
+  if git -C "$SUBMODULE" cat-file -e "$OLDPIN" 2>/dev/null; then
+    local drag
+    drag="$(git -C "$SUBMODULE" diff --name-only "$OLDPIN" "$PUSHED" | grep -vE "^$SLUG/|^(CNAME|404.html|index.html)\$" || true)"
+    [ -z "$drag" ] || die "submodule bump would drag co-tenant changes:"$'\n'"$drag"
+  else
+    warn "oldpin $OLDPIN not in submodule history (force-push?) — skipping drag check"
+  fi
+  run "stage submodule pointer" -- git -C "$SITE_REPO" add slidev
+  local staged; staged="$(git -C "$SITE_REPO" rev-parse :slidev)"
+  [ "$staged" = "$PUSHED" ] || die "staged gitlink ($staged) != pushed gh-pages ($PUSHED)"
+  note_rollback "reset submodule pointer: (cd '$SITE_REPO' && git restore --staged slidev && git -C slidev checkout $OLDPIN)"
+  log "submodule bumped → ${PUSHED:0:9}"
+}
+
+step_whitelist() {
+  CURRENT_STEP="whitelist"
+  local yml="$SITE_REPO/.github/workflows/deploy.yml"
+  if whitelist_has "$yml" "$SLUG"; then log "whitelist already has $SLUG (idempotent)"; return 0; fi
+  if [ "$DRYRUN" -eq 1 ]; then printf '  [dry-run] whitelist: add %s to %s\n' "$SLUG" "$yml"; return 0; fi
+  run "add $SLUG to CI whitelist" -- sh -c ". '$HERE/lib/deploy-lib.sh'; whitelist_add '$yml' '$SLUG'"
+  whitelist_has "$yml" "$SLUG" || die "whitelist_add did not take"
+  uv run --with pyyaml python3 -c "import yaml; yaml.safe_load(open('$yml'))" || die "deploy.yml no longer parses after whitelist edit"
+  log "whitelist updated"
+}
+
 main() {
   parse_args "$@"
   log "deploy-deck: slug=$SLUG theme=$THEME dry-run=$DRYRUN no-undraft=$NO_UNDRAFT cutover=$CUTOVER"
   preflight
   step_build
   step_publish_ghpages
+  step_bump_submodule
+  step_whitelist
 }
 main "$@"
