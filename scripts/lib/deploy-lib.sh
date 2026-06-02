@@ -98,3 +98,40 @@ whitelist_add() {
     rm -f "$tmp"; return 1
   fi
 }
+
+# draft_state <mdx_file> → echoes one of: draft | published | none | ambiguous | unreadable
+# Reads the FIRST `draft:` frontmatter key. Detection is CASE-INSENSITIVE on both key and value and
+# tolerates a trailing `# comment`, so YAML-truthy `draft: True` / `draft: TRUE` / `draft: true # x`
+# are all correctly seen as a draft — NOT silently mis-read as published (the original bug: a strict
+# `^draft:[[:space:]]+true$` match treated `draft: True` as published → the card never un-drafted).
+# A `draft:` line whose value isn't true/false → "ambiguous"; no `draft:` key → "none". Both make the
+# caller die rather than guess. Fail-closed: unreadable/absent file → "unreadable".
+draft_state() {
+  local file="$1" line val
+  [ -r "$file" ] || { echo unreadable; return 0; }
+  line=$(grep -iE '^draft:[[:space:]]+' "$file" | head -1)
+  [ -n "$line" ] || { echo none; return 0; }
+  # strip key+colon+leading space, then trailing comment, then trailing space; lowercase the value.
+  val=$(printf '%s' "$line" | sed -E 's/^[^:]*:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//' \
+        | tr '[:upper:]' '[:lower:]')
+  case "$val" in
+    true)  echo draft ;;
+    false) echo published ;;
+    *)     echo ambiguous ;;
+  esac
+}
+
+# undraft_content <mdx_file> → emit the file with `draft: <any-case-true>` → `draft: false` and the
+# legacy `slides: "https://s.vedmich.dev/…"` override line removed (so PresentationCard falls back to
+# the computed /slides/<slug>/). Pure: reads the arg, writes to stdout, no in-place edit. Returns 1
+# if unreadable. The draft substitution is anchored to the draft: line and is case-insensitive on the
+# value, so `True`/`TRUE` normalize to lowercase `false`; a trailing comment on the line is preserved.
+# slides:-strip is vv-only (the only theme parse_args accepts today); revisit when slurm lands.
+undraft_content() {
+  local file="$1"
+  [ -r "$file" ] || return 1
+  sed -E \
+    -e '/^[Dd][Rr][Aa][Ff][Tt]:[[:space:]]+/ s/[Tt][Rr][Uu][Ee]/false/' \
+    -e '/^slides:[[:space:]]*"https:\/\/s\.vedmich\.dev\//d' \
+    "$file"
+}

@@ -286,30 +286,31 @@ step_undraft() {
   # bilingual parity PRECONDITION: both must exist and both be draft:true (CREATE path is out of
   # autopilot scope — author the cards manually first, then re-run; see slides-onboarding.md Step 5)
   { [ -f "$en" ] && [ -f "$ru" ]; } || die "missing MDX card(s) for $SLUG (en/ru). Create both (draft:true) first, or pass --no-undraft."
-  # three-way parity gate (I1): both-published → idempotent no-op; MIXED → die (never silently
-  # leave one locale un-published); both-draft → proceed to un-draft. Trailing-space tolerant (M1).
-  local en_draft=0 ru_draft=0
-  grep -Eq '^draft:[[:space:]]+true[[:space:]]*$' "$en" && en_draft=1
-  grep -Eq '^draft:[[:space:]]+true[[:space:]]*$' "$ru" && ru_draft=1
-  if [ "$en_draft" -eq 0 ] && [ "$ru_draft" -eq 0 ]; then
+  # three-way parity gate (I1), now via the tested lib fn draft_state (case-insensitive, comment-
+  # tolerant — `draft: True` is correctly a draft, not silently "published"): both-published →
+  # idempotent no-op; MIXED → die; both-draft → proceed. `none`/`ambiguous`/`unreadable` from either
+  # locale → die (never guess at a malformed/missing draft: key).
+  local en_state ru_state
+  en_state="$(draft_state "$en")"; ru_state="$(draft_state "$ru")"
+  case "$en_state" in draft|published) ;; *) die "cannot read draft state of $en (got '$en_state') — fix the draft: frontmatter";; esac
+  case "$ru_state" in draft|published) ;; *) die "cannot read draft state of $ru (got '$ru_state') — fix the draft: frontmatter";; esac
+  if [ "$en_state" = published ] && [ "$ru_state" = published ]; then
     log "both cards already published (idempotent)"; return 0
   fi
-  [ "$en_draft" -eq 1 ] && [ "$ru_draft" -eq 1 ] \
-    || die "MIXED draft state for $SLUG (en draft=$en_draft, ru draft=$ru_draft) — fix both to draft:true (or both false) before deploying"
+  [ "$en_state" = draft ] && [ "$ru_state" = draft ] \
+    || die "MIXED draft state for $SLUG (en=$en_state, ru=$ru_state) — set both to draft:true (or both false) before deploying"
   if [ "$DRYRUN" -eq 1 ]; then printf '  [dry-run] un-draft + strip slides: in en/ru %s.md\n' "$SLUG"; return 0; fi
-  # all-or-nothing (C1): record rollback BEFORE any mv, sed BOTH to temps, validate BOTH, then mv
-  # BOTH. A mid-loop failure can no longer leave en=false / ru=true with no recovery hint.
+  # all-or-nothing (C1): record rollback BEFORE any mv, transform BOTH to temps, validate BOTH, then
+  # mv BOTH. A mid-loop failure can no longer leave en=false / ru=true with no recovery hint.
   note_rollback "re-draft cards: git -C '$SITE_REPO' checkout -- src/content/presentations/en/$SLUG.md src/content/presentations/ru/$SLUG.md"
   local ten tru
   ten="$(mktemp)"; tru="$(mktemp)"
-  # slides: strip is vv-only (parse_args rejects other themes today; keep this in mind when slurm
-  # lands — only strip the legacy s.vedmich.dev override). (M2)
-  sed -E '/^draft:[[:space:]]+true[[:space:]]*$/s/true/false/; /^slides:[[:space:]]*"https:\/\/s\.vedmich\.dev\//d' "$en" > "$ten"
-  sed -E '/^draft:[[:space:]]+true[[:space:]]*$/s/true/false/; /^slides:[[:space:]]*"https:\/\/s\.vedmich\.dev\//d' "$ru" > "$tru"
-  # post-check uses the SAME whitespace-tolerant matcher as the gate (M1): a multi-space
-  # 'draft:   true' becomes 'draft:   false', which a hardcoded '^draft: false' would miss → false die.
-  grep -Eq '^draft:[[:space:]]+false[[:space:]]*$' "$ten" || { rm -f "$ten" "$tru"; die "un-draft failed for $en"; }
-  grep -Eq '^draft:[[:space:]]+false[[:space:]]*$' "$tru" || { rm -f "$ten" "$tru"; die "un-draft failed for $ru"; }
+  undraft_content "$en" > "$ten" || { rm -f "$ten" "$tru"; die "un-draft transform failed for $en"; }
+  undraft_content "$ru" > "$tru" || { rm -f "$ten" "$tru"; die "un-draft transform failed for $ru"; }
+  # post-check via the same lib fn: both temps must now read as published; anything else → false-die
+  # before any mv (so the live files are untouched).
+  [ "$(draft_state "$ten")" = published ] || { rm -f "$ten" "$tru"; die "un-draft failed for $en (still $(draft_state "$ten"))"; }
+  [ "$(draft_state "$tru")" = published ] || { rm -f "$ten" "$tru"; die "un-draft failed for $ru (still $(draft_state "$tru"))"; }
   mv -- "$ten" "$en"
   mv -- "$tru" "$ru"
   log "un-drafted en/ru $SLUG (slides: override stripped)"
