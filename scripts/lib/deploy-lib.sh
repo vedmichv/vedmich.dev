@@ -25,9 +25,16 @@ validate_slug() {
 count_root_assets() {
   local index="$1"
   [ -r "$index" ] || { echo 0; return 0; }
+  # `grep -c .` exits 1 on ZERO matches; under the caller's `set -o pipefail` that nonzero would
+  # propagate out of this $()-captured function and trip the caller's ERR trap BEFORE assert_base's
+  # intended `die "no root-absolute assets…"` could fire — turning a precise diagnostic into a
+  # misleading "aborted during: build". `grep -c` already PRINTS "0" on zero matches, so a trailing
+  # `|| true` (NOT `|| echo 0`, which would double-print "0\n0" and break the caller's -ge test)
+  # just swallows the nonzero exit. The caller's `[ … -ge 1 ] || die` then fires correctly.
+  # (sibling base_violations is already immune via its own trailing `|| true`.)
   grep -oE '(src|href)="/[^"]*"' "$index" \
     | grep -vE '="//' \
-    | grep -c . | tr -d ' '
+    | grep -c . | tr -d ' ' || true
 }
 
 # base_violations <index_html> <expected_base> → prints each root-absolute asset URL that
