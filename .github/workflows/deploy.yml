@@ -41,7 +41,7 @@ jobs:
           # Active whitelist managed by scripts/deploy-deck.sh — it edits the sentinel line below.
           # Each slug must be pre-built in vedmichv/slidev:gh-pages with --base /slides/<slug>/.
           # See docs/slides-onboarding.md for the full flow.
-          SLIDES_WHITELIST=""  # DEPLOY_DECK_SENTINEL
+          SLIDES_WHITELIST="vv-demo"  # DEPLOY_DECK_SENTINEL
           for slug in $SLIDES_WHITELIST; do
             cp -r "slidev/$slug" dist/slides/
           done
