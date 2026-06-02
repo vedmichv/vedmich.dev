@@ -341,6 +341,28 @@ ci_equiv_gate() {
   rm -rf -- "$sd"; mkdir -p "$sd"; cp -R "$src/." "$sd/"
   [ -f "$sd/index.html" ] && [ -f "$sd/404.html" ] || die "deck copy missing index/404 for $SLUG (src=$src)"
   assert_base "$sd/index.html"
+  # Full-whitelist existence check. CI runs `for slug in $SLIDES_WHITELIST; do cp slidev/$slug …`;
+  # a whitelisted slug MISSING from the pinned submodule makes that cp fail and takes down the WHOLE
+  # Pages build (not just one deck). The single-$SLUG cp above can't catch a co-tenant gone stale.
+  # CRITICAL: `local IFS=' '` — the script's global IFS=$'\n\t' has no space, so a space-separated
+  # whitelist would iterate as ONE token (the exact trap the reviewer warned the obvious fix hits).
+  # Our own $SLUG is validated separately above (it may not be in the committed whitelist yet, and in
+  # dry-run isn't bumped into the submodule), so skip it here. Missing co-tenant → die (real) / warn
+  # (dry-run, where the submodule may legitimately lag the whitelist).
+  local wl_all wl_slug
+  wl_all="$(whitelist_get "$SITE_REPO/.github/workflows/deploy.yml")"
+  if [ -n "$wl_all" ]; then
+    local IFS=' '
+    for wl_slug in $wl_all; do
+      [ "$wl_slug" = "$SLUG" ] && continue
+      [ -d "$SUBMODULE/$wl_slug" ] && continue
+      if [ "$DRYRUN" -eq 1 ]; then
+        warn "ci-gate: whitelisted '$wl_slug' missing from submodule (dry-run; may not be pinned yet)"
+      else
+        die "whitelisted deck '$wl_slug' is missing from the pinned submodule ($SUBMODULE/$wl_slug) — CI's cp would fail and break the ENTIRE Pages build. Remove it from the whitelist or bump the submodule to a SHA that includes it."
+      fi
+    done
+  fi
   # the uncommented whitelist for-loop must still be valid bash
   local wlf; wlf="$(mktemp)"
   uv run --with pyyaml python3 - "$SITE_REPO/.github/workflows/deploy.yml" > "$wlf" <<'PY' || { rm -f "$wlf"; die "cannot extract whitelist run block"; }
