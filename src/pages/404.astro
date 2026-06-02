@@ -1,0 +1,77 @@
+---
+// Root 404 page → emitted by Astro as dist/404.html.
+//
+// GitHub Pages serves THIS file (the site-wide custom 404) for ANY unmatched
+// path on the custom domain — including deep-links under a published Slidev
+// deck, e.g. /slides/<slug>/10 or /slides/<slug>/presenter/3.
+//
+// WHY THIS IS NEEDED (verified 2026-06, Slidev 52.x):
+//   The decks live at /slides/<slug>/ (copied by deploy.yml into dist/slides/).
+//   Slidev v52 uses PATH-based slide routing: slide N is the URL
+//   /slides/<slug>/N, and the SPA router reads the slide number from the URL
+//   PATH AT BOOT. The deck root /slides/<slug>/ is a real file (HTTP 200), but
+//   /slides/<slug>/10 is NOT a file on disk → GitHub Pages returns its built-in
+//   "Page not found" page. The deck's own dist/slides/<slug>/404.html is never
+//   served for that path (Pages does not do per-directory 404 fallback on this
+//   custom-domain topology), and the deck's _redirects file is Netlify-only —
+//   GitHub Pages ignores it.
+//
+// THE FIX (empirically validated against the live deck with Playwright):
+//   For a /slides/<slug>/<rest> miss, fetch the deck's index.html shell and swap
+//   it into THIS document WITHOUT changing location. Because the URL stays at
+//   /slides/<slug>/10, Slidev's path router boots straight onto slide 10.
+//   - Tried & rejected: location.replace('/slides/<slug>/10') → 404 loop (the
+//     path is still not a file).  ?p=/N and #N → Slidev v52 normalises to /1
+//     (lands on slide 1, not N).  Document-injection is the only form that lands
+//     on the correct slide AND keeps the clean /N URL.
+//
+// Any non-/slides/ miss just goes home (the site is bilingual and the root
+// index.astro re-routes to the user's locale).
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Redirecting…</title>
+    <script is:inline>
+      (function () {
+        var path = window.location.pathname;
+        // Deep-link under a Slidev deck: /slides/<slug>/<rest>
+        // (<rest> = slide number, or presenter/N, overview, etc.)
+        var m = path.match(/^\/slides\/([^/]+)\/(.+)$/);
+        if (m) {
+          var slug = m[1];
+          // Boot the deck SPA in place. We keep `location` exactly as requested
+          // (/slides/<slug>/<rest>) so Slidev's path router lands on the right
+          // slide; we only swap in the deck's HTML shell so its bundle loads.
+          fetch('/slides/' + slug + '/index.html', { credentials: 'same-origin' })
+            .then(function (r) {
+              if (!r.ok) throw new Error('deck shell ' + r.status);
+              return r.text();
+            })
+            .then(function (html) {
+              document.open();
+              document.write(html);
+              document.close();
+            })
+            .catch(function () {
+              // Deck shell unreachable (bad slug / not deployed) → home.
+              window.location.replace('/');
+            });
+          return;
+        }
+        // Not a deck deep-link → send home (root re-routes to locale).
+        window.location.replace('/');
+      })();
+    </script>
+    <noscript>
+      <meta http-equiv="refresh" content="0;url=/" />
+    </noscript>
+  </head>
+  <body style="background:#0F172A;color:#94A3B8;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui;margin:0;">
+    <p>Page not found — <a href="/" style="color:#14B8A6;">go home</a>.</p>
+  </body>
+</html>
