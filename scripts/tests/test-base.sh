@@ -23,3 +23,21 @@ test_missing_index_fails_closed() {
   assert_eq "$(count_root_assets "$FX/nope.html")" 0
   assert_eq "$(base_violations "$FX/nope.html" /slides/vv-demo/)" NO_INDEX
 }
+test_base_regex_special_is_escaped() {
+  # base /slides/a.b/ — the '.' MUST be escaped. dot-index.html has an asset at /slides/aXb/ which
+  # would FALSELY match an unescaped '.' (wildcard) and be treated as "under base" → not flagged.
+  # With proper escaping, /slides/aXb/ is NOT under /slides/a.b/ → flagged. (Defense-in-depth: a
+  # '.' slug can't pass validate_slug, but a future refactor dropping the escape must fail here.)
+  assert_nonempty "$(base_violations "$FX/dot-index.html" /slides/a.b/)"
+  # the genuinely-based asset (/slides/a.b/…) is NOT a violation on its own (sanity on the fixture)
+  assert_empty "$(base_violations "$FX/dot-only-index.html" /slides/a.b/)"
+}
+test_count_unreadable_fails_closed() {
+  # present-but-unreadable (not just missing) must also fail closed → 0 / NO_INDEX. Skip if root
+  # (where -r always succeeds). chmod 000, assert, restore.
+  [ "$(id -u)" -eq 0 ] && return 0
+  local f; f="$(mktemp)"; printf '<script src="/x/a.js"></script>\n' > "$f"; chmod 000 "$f"
+  assert_eq "$(count_root_assets "$f")" 0
+  assert_eq "$(base_violations "$f" /slides/x/)" NO_INDEX
+  chmod 644 "$f"; rm -f "$f"
+}

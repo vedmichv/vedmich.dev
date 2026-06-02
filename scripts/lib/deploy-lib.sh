@@ -61,6 +61,7 @@ base_violations() {
 # slug is validate_slug'd by callers.
 whitelist_has() {
   local file="$1" slug="$2" cur
+  [ -r "$file" ] || return 1   # fail-closed: unreadable/absent → "not present" (never a false yes)
   cur=$(grep -E '^[[:space:]]*SLIDES_WHITELIST="[^"]*"[[:space:]]*# DEPLOY_DECK_SENTINEL' "$file" \
         | sed -E 's/^[[:space:]]*SLIDES_WHITELIST="([^"]*)".*/\1/')
   case " $cur " in *" $slug "*) return 0 ;; *) return 1 ;; esac
@@ -72,6 +73,7 @@ whitelist_has() {
 # into dist/slides/ by CI, so co-tenant decks on shared gh-pages are irrelevant to vedmich.dev).
 whitelist_get() {
   local file="$1"
+  [ -r "$file" ] || return 0   # fail-closed: unreadable/absent → empty list (caller scopes nothing)
   grep -E '^[[:space:]]*SLIDES_WHITELIST="[^"]*"[[:space:]]*# DEPLOY_DECK_SENTINEL' "$file" \
     | sed -E 's/^[[:space:]]*SLIDES_WHITELIST="([^"]*)".*/\1/' | head -1
 }
@@ -83,6 +85,7 @@ whitelist_get() {
 # DEPLOY_DECK_SENTINEL comment) so a stray comment mentioning the sentinel can't be rewritten.
 whitelist_add() {
   local file="$1" slug="$2" line cur newval tmp
+  [ -r "$file" ] || return 2   # fail-closed: unreadable/absent → same as "no sentinel" (caller dies)
   line=$(grep -nE '^[[:space:]]*SLIDES_WHITELIST="[^"]*"[[:space:]]*# DEPLOY_DECK_SENTINEL' "$file" | head -1 | cut -d: -f1)
   [ -n "$line" ] || return 2
   cur=$(sed -n "${line}p" "$file" | sed -E 's/^[[:space:]]*SLIDES_WHITELIST="([^"]*)".*/\1/')
