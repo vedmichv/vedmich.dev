@@ -90,7 +90,7 @@ preflight() {
   #    GAP1: site repo must be on main. The deploy commits land on the CURRENT branch, but
   #    step_finalize runs `git push origin main` — pushing the local main REF. From a feature
   #    branch that pushes a STALE main (empty whitelist) → 404, while the real commit rots on feat.
-  [ "$(git -C "$SITE_REPO" symbolic-ref --short HEAD)" = "main" ] \
+  [ "$(git -C "$SITE_REPO" symbolic-ref --short HEAD 2>/dev/null)" = "main" ] \
     || die "site repo must be on 'main' (deploy commits + 'git push origin main' assume it). Current: $(git -C "$SITE_REPO" symbolic-ref --short HEAD 2>/dev/null || echo detached). Run: git -C \"$SITE_REPO\" checkout main"
   #    GAP4a: the SPA-fallback that makes deep-links (/slides/<slug>/N) work. If removed, deep-links
   #    silently 404 (Pages serves its built-in page instead of our deck-shell injector).
@@ -224,10 +224,12 @@ step_bump_submodule() {
     local wl; wl=" $(whitelist_get "$SITE_REPO/.github/workflows/deploy.yml") "
     local changed_top dragged="" d
     changed_top="$(git -C "$SUBMODULE" diff --name-only "$OLDPIN" "$PUSHED" | awk -F/ 'NF>1{print $1}' | sort -u)"
+    set -f   # noglob: $changed_top is unquoted in the for-loop; a dir name with */?/[ must not glob cwd
     for d in $changed_top; do
       [ "$d" = "$SLUG" ] && continue
       case "$wl" in *" $d "*) dragged="$dragged $d" ;; esac   # a DIFFERENT whitelisted (served) slug changed
     done
+    set +f
     [ -z "$dragged" ] || die "submodule bump would change other SERVED (whitelisted) deck(s):$dragged — bump deliberately"
     # non-whitelisted co-tenant dirs (slurm-ai-agents etc.) are not served by vedmich.dev — allowed
   else
@@ -369,7 +371,7 @@ step_finalize() {
   # Our dist/404.html (built from src/pages/404.astro) is <title>Redirecting…</title> + an injector
   # that does fetch('/slides/'+slug+'/index.html') — so the literal "slides/$SLUG" is NOT in the raw
   # HTML (slug is a JS var), but "redirect" (from the title) is. GitHub's default 404 has neither.
-  local dl; dl="$(curl -s "https://vedmich.dev/slides/$SLUG/10")"
+  local dl; dl="$(curl -s "https://vedmich.dev/slides/$SLUG/10" || echo '')"
   printf '%s' "$dl" | grep -q "slides/$SLUG" || printf '%s' "$dl" | grep -qi 'redirect' \
     || warn "deep-link /slides/$SLUG/10 did not return the SPA-fallback (got $(printf '%s' "$dl" | grep -qi 'there isn.t a github pages site\|page not found . github' && echo 'GitHub default 404' || echo 'unknown')) — deep-links may be broken; check src/pages/404.astro"
   log "LIVE OK → https://vedmich.dev/slides/$SLUG/"
