@@ -68,6 +68,7 @@ parse_args() {
 
 # Captured in preflight for later steps / drag-detection.
 OLDPIN=""
+GHPAGES_BEHIND=0   # set by preflight (GAP2): #commits the gh-pages clone is behind origin; ff'd in publish
 
 preflight() {
   CURRENT_STEP="preflight"
@@ -86,6 +87,15 @@ preflight() {
     || die "site working tree dirty — commit/stash first"
   [ -z "$(git -C "$SUBMODULE" status --porcelain)" ] \
     || die "submodule working tree dirty"
+  #    GAP1: site repo must be on main. The deploy commits land on the CURRENT branch, but
+  #    step_finalize runs `git push origin main` — pushing the local main REF. From a feature
+  #    branch that pushes a STALE main (empty whitelist) → 404, while the real commit rots on feat.
+  [ "$(git -C "$SITE_REPO" symbolic-ref --short HEAD)" = "main" ] \
+    || die "site repo must be on 'main' (deploy commits + 'git push origin main' assume it). Current: $(git -C "$SITE_REPO" symbolic-ref --short HEAD 2>/dev/null || echo detached). Run: git -C \"$SITE_REPO\" checkout main"
+  #    GAP4a: the SPA-fallback that makes deep-links (/slides/<slug>/N) work. If removed, deep-links
+  #    silently 404 (Pages serves its built-in page instead of our deck-shell injector).
+  [ -f "$SITE_REPO/src/pages/404.astro" ] \
+    || die "missing src/pages/404.astro — deep-links (/slides/<slug>/N) will 404. See docs/slides-onboarding.md / the deep-link fix."
   # 4. submodule wiring
   [ "$(git -C "$SITE_REPO" config -f .gitmodules --get submodule.slidev.branch)" = "gh-pages" ] \
     || die ".gitmodules submodule.slidev.branch must be gh-pages"
@@ -98,6 +108,20 @@ preflight() {
   # 5. gh-pages repo really on gh-pages
   [ "$(git -C "$GHPAGES_REPO" symbolic-ref --short HEAD)" = "gh-pages" ] \
     || die "$GHPAGES_REPO is not on the gh-pages branch"
+  # 5b. GAP2: the push-target clone is SHARED with the slurm pipeline (other machine pushes here).
+  # If it's behind origin, `git push origin gh-pages` mid-deploy is rejected. Fetch updates only the
+  # remote-tracking ref, never the working tree, so it's safe to run even in --dry-run (keeps the
+  # dry-run honest — surfaces a behind/diverged clone). The actual fast-forward is gated to the real
+  # run (top of step_publish_ghpages, via run()). ahead = our local-only commits.
+  log "fetch gh-pages clone (freshness check)"
+  git -C "$GHPAGES_REPO" fetch --quiet origin gh-pages || die "cannot fetch origin gh-pages in $GHPAGES_REPO"
+  GHPAGES_BEHIND="$(git -C "$GHPAGES_REPO" rev-list --count HEAD..origin/gh-pages 2>/dev/null || echo 0)"
+  local ghpages_ahead; ghpages_ahead="$(git -C "$GHPAGES_REPO" rev-list --count origin/gh-pages..HEAD 2>/dev/null || echo 0)"
+  if [ "$GHPAGES_BEHIND" -gt 0 ] && [ "$ghpages_ahead" -gt 0 ]; then
+    die "gh-pages clone has diverged (ahead=$ghpages_ahead, behind=$GHPAGES_BEHIND) — resolve manually in $GHPAGES_REPO"
+  elif [ "$GHPAGES_BEHIND" -gt 0 ]; then
+    warn "gh-pages clone is $GHPAGES_BEHIND commit(s) behind origin — will fast-forward at the top of the publish step"
+  fi
   # 6. base-collision guard (B1): slug already on gh-pages at a different base?
   local existing="$GHPAGES_REPO/$SLUG/index.html"
   if [ -f "$existing" ] && [ ! -r "$existing" ]; then
@@ -141,6 +165,14 @@ PUSHED=""   # gh-pages SHA after step 2
 
 step_publish_ghpages() {
   CURRENT_STEP="publish-ghpages"
+  # GAP2: if preflight found the shared clone behind origin (and NOT diverged — that already died),
+  # fast-forward it before snapshotting/committing so the subsequent push is a clean fast-forward.
+  # Safe: gh-pages here is a pure artifact target, never hand-edited, so --ff-only can't lose work.
+  # Gated via run() → dry-run only prints it (no working-tree mutation in dry-run).
+  if [ "$GHPAGES_BEHIND" -gt 0 ]; then
+    run "fast-forward gh-pages clone to origin ($GHPAGES_BEHIND behind)" -- \
+      git -C "$GHPAGES_REPO" merge --ff-only origin/gh-pages
+  fi
   local dest="$GHPAGES_REPO/$SLUG" snap=""
   # snapshot the existing slot for rollback (B1). Gated behind non-dry-run so the dry-run
   # leaves zero side effects (no mktemp dir, no phantom rollback note). The tarball lives in a
@@ -178,15 +210,26 @@ step_bump_submodule() {
   [ "$DRYRUN" -eq 1 ] && { printf '  [dry-run] submodule: fetch + checkout %s + drag-gate\n' "${PUSHED:-<pushed>}"; return 0; }
   run "fetch gh-pages in submodule" -- git -C "$SUBMODULE" fetch origin gh-pages
   run "checkout pushed SHA in submodule" -- git -C "$SUBMODULE" checkout --quiet "$PUSHED"
-  # drag-detection GATE — only our slug (+ allowed root files) may differ vs OLDPIN
-  # Drag-gate: the diff baseline is OLDPIN (the LAST pinned submodule SHA), not gh-pages-pre-push.
-  # So if a co-tenant deck (slurm/dkt) was pushed to gh-pages since the last pin bump, this
-  # correctly ABORTS — we only want OUR slug (+ cutover index.html) in the pointer bump. A legit
-  # abort here means: bump the pin deliberately. Do NOT widen this filter to "fix" it.
+  # drag-detection GATE (GAP3) — whitelisted-only semantics.
+  # The diff baseline is OLDPIN (the LAST pinned submodule SHA), not gh-pages-pre-push. So the
+  # OLDPIN..PUSHED diff may touch co-tenant decks (slurm-ai-agents/, dkt/) pushed to the SHARED
+  # gh-pages since the last pin bump. But vedmich.dev's CI only COPIES WHITELISTED slugs into
+  # dist/slides/ — a co-tenant deck NOT in the whitelist is never served by this site, so dragging
+  # its bytes through the pointer bump is HARMLESS. The bump is unsafe ONLY if it changes a
+  # DIFFERENT *whitelisted* (served) slug — that would silently re-deploy someone else's deck.
+  # Our own $SLUG (expected) + root files (CNAME/404.html/index.html) are always allowed.
+  # NOTE on ordering: step_whitelist runs AFTER this in main(), so $SLUG may not yet be in the
+  # committed whitelist at gate time — fine, we `continue` on $SLUG explicitly regardless.
   if git -C "$SUBMODULE" cat-file -e "$OLDPIN" 2>/dev/null; then
-    local drag
-    drag="$(git -C "$SUBMODULE" diff --name-only "$OLDPIN" "$PUSHED" | grep -vE "^$SLUG/|^(CNAME|404\.html|index\.html)\$" || true)"
-    [ -z "$drag" ] || die "submodule bump would drag co-tenant changes:"$'\n'"$drag"
+    local wl; wl=" $(whitelist_get "$SITE_REPO/.github/workflows/deploy.yml") "
+    local changed_top dragged="" d
+    changed_top="$(git -C "$SUBMODULE" diff --name-only "$OLDPIN" "$PUSHED" | awk -F/ 'NF>1{print $1}' | sort -u)"
+    for d in $changed_top; do
+      [ "$d" = "$SLUG" ] && continue
+      case "$wl" in *" $d "*) dragged="$dragged $d" ;; esac   # a DIFFERENT whitelisted (served) slug changed
+    done
+    [ -z "$dragged" ] || die "submodule bump would change other SERVED (whitelisted) deck(s):$dragged — bump deliberately"
+    # non-whitelisted co-tenant dirs (slurm-ai-agents etc.) are not served by vedmich.dev — allowed
   else
     warn "oldpin $OLDPIN not in submodule history (force-push?) — skipping drag check"
   fi
@@ -321,6 +364,14 @@ step_finalize() {
     || warn "could not confirm a hashed asset 200 (asset='$asset')"
   curl -s "https://vedmich.dev/slides/$SLUG/404.html" | grep -q "/slides/$SLUG/" \
     || warn "deck 404.html base not confirmed (deep-link fallback)"
+  # GAP4b (SOFT): actually fetch a deep-link and confirm Pages serves OUR SPA-fallback shell, not
+  # GitHub's built-in 404. A deep-link is HTTP 404 BY DESIGN (no file on disk); the BODY is the test.
+  # Our dist/404.html (built from src/pages/404.astro) is <title>Redirecting…</title> + an injector
+  # that does fetch('/slides/'+slug+'/index.html') — so the literal "slides/$SLUG" is NOT in the raw
+  # HTML (slug is a JS var), but "redirect" (from the title) is. GitHub's default 404 has neither.
+  local dl; dl="$(curl -s "https://vedmich.dev/slides/$SLUG/10")"
+  printf '%s' "$dl" | grep -q "slides/$SLUG" || printf '%s' "$dl" | grep -qi 'redirect' \
+    || warn "deep-link /slides/$SLUG/10 did not return the SPA-fallback (got $(printf '%s' "$dl" | grep -qi 'there isn.t a github pages site\|page not found . github' && echo 'GitHub default 404' || echo 'unknown')) — deep-links may be broken; check src/pages/404.astro"
   log "LIVE OK → https://vedmich.dev/slides/$SLUG/"
 }
 

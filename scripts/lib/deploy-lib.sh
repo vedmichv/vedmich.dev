@@ -59,6 +59,16 @@ whitelist_has() {
   case " $cur " in *" $slug "*) return 0 ;; *) return 1 ;; esac
 }
 
+# whitelist_get <deploy_yml> → echo the space-separated slug list from the sentinel line (may be empty).
+# Mirrors whitelist_has's anchored-sentinel extraction so a stray comment mentioning the sentinel
+# can't be picked. Used by the drag-gate to scope "served" slugs (only whitelisted decks are copied
+# into dist/slides/ by CI, so co-tenant decks on shared gh-pages are irrelevant to vedmich.dev).
+whitelist_get() {
+  local file="$1"
+  grep -E '^[[:space:]]*SLIDES_WHITELIST="[^"]*"[[:space:]]*# DEPLOY_DECK_SENTINEL' "$file" \
+    | sed -E 's/^[[:space:]]*SLIDES_WHITELIST="([^"]*)".*/\1/' | head -1
+}
+
 # whitelist_add <deploy_yml> <slug> → idempotently append slug to the sentinel SLIDES_WHITELIST
 # line, preserving leading indentation. Returns 2 if the sentinel line is missing, 1 on rewrite
 # failure (leaves the live file untouched). slug is validate_slug'd by callers.

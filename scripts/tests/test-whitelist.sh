@@ -38,3 +38,11 @@ test_whitelist_token_boundary() {
   assert_fail whitelist_has "$tmp" vv-dem
   rm -f "$tmp"
 }
+test_whitelist_get() {
+  local tmp; tmp=$(mktemp); cp "$FXSRC" "$tmp"
+  assert_eq "$(whitelist_get "$tmp")" ""          # empty initially
+  whitelist_add "$tmp" vv-demo
+  whitelist_add "$tmp" karpenter-prod
+  assert_eq "$(whitelist_get "$tmp")" "vv-demo karpenter-prod"
+  rm -f "$tmp"
+}
