@@ -1,7 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # deploy-deck.sh — fail-closed autopilot: publish a slidev-theme-vv deck to vedmich.dev/slides/<slug>/.
 # macOS/BSD/bash-3.2 safe: no `sed -i`, no `timeout`, no bash-4 features. See
 # docs/superpowers/specs/2026-06-01-vedmich-dev-skill-slides-deploy-design.md and docs/slides-onboarding.md.
+#
+# SHEBANG IS /bin/bash ON PURPOSE (not /usr/bin/env bash). This script is macOS-local (its repo paths
+# are hard-coded under ~/Documents/GitHub) and the "bash-3.2 safe" contract is real: /bin/bash on
+# macOS is genuine 3.2.57. Pinning it here ENFORCES that contract — any accidental bash-4ism breaks
+# loudly at the certification target instead of silently passing under a Homebrew bash 5 that
+# `env bash` would pick up. The test harness (scripts/tests/run.sh) keeps `#!/usr/bin/env bash` so the
+# unit suite runs under whatever bash the dev has; both bashes are exercised in CI-local verification.
 set -Eeuo pipefail
 IFS=$'\n\t'
 
