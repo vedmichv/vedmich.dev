@@ -25,7 +25,32 @@ print_rollback() {
   printf '\033[1;33m── rollback ──\n%s\033[0m\n' "$ROLLBACK_NOTES" >&2
 }
 die() { printf '\033[1;31m✗ %s\033[0m\n' "$*" >&2; print_rollback; exit 1; }
+
+# Advisory single-instance lock. Two concurrent runs share the gh-pages clone, the submodule, and
+# the site working tree — interleaving them can corrupt a slot mid-swap or push a half-built tree.
+# bash 3.2 / macOS has no flock(1), so use the atomic `mkdir` idiom (mkdir fails if the dir exists).
+# Global (not per-slug): the shared state is shared regardless of slug. Stale-lock safe: the holder
+# writes its PID; a lock whose PID is dead is reclaimed (covers SIGKILL/reboot leaving a dir behind).
+LOCKDIR="${TMPDIR:-/tmp}/deploy-deck.lock"
+LOCK_HELD=0
+acquire_lock() {
+  if mkdir "$LOCKDIR" 2>/dev/null; then
+    LOCK_HELD=1; echo $$ > "$LOCKDIR/pid"; return 0
+  fi
+  local opid; opid="$(cat "$LOCKDIR/pid" 2>/dev/null || echo '')"
+  if [ -n "$opid" ] && kill -0 "$opid" 2>/dev/null; then
+    die "another deploy-deck.sh is running (pid $opid). If you are certain it is not, run: rm -rf '$LOCKDIR'"
+  fi
+  warn "reclaiming stale lock (holder pid ${opid:-unknown} not alive)"
+  rm -rf "$LOCKDIR"
+  mkdir "$LOCKDIR" 2>/dev/null || die "could not acquire lock at $LOCKDIR"
+  LOCK_HELD=1; echo $$ > "$LOCKDIR/pid"
+}
+# Only the holder removes the lock — a process that failed to acquire must NOT delete the live one.
+release_lock() { [ "$LOCK_HELD" -eq 1 ] && rm -rf "$LOCKDIR"; return 0; }
+
 trap 'die "aborted during: $CURRENT_STEP"' ERR
+trap 'release_lock' EXIT
 
 # run <description> -- <cmd...>  : in --dry-run, print and skip; else execute.
 run() {
@@ -332,8 +357,18 @@ step_finalize() {
   CURRENT_STEP="finalize"
   ci_equiv_gate
   if [ "$DRYRUN" -eq 1 ]; then printf '  [dry-run] commit+push main, poll Pages, curl /slides/%s/\n' "$SLUG"; return 0; fi
-  run "commit site (submodule bump + whitelist)" -- \
-    sh -c "cd '$SITE_REPO' && git add slidev .github/workflows/deploy.yml && (git diff --cached --quiet || git commit -m 'deploy(slides): $SLUG → /slides/$SLUG/')"
+  # The un-drafted cards (step_undraft) MUST land in the SAME commit as the submodule bump + whitelist.
+  # If they don't: (a) the homepage card never publishes — CI builds origin/main where it's still
+  # draft:true; and (b) the orphaned working-tree edit makes the NEXT run's preflight die on a dirty
+  # tree, bricking all future deploys. Atomic single commit also means the auto-revert below
+  # (git revert $sha) re-drafts the card too — a failed deploy can't leave a published card pointing
+  # at a reverted deck. NO_UNDRAFT=1 (theme demos like vv-demo) skips step_undraft, so no card paths.
+  local cards=""
+  if [ "$NO_UNDRAFT" -eq 0 ]; then
+    cards="src/content/presentations/en/$SLUG.md src/content/presentations/ru/$SLUG.md"
+  fi
+  run "commit site (submodule bump + whitelist$([ -n "$cards" ] && echo ' + cards')" -- \
+    sh -c "cd '$SITE_REPO' && git add slidev .github/workflows/deploy.yml $cards && (git diff --cached --quiet || git commit -m 'deploy(slides): $SLUG → /slides/$SLUG/')"
   local sha; sha="$(git -C "$SITE_REPO" rev-parse HEAD)"
   run "push main" -- git -C "$SITE_REPO" push origin main
   note_rollback "revert site commit: (cd '$SITE_REPO' && git revert --no-edit $sha && git push origin main)"
@@ -391,6 +426,9 @@ step_finalize() {
 main() {
   parse_args "$@"
   log "deploy-deck: slug=$SLUG theme=$THEME dry-run=$DRYRUN no-undraft=$NO_UNDRAFT cutover=$CUTOVER"
+  # Lock even in --dry-run: the dry-run does a real slidev build + a real Astro build, both of which
+  # write shared dist/ dirs a concurrent real run also touches.
+  acquire_lock
   preflight
   step_build
   step_publish_ghpages
