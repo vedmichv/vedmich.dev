@@ -67,9 +67,9 @@ const src = clicks > 0 ? `${base}?clicks=0` : base;
 <script>
   // One initializer for every SlideEmbed on the page. Idempotent (guards a per-iframe flag).
   function initSlideEmbeds() {
-    const STEP_MS = 2500;   // dwell per click step (slow + readable)
-    const HOLD_MS = 3800;   // dwell on the final, fully-revealed frame
-    const RESET_MS = 700;   // brief beat on the empty frame before replaying
+    const STEP_MS = 2600;   // dwell per click step (slow + readable)
+    const HOLD_MS = 4200;   // dwell on the final, fully-revealed frame
+    const RESET_MS = 900;   // brief beat on the empty frame before replaying
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const frames = document.querySelectorAll<HTMLIFrameElement>('iframe[data-slide-embed]');
@@ -83,34 +83,71 @@ const src = clicks > 0 ? `${base}?clicks=0` : base;
       // reduced motion: just show the final, fully-revealed frame and stop.
       if (reduce) { iframe.src = `${base}?clicks=${clicks}`; return; }
 
+      // Advance clicks IN-DOCUMENT (pushState + popstate) so the deck's own CSS transitions fire —
+      // a real "click" fade-in, no iframe reload, no flash. Verified deterministic on the live deck:
+      // vue-router reads ?clicks from the query on popstate, lands exactly on k, never overshoots into
+      // an adjacent slide (which synthetic ArrowRight does). Falls back to a src reload if the iframe
+      // is cross-origin (e.g. a dev preview on a different host) where contentWindow is unreachable.
+      const go = (k: number) => {
+        try {
+          const w = iframe.contentWindow as any;
+          if (w && w.history && w.location && w.location.pathname.indexOf(base) !== -1) {
+            w.history.pushState(w.history.state, '', `${base}?clicks=${k}`);
+            w.dispatchEvent(new PopStateEvent('popstate', { state: w.history.state }));
+            return;
+          }
+        } catch (_) { /* cross-origin: fall through to reload */ }
+        iframe.src = `${base}?clicks=${k}`;
+      };
+
       let step = 0;
       let timer: number | undefined;
       let running = false;
+      let booted = false;
 
-      const show = (k: number) => { iframe.src = `${base}?clicks=${k}`; };
       const tick = () => {
         if (!running) return;
         step += 1;
         if (step > clicks) {
           // finished a full pass: hold the final frame, then reset to empty and replay
           step = 0;
-          show(clicks);
+          go(clicks);
           timer = window.setTimeout(() => {
             if (!running) return;
-            show(0);
+            go(0);
             timer = window.setTimeout(tick, RESET_MS);
           }, HOLD_MS);
           return;
         }
-        show(step);
+        go(step);
         timer = window.setTimeout(tick, STEP_MS);
       };
-      const start = () => { if (running) return; running = true; timer = window.setTimeout(tick, STEP_MS); };
-      const stop = () => { running = false; if (timer) { clearTimeout(timer); timer = undefined; } };
+
+      // Kick off as soon as the embed is on screen: show the FIRST step immediately (no dead dwell on
+      // the empty frame), then continue the cadence. The iframe SPA needs a beat to boot before
+      // pushState can drive it, so on first run we wait for its load; afterwards it's instant.
+      const begin = () => {
+        if (running) return;
+        running = true;
+        const fire = () => { if (!running) return; step = 1; go(1); timer = window.setTimeout(tick, STEP_MS); };
+        if (booted) { fire(); }
+        else {
+          // wait for the iframe document to be ready, then fire the first step right away
+          const onLoad = () => { booted = true; iframe.removeEventListener('load', onLoad); if (running) fire(); };
+          // it may already be loaded (lazy iframe resolved while scrolling in)
+          try {
+            if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') { booted = true; fire(); return; }
+          } catch (_) {}
+          iframe.addEventListener('load', onLoad);
+          // safety net: if load already fired and we missed it, fire after a short boot delay
+          window.setTimeout(() => { if (running && !booted) { booted = true; fire(); } }, 1800);
+        }
+      };
+      const halt = () => { running = false; if (timer) { clearTimeout(timer); timer = undefined; } };
 
       // only animate while the embed is on screen
       const io = new IntersectionObserver((entries) => {
-        entries.forEach((e) => { if (e.isIntersecting) start(); else stop(); });
+        entries.forEach((e) => { if (e.isIntersecting) begin(); else halt(); });
       }, { threshold: 0.35 });
       io.observe(iframe);
     });
