@@ -1,0 +1,313 @@
+---
+title: "Kubernetes Gateway API: from zero to hero"
+description: "Ingress is feature-frozen and ingress-nginx is retired. Here is its successor end to end: four typed resources, the platform-vs-app split, canary, TLS, multi-team, and the mesh, built on one running shop."
+date: 2026-06-06
+tags: ["kubernetes", "gateway-api", "networking"]
+---
+import SlideEmbed from '../../../components/SlideEmbed.astro';
+
+In March 2026, ingress-nginx was retired. About half of all Kubernetes clusters ran it, and now there are no more releases and no more CVE patches, ever. That is the forcing function that turns "I should look at Gateway API eventually" into "I need to understand this now."
+
+So let's understand it. This is the companion writeup to a talk I give as a from-zero-to-hero walkthrough: we take one online shop and route all of its traffic the modern way, growing the design one concept at a time. It is vendor-neutral and current as of Gateway API v1.5 (February 2026). The slides are embedded throughout, so you can click through the animated ones yourself. A follow-up post will make all of this concrete on AWS.
+
+One terminology note first, because it trips up everyone. This is the **Gateway API**, the Kubernetes standard. It is not "API Gateway", which is a generic architectural pattern and also an AWS product. Different things.
+
+## Ingress is done. This is what replaced it.
+
+I spend exactly one slide on the "why now", and so will this section. Four facts:
+
+- **ingress-nginx is retired** (March 2026). Roughly half of all clusters ran it. The repos are read-only and there will be no patches for any future CVE.
+- **Gateway API is the standard.** It hit v1 GA in October 2023 and reached v1.5 in February 2026. It is SIG Network's official successor to Ingress.
+- **Every implementation supports it.** GKE, AKS, Istio, Cilium, Envoy Gateway, NGINX Gateway Fabric, and more. Seven implementations were already conformant with v1.5 on release day.
+- **The `Ingress` API still works**, but it is feature-frozen. It is stable and will keep working for years. All new capability lands in Gateway API. If you are starting today, you start here.
+
+That is the entire history portion. The rest is the "what" and the "how".
+
+## How does a request even reach a Pod?
+
+Before any YAML, here is the fundamental problem. A browser has a URL, `shop.example.com`. Your code runs in a Pod with an internal IP like `10.1.2.7` that changes on every restart and every scale event. You can never point DNS at a Pod. Something has to bridge that gap.
+
+<SlideEmbed slide={6} title="How a request reaches a Pod" caption="Browser to Pod: the Service solves the inside half, but something still has to take external traffic to the right Service. That missing piece is what Gateway API models." />
+
+Kubernetes already solves half of this with a **Service**: a stable virtual IP and DNS name in front of a set of Pods. So inside the cluster, Service-to-Pod is handled. But the Service is internal. Something still has to take external traffic, on a real hostname and port, and get it to the right Service. That missing piece is exactly what Gateway API models: the typed, role-owned way to define the entry point and the routing. Ingress filled this slot before. Gateway API is the better-structured answer.
+
+## Why Ingress was not enough
+
+It is worth being precise about what Ingress got structurally wrong, because Gateway API fixes each of these by design, not by adding more configuration.
+
+1. **Everything lived in annotations.** TLS, rewrites, timeouts, CORS, canary, all untyped strings. ingress-nginx had over a hundred of them. A misspelled key is silently ignored, and you find out at 3am.
+2. **One blob, one owner.** A developer who just wanted to add a path route had to edit the same object that carried the cluster's TLS secrets and load balancer config. No separation of duties.
+3. **Vendor lock-in by annotation.** A `nginx.ingress.kubernetes.io/...` key means nothing to Traefik or HAProxy. Switching controllers meant rewriting everything.
+4. **No native L7 expressiveness.** Header routing, traffic weights, method matching, none of it was in the spec. Every controller bolted on its own version through, you guessed it, more annotations.
+
+Keep these four in mind. Each one gets solved structurally below.
+
+## Gateway API in one breath
+
+If you remember one sentence, this is it. Gateway API takes the single Ingress blob and splits it into **typed resources**, each **owned by the right team**, that **attach to each other** to describe traffic from the edge of the cluster all the way to your Pods.
+
+Four properties fall out of that: it is role-oriented, everything is typed and validated, it is vendor-neutral so the same YAML works everywhere, and the same API covers both ingress (north-south) and service mesh (east-west). Now let's earn that sentence by building the resources one at a time.
+
+## The four resources
+
+Our running example is a deliberately simplified version of Google's Online Boutique, so it maps to anything you have seen: five services. Four of them (`web`, `products`, `cart`, `orders`) are owned by the shop team. The fifth, `payments`, lives in a different team's namespace. Hold onto that detail. It is the reason cross-namespace routing matters later.
+
+### 1. GatewayClass: the template
+
+A cluster-scoped template that names which **controller** implements gateways of this class. The cleanest analogy is `StorageClass`: you do not define a disk, you ask for a disk of class `fast-ssd` and a provisioner handles it. Same here. It decouples your routing config from the implementation, and it is created once by the infrastructure provider. Application teams never touch it.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: prod
+spec:
+  # the controller that will program real infrastructure
+  controllerName: example.net/gateway-controller
+```
+
+### 2. Gateway: the entry point
+
+This is the hero of the model. When you create a Gateway, the controller provisions a real load balancer or proxy. It has listeners (ports, protocols, TLS), and one Gateway is one front door to your cluster. It is also the ownership boundary for infrastructure concerns: TLS certificates live here, and `allowedRoutes` decides which namespaces are permitted to attach routes. That is the governance lever the platform team holds.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: shop-gateway
+  namespace: infra
+spec:
+  gatewayClassName: prod
+  listeners:
+    - name: https
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Selector   # All | Same | Selector
+          selector:
+            matchLabels:
+              gateway-access: "true"
+```
+
+### 3. HTTPRoute: the rules
+
+This is where developers live. It matches on hostname and path and forwards to a backend Service, and it connects to a Gateway through `parentRefs`. It is the only resource an application developer needs to touch: typed, schema-validated, and scoped to their own namespace. No cluster rights, no TLS access. Note that `parentRefs` points at the Gateway in the `infra` namespace, a cross-namespace reference that is allowed for attaching to Gateways and gated by that Gateway's `allowedRoutes`.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web
+  namespace: shop
+spec:
+  parentRefs:
+    - name: shop-gateway
+      namespace: infra
+  hostnames: ["shop.example.com"]
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: / }
+      backendRefs:
+        - name: web
+          port: 8080
+```
+
+### 4. Service and Pods: the destination
+
+The good news: you already know this one. It is a standard Kubernetes Service and Pods, nothing Gateway-API-specific. It matters in the chain because Pods are ephemeral, they restart and reschedule and their IPs change, while the Service is the durable thing. That is why an HTTPRoute targets a Service, never a Pod directly. `backendRefs` simply names a Service that already exists. It is the bridge from Gateway API into the Kubernetes you already run.
+
+### Who owns what
+
+Here is the conceptual heart, the same chain colored by ownership:
+
+<SlideEmbed slide={15} title="Who owns what" caption="Infrastructure provider owns GatewayClass. Cluster operator owns the Gateway, its TLS, and the attach policy. Application developer owns the HTTPRoute, in their own namespace, with no cluster rights." />
+
+Remember the Ingress problem: one blob, one owner, developers forced to touch cluster config. This three-way split is the structural fix. Each team gets exactly the surface it needs and nothing more.
+
+### The assembled journey
+
+Now the payoff. The four resources plus Service and Pod, assembled, following one request from the browser through GatewayClass, the Gateway, the HTTPRoute, the Service, to a healthy Pod:
+
+<SlideEmbed slide={14} title="The request's journey, assembled" caption="Teal is platform-owned config, amber is the app layer, violet is the workload. This chain is the spine of everything. Every later feature is a variation on this exact picture." />
+
+## Hands-on: route the shop
+
+Time to deploy. The Gateway API CRDs are not built into Kubernetes, you install them, and the great property is that this works on any Kubernetes 1.30 or newer. You do not upgrade Kubernetes to get a newer Gateway API, you just apply newer CRDs.
+
+```bash
+# 1. Install the Gateway API CRDs (Standard channel, GA resources)
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/\
+releases/download/v1.5.0/standard-install.yaml
+
+# 2. Verify the CRDs are present
+kubectl get crd | grep gateway.networking.k8s.io
+
+# 3. Install a controller (NGINX Gateway Fabric, Istio, Cilium,
+#    Envoy Gateway, or a cloud provider's). Each ships a GatewayClass.
+kubectl get gatewayclass
+#   NAME   CONTROLLER                      ACCEPTED
+#   prod   example.net/gateway-controller  True
+```
+
+The CRDs are the vocabulary; a controller is what actually watches these objects and programs real infrastructure. Verify it shows `ACCEPTED: True` and you are ready.
+
+Next, the platform team creates the front door, one HTTP listener for now, with the governance label that controls who may attach:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: shop-gateway
+  namespace: infra
+spec:
+  gatewayClassName: prod
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              gateway-access: "true"
+```
+
+Then the shop team labels its namespace to fit that lock, and attaches a route. Two YAML files, two teams, neither needing the other's permissions:
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shop
+  labels:
+    gateway-access: "true"      # the key that fits the Gateway's lock
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web
+  namespace: shop
+spec:
+  parentRefs:
+    - name: shop-gateway
+      namespace: infra
+  hostnames: ["shop.example.com"]
+  rules:
+    - backendRefs: [{ name: web, port: 8080 }]   # no matcher = match all
+```
+
+Then verify each seam, because this is the part people skip and then wonder why nothing works. Gateway API gives you rich status, which Ingress never did:
+
+```bash
+# Is the Gateway programmed and did it get an address?
+kubectl get gateway shop-gateway -n infra
+#   NAME           CLASS  ADDRESS         PROGRAMMED
+#   shop-gateway   prod   203.0.113.10    True
+
+# Did the route attach cleanly?
+kubectl get httproute web -n shop \
+  -o jsonpath='{.status.parents[0].conditions}'
+#   type: Accepted     status: "True"
+#   type: ResolvedRefs status: "True"
+
+# Send a real request through the front door
+curl -H "Host: shop.example.com" http://203.0.113.10/
+```
+
+Three checks, three seams: infrastructure, attachment, traffic. To grow the shop, each app team adds more HTTPRoutes (`/products` to products, `/cart` to cart) in their own namespace, without ever touching the Gateway or calling the platform team. The Gateway is shared infrastructure; the routes are self-service.
+
+## HTTPRoute mastery
+
+Path is just the start. Path matching comes in three types: `Exact` (one path only, good for health endpoints), `PathPrefix` (the prefix and everything under it, what you will use 90% of the time), and `RegularExpression`, which is powerful but marked implementation-specific in the spec, so always check your controller's conformance before relying on it. That last one is a common migration trap from nginx.
+
+Then there are the matchers Ingress never had, all first-class typed fields: **header** matching (route `x-version: beta` traffic to a new build), **query parameter** matching (`?debug=true` to a debug backend), and **method** matching (`POST /orders` to a writer service, `GET /orders` to a read replica). You can combine them: a single match can require a path AND a header AND a method together.
+
+The crowd favorite is **traffic splitting**, canary built into the route itself:
+
+<SlideEmbed slide={25} title="Traffic splitting: built-in canary" caption="cart-v1 at weight 90, cart-v2 at weight 10. Genuine L7 weighting by the data plane, not just running more replicas. Two backendRefs with weights is the entire mechanism." />
+
+```yaml
+rules:
+  - backendRefs:
+      - name: cart-v1
+        port: 8080
+        weight: 90
+      - name: cart-v2
+        port: 8080
+        weight: 10
+```
+
+To roll forward you shift the weights: 90/10, then 50/50, then 0/100, watching your metrics at each step. Something looks wrong? Shift them back. For simple canary you need no Argo Rollouts and no Flagger, just the weights in your HTTPRoute. Those tools still help for automated analysis, but the primitive is built in.
+
+Finally, **filters** transform a request as it passes through, and they are typed, no annotations. `RequestHeaderModifier` adds, sets, or removes headers. `RequestRedirect` sends a typed 301 or 302 with a real `statusCode` field. `URLRewrite` reshapes the path before forwarding, so the public URL stays `/products` while the service itself only ever sees `/`. There is also `RequestMirror` to shadow traffic to a second backend. Between matching, splitting, and filters, HTTPRoute covers the vast majority of real routing needs, all typed and portable.
+
+## Production: TLS, multi-team, cross-namespace
+
+The shop is routing, but production needs more. First, TLS, and notice **where** it lives: on the Gateway listener, owned by the platform team, not in the developer's route.
+
+```yaml
+listeners:
+  - name: https
+    port: 443
+    protocol: HTTPS
+    hostname: shop.example.com
+    tls:
+      mode: Terminate            # decrypt here, forward plain HTTP inside
+      certificateRefs:
+        - kind: Secret
+          name: shop-tls         # owned by the platform team in infra
+```
+
+`mode: Terminate` means the Gateway decrypts and forwards plain HTTP to backends inside the cluster, and `certificateRefs` points at a Secret in the `infra` namespace. The shop developers writing HTTPRoutes never see the certificate, never manage rotation, never get cluster-secret access. One team owns crypto, another owns routing. There is also `mode: Passthrough` for end-to-end TLS, which pairs with TLSRoute.
+
+Because the Gateway is the shared front door, **many teams** can attach to it independently: the shop team's routes, a separate marketing team's `/promo` and `/campaigns` from their namespace, support's `/help` and `/status` from theirs. TLS is configured once, on that Gateway, and enforced for everyone. This is impossible to do cleanly with one Ingress object; here it is the natural shape of the API.
+
+But all of those are trusted shop teams. The `payments` service we flagged at the start lives in another team's namespace, and that needs an explicit grant:
+
+<SlideEmbed slide={30} title="ReferenceGrant: cross-namespace, safely" caption="The shop's cross-namespace backendRef to payments is denied by default (RefNotPermitted). The payments team, the owner of the target, creates a ReferenceGrant to opt in. Permission is granted by the owner, never the requester." />
+
+The critical property: the shop team cannot grant itself access to payments. The payments team must opt in by creating a ReferenceGrant in their own namespace. That is a real security handshake, exactly what you want when money is involved. In Ingress this was simply not possible without hacks. ReferenceGrant graduated to the Standard GA channel in v1.5, so it is stable API now.
+
+## Beyond HTTP, and into the mesh
+
+HTTPRoute has siblings. **GRPCRoute** (GA) handles gRPC with method-level matching. **TLSRoute** graduated to Standard GA in v1.5 for L4 TLS passthrough with SNI routing, so if you have seen older talks calling it experimental, that changed. **TCPRoute** and **UDPRoute** remain experimental. The two channels matter for production: Standard is stable and backward-compatible, Experimental makes no promises.
+
+Then there is a whole second direction of traffic. GAMMA (Gateway API for Mesh Management and Administration) extends the same API to service-to-service traffic inside the cluster:
+
+<SlideEmbed slide={33} title="GAMMA: the same API inside the mesh" caption="North-south (teal) enters through a Gateway. East-west (amber) is the GAMMA extension: the HTTPRoute's parentRef points at a Service, not a Gateway. That one change repurposes the same routing API for the mesh." />
+
+The key twist is that one change: the HTTPRoute's `parentRef` points at a **Service** instead of a Gateway. So you get canary, header routing, and traffic splitting for internal calls too, using the identical HTTPRoute shape you already learned. Istio, Linkerd, and Cilium's mesh all implement GAMMA, so it is vendor-neutral mesh policy. One API, both directions.
+
+## The whole shop, every concept
+
+Here is everything on one screen, on our shop: the amber `shop-gateway` on 443 with TLS, the shop namespace with four HTTPRoutes (including the 90/10 cart canary), and the payments team's separate namespace reachable only because the ReferenceGrant permits it.
+
+<SlideEmbed slide={34} title="The whole shop, every concept" caption="GatewayClass behind the Gateway, role-owned resources, path matching, traffic splitting, TLS at the edge, multi-team attachment, and cross-namespace security via ReferenceGrant. From one web service to this." />
+
+The thing I want you to notice: it was the **same five resources** the entire time. We never added a new core concept after the four resources, we just composed them into richer scenarios. That compositionality is the elegance of Gateway API.
+
+## Operating it in 2026
+
+Three things to know to run it well. First, **what's current**: v1.5 (February 2026) is the biggest release yet, themed around graduating Experimental features to GA. The headline is **ListenerSet**, which lets listeners be defined independently and merged onto a Gateway, breaking the old 64-listener limit and letting platform teams delegate individual listeners to app teams. TLSRoute and ReferenceGrant both reached Standard, and there is now a native HTTPRoute CORS filter, so no more annotations for CORS. Cadence is about every four months, so expect v1.6 later in 2026.
+
+Second, and this is the single most useful mental model: **the spec is not the implementation.** The API is vendor-neutral and versioned. A controller is what actually does the work, and each implementation chooses which parts of the spec it supports. So a field can be perfectly GA in the spec and still not work on your cluster because your controller has not implemented it. `RegularExpression` path matching is the classic example. Do not assume, check your controller's conformance report. This one habit prevents most "why doesn't my route work" surprises.
+
+Third, the **gotchas** that catch people in real migrations:
+
+- **Path semantics differ from nginx.** Case sensitivity, prefix behavior, and regex support are all subtly different. Audit every path rule, do not assume parity.
+- **Cross-namespace is default-deny.** Forget the ReferenceGrant and you get `RefNotPermitted` and a route that silently will not program. Remember it is a security feature.
+- **Read the status conditions.** `Accepted`, `ResolvedRefs`, `Programmed`. When something is wrong, `kubectl get` the route's status and it usually tells you exactly what.
+- **Not every annotation maps cleanly.** Some nginx config-snippet tricks (raw rate limiting, custom Lua) have no typed Gateway API equivalent yet. Plan to move those to controller-specific policy resources.
+
+## Zero to hero
+
+You now understand every core resource, how they compose, and how to take an application from a single exposed service to a secure, multi-team, canary-deploying system, all with the same five building blocks.
+
+To start concretely: install Gateway API v1.5 on any Kubernetes 1.30 or newer, pick a conformant controller, and expose your first service exactly like we did with `web`. Read the status conditions, check your controller's conformance, and grow from there.
+
+## Related
+
+- **Slides:** [Kubernetes Gateway API: from zero to hero](/slides/k8s-gateway-api/). The full deck this post is built on. Click through the animated diagrams in presenter mode.
+- **Next up:** the AWS implementation deck, making this vendor-neutral foundation concrete with load balancer controllers, ACM for certificates, and VPC Lattice for the mesh.

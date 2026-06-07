@@ -1,0 +1,53 @@
+---
+/**
+ * SlideEmbed — embed one slide of a deployed Slidev deck as a live, interactive iframe.
+ *
+ * The deck is a first-party artifact served at /slides/<slug>/ (see docs/slides-onboarding.md).
+ * We iframe a specific slide by URL, so the animation + click-through are the real deck, always
+ * in sync with what's deployed, and zero Slidev deps are pulled into the Astro toolchain.
+ *
+ * Used by blog posts that companion a deck (e.g. the Kubernetes Gateway API zero-to-hero article)
+ * to reuse animation/diagram slides instead of re-drawing them. Code slides stay as Shiki blocks.
+ *
+ * loading="lazy" is load-bearing: a post may embed many slides, each a full SPA, so they must not
+ * all boot on page load.
+ */
+interface Props {
+  slug?: string;
+  slide: number;
+  title: string;
+  caption?: string;
+}
+const { slug = 'k8s-gateway-api', slide, title, caption } = Astro.props;
+const src = `/slides/${slug}/${slide}`;
+---
+<figure class="my-8">
+  <div class="slide-embed">
+    <iframe
+      src={src}
+      title={title}
+      loading="lazy"
+      allowfullscreen
+      referrerpolicy="no-referrer"
+    ></iframe>
+  </div>
+  {caption && <figcaption class="text-sm text-text-muted mt-2 text-center">{caption}</figcaption>}
+</figure>
+<style>
+  .slide-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 0.08);
+    background: #0F172A;
+  }
+  .slide-embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>
