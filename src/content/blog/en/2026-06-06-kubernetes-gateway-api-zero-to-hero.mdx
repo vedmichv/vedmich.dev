@@ -27,7 +27,7 @@ That is the entire history portion. The rest is the "what" and the "how".
 
 Before any YAML, here is the fundamental problem. A browser has a URL, `shop.example.com`. Your code runs in a Pod with an internal IP like `10.1.2.7` that changes on every restart and every scale event. You can never point DNS at a Pod. Something has to bridge that gap.
 
-<SlideEmbed slide={6} title="How a request reaches a Pod" caption="Browser to Pod: the Service solves the inside half, but something still has to take external traffic to the right Service. That missing piece is what Gateway API models." />
+<SlideEmbed slide={6} clicks={4} title="How a request reaches a Pod" caption="Browser to Pod: the Service solves the inside half, but something still has to take external traffic to the right Service. That missing piece is what Gateway API models." />
 
 Kubernetes already solves half of this with a **Service**: a stable virtual IP and DNS name in front of a set of Pods. So inside the cluster, Service-to-Pod is handled. But the Service is internal. Something still has to take external traffic, on a real hostname and port, and get it to the right Service. That missing piece is exactly what Gateway API models: the typed, role-owned way to define the entry point and the routing. Ingress filled this slot before. Gateway API is the better-structured answer.
 
@@ -121,7 +121,7 @@ The good news: you already know this one. It is a standard Kubernetes Service an
 
 Here is the conceptual heart, the same chain colored by ownership:
 
-<SlideEmbed slide={15} title="Who owns what" caption="Infrastructure provider owns GatewayClass. Cluster operator owns the Gateway, its TLS, and the attach policy. Application developer owns the HTTPRoute, in their own namespace, with no cluster rights." />
+<SlideEmbed slide={15} clicks={3} title="Who owns what" caption="Infrastructure provider owns GatewayClass. Cluster operator owns the Gateway, its TLS, and the attach policy. Application developer owns the HTTPRoute, in their own namespace, with no cluster rights." />
 
 Remember the Ingress problem: one blob, one owner, developers forced to touch cluster config. This three-way split is the structural fix. Each team gets exactly the surface it needs and nothing more.
 
@@ -129,7 +129,7 @@ Remember the Ingress problem: one blob, one owner, developers forced to touch cl
 
 Now the payoff. The four resources plus Service and Pod, assembled, following one request from the browser through GatewayClass, the Gateway, the HTTPRoute, the Service, to a healthy Pod:
 
-<SlideEmbed slide={14} title="The request's journey, assembled" caption="Teal is platform-owned config, amber is the app layer, violet is the workload. This chain is the spine of everything. Every later feature is a variation on this exact picture." />
+<SlideEmbed slide={14} clicks={5} title="The request's journey, assembled" caption="Teal is platform-owned config, amber is the app layer, violet is the workload. This chain is the spine of everything. Every later feature is a variation on this exact picture." />
 
 ## Hands-on: route the shop
 
@@ -226,7 +226,7 @@ Then there are the matchers Ingress never had, all first-class typed fields: **h
 
 The crowd favorite is **traffic splitting**, canary built into the route itself:
 
-<SlideEmbed slide={25} title="Traffic splitting: built-in canary" caption="cart-v1 at weight 90, cart-v2 at weight 10. Genuine L7 weighting by the data plane, not just running more replicas. Two backendRefs with weights is the entire mechanism." />
+<SlideEmbed slide={25} clicks={3} title="Traffic splitting: built-in canary" caption="cart-v1 at weight 90, cart-v2 at weight 10. Genuine L7 weighting by the data plane, not just running more replicas. Two backendRefs with weights is the entire mechanism." />
 
 ```yaml
 rules:
@@ -266,7 +266,7 @@ Because the Gateway is the shared front door, **many teams** can attach to it in
 
 But all of those are trusted shop teams. The `payments` service we flagged at the start lives in another team's namespace, and that needs an explicit grant:
 
-<SlideEmbed slide={30} title="ReferenceGrant: cross-namespace, safely" caption="The shop's cross-namespace backendRef to payments is denied by default (RefNotPermitted). The payments team, the owner of the target, creates a ReferenceGrant to opt in. Permission is granted by the owner, never the requester." />
+<SlideEmbed slide={30} clicks={1} title="ReferenceGrant: cross-namespace, safely" caption="The shop's cross-namespace backendRef to payments is denied by default (RefNotPermitted). The payments team, the owner of the target, creates a ReferenceGrant to opt in. Permission is granted by the owner, never the requester." />
 
 The critical property: the shop team cannot grant itself access to payments. The payments team must opt in by creating a ReferenceGrant in their own namespace. That is a real security handshake, exactly what you want when money is involved. In Ingress this was simply not possible without hacks. ReferenceGrant graduated to the Standard GA channel in v1.5, so it is stable API now.
 

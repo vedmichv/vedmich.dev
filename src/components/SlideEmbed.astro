@@ -1,25 +1,34 @@
 ---
 /**
- * SlideEmbed — embed one slide of a deployed Slidev deck as a live, interactive iframe.
+ * SlideEmbed — embed one slide of a deployed Slidev deck as a live iframe, with optional auto-loop.
  *
  * The deck is a first-party artifact served at /slides/<slug>/ (see docs/slides-onboarding.md).
- * We iframe a specific slide by URL, so the animation + click-through are the real deck, always
- * in sync with what's deployed, and zero Slidev deps are pulled into the Astro toolchain.
+ * We iframe a specific slide by URL, so the visuals are the real deck, always in sync with what's
+ * deployed, and zero Slidev deps are pulled into the Astro toolchain.
  *
  * Used by blog posts that companion a deck (e.g. the Kubernetes Gateway API zero-to-hero article)
  * to reuse animation/diagram slides instead of re-drawing them. Code slides stay as Shiki blocks.
  *
- * loading="lazy" is load-bearing: a post may embed many slides, each a full SPA, so they must not
- * all boot on page load.
+ * AUTO-LOOP: pass `clicks` = the slide's total v-click steps (> 0). The runtime then drives the
+ * animation on a slow loop so the reader doesn't have to click: it steps clicks 0..N by reloading
+ * the iframe to /<slide>?clicks=<k> (absolute, ~100ms warm, so it never drifts into an adjacent
+ * slide the way relative keypresses do — verified on the live deck), holds the final frame, resets,
+ * repeats. Gated to viewport via IntersectionObserver (many SPAs must not all run off-screen) and
+ * disabled under prefers-reduced-motion (shows the final, fully-revealed frame). clicks=0 (default)
+ * = a plain static embed, still fully interactive by hand.
+ *
+ * loading="lazy" is load-bearing: a post may embed many slides, each a full SPA.
  */
 interface Props {
   slug?: string;
   slide: number;
   title: string;
   caption?: string;
+  clicks?: number;
 }
-const { slug = 'k8s-gateway-api', slide, title, caption } = Astro.props;
-const src = `/slides/${slug}/${slide}`;
+const { slug = 'k8s-gateway-api', slide, title, caption, clicks = 0 } = Astro.props;
+const base = `/slides/${slug}/${slide}`;
+const src = clicks > 0 ? `${base}?clicks=0` : base;
 ---
 <figure class="my-8">
   <div class="slide-embed">
@@ -29,6 +38,9 @@ const src = `/slides/${slug}/${slide}`;
       loading="lazy"
       allowfullscreen
       referrerpolicy="no-referrer"
+      data-slide-embed
+      data-base={base}
+      data-clicks={clicks}
     ></iframe>
   </div>
   {caption && <figcaption class="text-sm text-text-muted mt-2 text-center">{caption}</figcaption>}
@@ -51,3 +63,60 @@ const src = `/slides/${slug}/${slide}`;
     border: 0;
   }
 </style>
+
+<script>
+  // One initializer for every SlideEmbed on the page. Idempotent (guards a per-iframe flag).
+  function initSlideEmbeds() {
+    const STEP_MS = 2500;   // dwell per click step (slow + readable)
+    const HOLD_MS = 3800;   // dwell on the final, fully-revealed frame
+    const RESET_MS = 700;   // brief beat on the empty frame before replaying
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const frames = document.querySelectorAll<HTMLIFrameElement>('iframe[data-slide-embed]');
+    frames.forEach((iframe) => {
+      if (iframe.dataset.loopInit) return;
+      const clicks = parseInt(iframe.dataset.clicks || '0', 10);
+      const base = iframe.dataset.base || '';
+      if (!clicks || clicks < 1 || !base) return;   // static embed, nothing to drive
+      iframe.dataset.loopInit = '1';
+
+      // reduced motion: just show the final, fully-revealed frame and stop.
+      if (reduce) { iframe.src = `${base}?clicks=${clicks}`; return; }
+
+      let step = 0;
+      let timer: number | undefined;
+      let running = false;
+
+      const show = (k: number) => { iframe.src = `${base}?clicks=${k}`; };
+      const tick = () => {
+        if (!running) return;
+        step += 1;
+        if (step > clicks) {
+          // finished a full pass: hold the final frame, then reset to empty and replay
+          step = 0;
+          show(clicks);
+          timer = window.setTimeout(() => {
+            if (!running) return;
+            show(0);
+            timer = window.setTimeout(tick, RESET_MS);
+          }, HOLD_MS);
+          return;
+        }
+        show(step);
+        timer = window.setTimeout(tick, STEP_MS);
+      };
+      const start = () => { if (running) return; running = true; timer = window.setTimeout(tick, STEP_MS); };
+      const stop = () => { running = false; if (timer) { clearTimeout(timer); timer = undefined; } };
+
+      // only animate while the embed is on screen
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) start(); else stop(); });
+      }, { threshold: 0.35 });
+      io.observe(iframe);
+    });
+  }
+
+  initSlideEmbeds();
+  // re-run for Astro view-transition navigations
+  document.addEventListener('astro:page-load', initSlideEmbeds);
+</script>
