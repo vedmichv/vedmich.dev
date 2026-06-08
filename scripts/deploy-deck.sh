@@ -403,7 +403,7 @@ step_finalize() {
   run "push main" -- git -C "$SITE_REPO" push origin main
   note_rollback "revert site commit: (cd '$SITE_REPO' && git revert --no-edit $sha && git push origin main)"
   # poll Pages keyed on THIS sha (no `timeout`; bounded loop)
-  log "waiting for Pages build of $sha…"
+  log "waiting for Pages build of ${sha}…"
   local i=0 st=""
   while [ "$i" -lt 60 ]; do
     st="$(gh run list --repo vedmichv/vedmich.dev --commit "$sha" --json status --jq '.[0].status' 2>/dev/null || echo '')"
