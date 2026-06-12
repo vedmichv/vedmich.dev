@@ -1,0 +1,184 @@
+---
+title: "Latency vs Throughput vs Bandwidth: The Three Numbers Everyone Confuses"
+description: "A customer once asked me to double their bandwidth because the app felt slow. We did. Nothing changed. Here is the difference between latency, throughput, and bandwidth, explained with one simple analogy and the formula that ties them together."
+date: 2026-06-11
+tags:
+  - networking
+  - performance
+  - aws
+  - fundamentals
+draft: false
+---
+
+A customer once asked me to double their bandwidth because the app felt slow.
+
+We doubled it. Nothing changed.
+
+The problem was never capacity. It was a chatty service paying a round-trip cost on every single call, plus a buffer that ballooned the moment traffic picked up. More megabits per second couldn't fix either one. We spent money widening a road that was never the bottleneck.
+
+That conversation happens more than it should, and it almost always comes from blurring three different numbers into one vague idea called "network speed." Speed isn't one number. It's three, and each tells a different story:
+
+- **Latency** is the delay.
+- **Throughput** is what actually gets delivered.
+- **Bandwidth** is the ceiling.
+
+Mix them up and you'll fix the wrong problem. Let's pull them apart.
+
+<iframe src="/embeds/ltb/01-three-lanes.html" loading="lazy"
+        style="width:100%;border:0;border-radius:18px;height:760px"
+        title="Latency vs throughput vs bandwidth, animated"></iframe>
+
+## One analogy that carries the whole post
+
+Forget the highway for a second. The cleanest mental model is a **water pipe**.
+
+- The **width of the pipe** is bandwidth. It sets the maximum.
+- The **water actually flowing out the far end** per second is throughput.
+- The **time it takes the first drop to travel the length of the pipe** is latency.
+
+Hold that picture. Every definition below maps back to it.
+
+## Latency: how long one packet takes
+
+**Plain version:** how long a single packet takes to make the trip from A to B.
+
+**Precise version:** the time for a packet to travel from source to destination, often measured as round-trip time (RTT). It's the sum of four delays: propagation (distance over the speed of the signal), transmission (pushing bits onto the wire), processing (the router reading the header), and queuing (waiting in a buffer).
+
+**Unit:** milliseconds (ms), sometimes microseconds.
+
+**A real number:** New York to London has a physics floor near 55 ms round-trip over fiber. That figure is the theoretical best case for a straight cable. Real measured RTT is higher (more like 70 to 80 ms) once you add routing and switching. But the floor is the humbling part: light in fiber travels at roughly 200,000 km/s (about two-thirds of light in a vacuum), so we're already within a small factor of the physical limit. You can't "upgrade" your way out of the speed of light. The only real lever is moving the data closer, which is exactly why CDNs exist.
+
+In the pipe analogy: latency is purely about the length of the pipe and how fast the drop moves through it. It has nothing to do with how wide the pipe is.
+
+## Throughput: how much actually arrives
+
+**Plain version:** how much data really makes it through per second.
+
+**Precise version:** the average volume of data successfully delivered over a period of time. This is the number your download speed reflects.
+
+**Unit:** bits per second, scaled up: Kbps, Mbps, Gbps.
+
+**A real number:** a "100 Mbps" connection might actually deliver 62 Mbps when you test it. That gap is normal. Congestion, packet loss, retransmissions, and protocol overhead all skim off the top.
+
+In the pipe analogy: throughput is the litres per second actually coming out the end. Never the theoretical max, always the real, messy, conditions-on-the-day number.
+
+## Bandwidth: the ceiling
+
+**Plain version:** the most the link could ever carry.
+
+**Precise version:** the theoretical maximum data transfer capacity of the link. A ceiling, not a promise.
+
+**Unit:** same as throughput. Bits per second: Mbps, Gbps.
+
+**A real number:** the "100 Mbps" on your plan. You pay for this number. You rarely see it on a real transfer.
+
+In the pipe analogy: bandwidth is the width of the pipe. It caps everything, but it never guarantees the pipe is full.
+
+## How the three fit together
+
+Here's the relationship that clears up most of the confusion:
+
+**Throughput is always less than or equal to bandwidth. Never more.**
+
+<iframe src="/embeds/ltb/02-throughput-ceiling.html" loading="lazy"
+        style="width:100%;border:0;border-radius:18px;height:520px"
+        title="Throughput never beats bandwidth"></iframe>
+
+Bandwidth is the ceiling; throughput is what you actually get after the real world takes its cut. If your link is rated 100 Mbps and you measure 62 Mbps, those numbers aren't in conflict. One is the ceiling, the other is the delivery.
+
+And then the part people miss most:
+
+**Latency lives on a completely separate axis. It's time, not volume.**
+
+A pipe can be enormously wide (high bandwidth) and still take a long time to deliver the first drop (high latency). A transcontinental link with huge capacity still has the RTT of the distance baked in. That's why "just add more bandwidth" so often changes nothing: if your bottleneck is on the time axis, widening the pipe doesn't touch it.
+
+| Metric | Question it answers | Unit | Pipe analogy |
+|---|---|---|---|
+| Latency | How long for one packet? | ms | Time for the first drop |
+| Throughput | How much arrives per second? | Mbps | Litres flowing out |
+| Bandwidth | What's the maximum? | Mbps | Width of the pipe |
+
+## A quick units trap: bits vs bytes
+
+Network speeds are in **bits** (Mbps). File sizes are in **bytes** (MB). There are 8 bits in a byte, so:
+
+> A 100 Mbps connection tops out at about 12.5 MB/s (100 ÷ 8).
+
+This is why a "fast" connection can feel slow when you watch a file download counter. A 1 GB file over a perfect 100 Mbps link still needs roughly 80 seconds, not 8. Mbps is speed; MB is size. Don't compare them directly without the ÷8.
+
+## The formula behind "high bandwidth, low throughput"
+
+If you want the one piece of math that explains why a 1 Gbps link can crawl, it's the **bandwidth-delay product (BDP)**:
+
+```
+BDP (bits) = bandwidth (bits/sec) × round-trip time (sec)
+```
+
+BDP is the amount of data that can be "in flight" on the link at once. The pipe's volume, not its width.
+
+Here's why it matters. With TCP, a sender can only push one window of data before it has to stop and wait for an acknowledgment, which takes one full round trip to come back. So:
+
+```
+max single-connection throughput ≈ window size ÷ RTT
+```
+
+Now plug in real numbers. Fill a **1 Gbps** link with **100 ms** RTT:
+
+```
+BDP = 1,000,000,000 bits/s × 0.1 s = 100,000,000 bits = 12.5 MB
+```
+
+You need 12.5 MB in flight to keep that pipe full. But the original TCP window maxes out at 64 KB without scaling. So:
+
+```
+65,535 bytes × 8 ÷ 0.1 s ≈ 5.2 Mbps
+```
+
+A single connection uses about **0.5% of a 1 Gbps pipe**, purely because of latency and a small window. The fix is TCP window scaling (RFC 7323), which is on by default on modern systems but still trips people up on tuned or legacy stacks. The takeaway: on a "long fat network," latency throttles throughput directly, no matter how much bandwidth you bought.
+
+<iframe src="/embeds/ltb/03-bdp-calculator.html" loading="lazy"
+        style="width:100%;border:0;border-radius:18px;height:720px"
+        title="Interactive bandwidth-delay product calculator"></iframe>
+
+## Why your app feels slow even when bandwidth looks fine
+
+When something feels slow, resist the urge to buy more Mbps. Walk through the actual suspects first:
+
+1. **The bottleneck is latency.** A chatty protocol pays the round-trip cost on every request. For most websites, latency, not bandwidth, is the wall. Distance and round-trips dominate.
+
+2. **Bufferbloat.** Oversized buffers in routers and modems fill up under load. Your idle ping is 20 ms, then you start a download and it jumps to 200 ms or worse. Everything interactive (video calls, gaming, SSH) suffers. The fix lives in smart queue management: CoDel, FQ-CoDel, or the BBR congestion control algorithm, not a bigger pipe.
+
+3. **Packets per second, not bits.** In high-traffic systems the real ceiling is often the packet rate the hardware can process, not the raw bandwidth. I've seen network performance analysis on large systems where the limit was PPS, and the fix was jumbo frames (bigger packets, fewer of them), not more bandwidth.
+
+4. **One connection, small window.** A single TCP flow over a long path caps far below the line rate until the window scales (see the BDP math above). Parallel connections or HTTP/2 multiplexing often help more than capacity.
+
+5. **Packet loss.** TCP reads loss as congestion and backs off hard. Even 1 to 2% loss can tank throughput on a high-RTT link. Adding bandwidth does nothing here; you have to find and fix the loss.
+
+Notice how many of these are latency or quality problems wearing a "we need more bandwidth" disguise.
+
+## How to actually measure each one
+
+You can't fix what you can't see. Each metric has its own tool:
+
+- **Latency:** `ping` gives you RTT in milliseconds. `traceroute` (or `mtr`) shows you per-hop latency so you can find *where* the delay is introduced.
+- **Throughput:** `iperf3` between two hosts gives you achievable Mbps on a path you control. A speed test (Ookla, Cloudflare) measures it against a nearby server.
+- **Bandwidth:** you don't measure it directly. It's the rated or provisioned capacity of the link. Speed tests measure throughput, and you infer the ceiling from there.
+- **Bufferbloat:** ping a host continuously, then start a big download. If your RTT balloons while the transfer runs, you've found it. The Waveform Bufferbloat Test does this for you.
+
+The single most useful diagnostic habit: **run ping during a download.** If latency stays flat, your slowness is elsewhere. If it spikes, you've got bufferbloat or a saturated link, and no amount of extra bandwidth will save you.
+
+## The one question to ask first
+
+So when an app feels slow, the first question is never "how much bandwidth do we have."
+
+It's: **which of the three is actually the bottleneck?**
+
+- If it's latency, move the data closer or cut the round-trips.
+- If it's throughput on a long path, look at window scaling, parallelism, and packet loss.
+- If it's genuinely bandwidth (the pipe really is full), then, and only then, buy more.
+
+Get that diagnosis wrong and you'll do what my customer did: spend real money widening a road that was never the problem.
+
+---
+
+*If you found this useful, I publish weekly breakdowns of networking, AWS, and Kubernetes fundamentals. The companion visual carousel for this post is on [my LinkedIn](https://www.linkedin.com/in/vedmich/).*

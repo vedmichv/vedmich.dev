@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Latency vs Throughput vs Bandwidth · animated</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F172A; --surface:#1E293B; --border:rgba(148,163,184,.16);
+    --teal:#14B8A6; --teal-deep:#0D9488; --amber:#F59E0B; --purple:#C084FC;
+    --text:#E2E8F0; --dim:#94A3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  .wrap{max-width:920px;margin:0 auto;padding:34px 26px 30px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(26px,5vw,40px);line-height:1.04;letter-spacing:-.025em;margin-bottom:8px}
+  h1 .em{color:var(--amber)}
+  .lead{color:var(--dim);font-size:clamp(14px,2.4vw,17px);line-height:1.5;max-width:660px;margin-bottom:28px}
+
+  .lanes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .lane{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px 14px 18px;display:flex;flex-direction:column;align-items:center;overflow:hidden}
+  .lane::after{content:'';position:absolute;inset:0;border-radius:18px;pointer-events:none;opacity:.5;background:radial-gradient(120% 60% at 50% 0%,var(--c-soft),transparent 60%)}
+  .lane.lat{--c:var(--teal);--c-soft:rgba(20,184,166,.14)}
+  .lane.thr{--c:var(--amber);--c-soft:rgba(245,158,11,.13)}
+  .lane.bw{--c:var(--purple);--c-soft:rgba(192,132,252,.13)}
+  .lane .bar{position:absolute;top:0;left:0;right:0;height:4px;background:var(--c);opacity:.9}
+
+  .name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(17px,3.2vw,23px);color:var(--c);letter-spacing:-.02em;z-index:2}
+  .role{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.06em;margin-top:2px;margin-bottom:14px;z-index:2;text-align:center}
+  .node{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);font-weight:500;letter-spacing:.04em;z-index:2}
+
+  /* the travel channel */
+  .track{position:relative;width:100%;flex:1;min-height:260px;display:flex;justify-content:center;align-items:stretch;margin:10px 0;z-index:2}
+
+  /* LATENCY: one packet travels the whole length slowly */
+  .lat .pipe{position:relative;width:10px;align-self:stretch;background:rgba(20,184,166,.10);border-radius:6px;overflow:visible}
+  .lat .pipe::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background:repeating-linear-gradient(to bottom,rgba(20,184,166,.5) 0 5px,transparent 5px 13px)}
+  .pk1{position:absolute;left:50%;top:0;width:34px;height:34px;margin-left:-17px;border-radius:9px;background:var(--teal);box-shadow:0 0 22px rgba(20,184,166,.75);animation:travel 2.8s cubic-bezier(.45,0,.55,1) infinite}
+  @keyframes travel{0%{top:0;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:calc(100% - 34px);opacity:0}}
+
+  /* THROUGHPUT: a continuous stream of packets */
+  .thr .pipe{position:relative;width:58px;align-self:stretch;background:rgba(245,158,11,.07);border-radius:9px;overflow:hidden}
+  .pkt{position:absolute;left:50%;margin-left:-21px;width:42px;height:18px;border-radius:5px;background:var(--amber);box-shadow:0 0 14px rgba(245,158,11,.5);animation:stream 1.6s linear infinite}
+  @keyframes stream{0%{top:-22px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+
+  /* BANDWIDTH: wide channel, fill rises but never tops the ceiling */
+  .bw .pipe{position:relative;width:84px;align-self:stretch;border:2px dashed rgba(192,132,252,.55);border-radius:10px;overflow:hidden;display:flex;align-items:flex-end}
+  .bw .ceil{position:absolute;top:7px;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#E9D5FF;letter-spacing:.05em;z-index:3}
+  .fill{position:relative;width:100%;height:60%;background:linear-gradient(180deg,rgba(192,132,252,.6),rgba(192,132,252,.34));animation:wobble 3.4s ease-in-out infinite}
+  .fill::before{content:'';position:absolute;top:0;left:-50%;width:200%;height:14px;background:radial-gradient(closest-side,rgba(233,213,255,.55),transparent);animation:ripple 3.4s ease-in-out infinite}
+  @keyframes wobble{0%,100%{height:54%}50%{height:66%}}
+  @keyframes ripple{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
+  .fill .lbl{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#2B1248;font-weight:600}
+
+  .metric{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(20px,4vw,28px);color:var(--c);margin-top:8px;z-index:2}
+  .unit{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);margin-top:3px;letter-spacing:.04em;z-index:2;text-align:center}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+  .foot .who b{color:var(--text);font-weight:600}
+  .legend{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)}
+
+  @media(max-width:560px){.role{display:none}.track{min-height:200px}}
+  @media(prefers-reduced-motion:reduce){
+    .pk1{animation:none;top:40%}
+    .pkt{animation:none}
+    .pkt:nth-child(odd){display:none}
+    .fill{animation:none;height:60%}.fill::before{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">One trip · three things to measure</div>
+  <h1>Same connection, <span class="em">three</span> different stories.</h1>
+  <p class="lead">Watch the same Sender to Receiver path through each metric. Latency is one packet's journey. Throughput is the stream that arrives. Bandwidth is the channel they all share.</p>
+
+  <div class="lanes">
+    <!-- LATENCY -->
+    <div class="lane lat">
+      <div class="bar"></div>
+      <div class="name">Latency</div>
+      <div class="role">the delay</div>
+      <div class="node">Sender</div>
+      <div class="track">
+        <div class="pipe"><div class="pk1"></div></div>
+      </div>
+      <div class="node">Receiver</div>
+      <div class="metric">40 ms</div>
+      <div class="unit">round-trip, 1 packet</div>
+    </div>
+
+    <!-- THROUGHPUT -->
+    <div class="lane thr">
+      <div class="bar"></div>
+      <div class="name">Throughput</div>
+      <div class="role">what arrives</div>
+      <div class="node">Sender</div>
+      <div class="track">
+        <div class="pipe">
+          <div class="pkt" style="animation-delay:0s"></div>
+          <div class="pkt" style="animation-delay:-.27s"></div>
+          <div class="pkt" style="animation-delay:-.53s"></div>
+          <div class="pkt" style="animation-delay:-.8s"></div>
+          <div class="pkt" style="animation-delay:-1.07s"></div>
+          <div class="pkt" style="animation-delay:-1.33s"></div>
+        </div>
+      </div>
+      <div class="node">Receiver</div>
+      <div class="metric">62 Mbps</div>
+      <div class="unit">data per second</div>
+    </div>
+
+    <!-- BANDWIDTH -->
+    <div class="lane bw">
+      <div class="bar"></div>
+      <div class="name">Bandwidth</div>
+      <div class="role">the ceiling</div>
+      <div class="node">Sender</div>
+      <div class="track">
+        <div class="pipe">
+          <div class="ceil">the ceiling</div>
+          <div class="fill"><span class="lbl">what fits</span></div>
+        </div>
+      </div>
+      <div class="node">Receiver</div>
+      <div class="metric">100 Mbps</div>
+      <div class="unit">link capacity</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="who"><b>Viktor Vedmich</b> · vedmich.dev</div>
+    <div class="legend">latency = time · throughput = volume · bandwidth = ceiling</div>
+  </div>
+</div>
+</body>
+</html>
