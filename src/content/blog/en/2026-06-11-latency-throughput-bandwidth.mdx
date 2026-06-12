@@ -9,6 +9,7 @@ tags:
   - fundamentals
 draft: false
 ---
+import HtmlEmbed from '../../../components/HtmlEmbed.astro';
 
 A customer once asked me to double their bandwidth because the app felt slow.
 
@@ -22,11 +23,10 @@ That conversation happens more than it should, and it almost always comes from b
 - **Throughput** is what actually gets delivered.
 - **Bandwidth** is the ceiling.
 
-Mix them up and you'll fix the wrong problem. Let's pull them apart.
+Mix them up and you'll fix the wrong problem. Here are all three on the same connection, animated. Watch one packet's trip, the stream that arrives, and the channel they share:
 
-<iframe src="/embeds/ltb/01-three-lanes.html" loading="lazy"
-        style="width:100%;border:0;border-radius:18px;height:760px"
-        title="Latency vs throughput vs bandwidth, animated"></iframe>
+<HtmlEmbed src="/embeds/ltb/01-three-lanes.html" minHeight={720}
+  title="Latency vs throughput vs bandwidth, animated" />
 
 ## One analogy that carries the whole post
 
@@ -80,9 +80,8 @@ Here's the relationship that clears up most of the confusion:
 
 **Throughput is always less than or equal to bandwidth. Never more.**
 
-<iframe src="/embeds/ltb/02-throughput-ceiling.html" loading="lazy"
-        style="width:100%;border:0;border-radius:18px;height:520px"
-        title="Throughput never beats bandwidth"></iframe>
+<HtmlEmbed src="/embeds/ltb/02-throughput-ceiling.html" minHeight={520}
+  title="Throughput never beats bandwidth" />
 
 Bandwidth is the ceiling; throughput is what you actually get after the real world takes its cut. If your link is rated 100 Mbps and you measure 62 Mbps, those numbers aren't in conflict. One is the ceiling, the other is the delivery.
 
@@ -136,9 +135,10 @@ You need 12.5 MB in flight to keep that pipe full. But the original TCP window m
 
 A single connection uses about **0.5% of a 1 Gbps pipe**, purely because of latency and a small window. The fix is TCP window scaling (RFC 7323), which is on by default on modern systems but still trips people up on tuned or legacy stacks. The takeaway: on a "long fat network," latency throttles throughput directly, no matter how much bandwidth you bought.
 
-<iframe src="/embeds/ltb/03-bdp-calculator.html" loading="lazy"
-        style="width:100%;border:0;border-radius:18px;height:720px"
-        title="Interactive bandwidth-delay product calculator"></iframe>
+Don't take my word for it. Drag the round-trip time up and watch a gigabit link collapse, then flip on window scaling and watch it recover:
+
+<HtmlEmbed src="/embeds/ltb/03-bdp-calculator.html" minHeight={680}
+  title="Interactive bandwidth-delay product calculator" />
 
 ## Why your app feels slow even when bandwidth looks fine
 
@@ -158,14 +158,30 @@ Notice how many of these are latency or quality problems wearing a "we need more
 
 ## How to actually measure each one
 
-You can't fix what you can't see. Each metric has its own tool:
+You can't fix what you can't see. Each metric has its own tool, and none of them is "look at your plan's Mbps":
 
-- **Latency:** `ping` gives you RTT in milliseconds. `traceroute` (or `mtr`) shows you per-hop latency so you can find *where* the delay is introduced.
-- **Throughput:** `iperf3` between two hosts gives you achievable Mbps on a path you control. A speed test (Ookla, Cloudflare) measures it against a nearby server.
-- **Bandwidth:** you don't measure it directly. It's the rated or provisioned capacity of the link. Speed tests measure throughput, and you infer the ceiling from there.
-- **Bufferbloat:** ping a host continuously, then start a big download. If your RTT balloons while the transfer runs, you've found it. The Waveform Bufferbloat Test does this for you.
+```bash
+# Latency — round-trip time, and WHERE it is introduced
+ping vedmich.dev                 # RTT per packet, in ms
+mtr -rwc 100 vedmich.dev         # per-hop latency + loss over 100 packets
 
-The single most useful diagnostic habit: **run ping during a download.** If latency stays flat, your slowness is elsewhere. If it spikes, you've got bufferbloat or a saturated link, and no amount of extra bandwidth will save you.
+# Throughput — what the path actually delivers
+iperf3 -c iperf.example.net      # achievable Mbps on a path you control
+#  ... or a browser speed test (Ookla / Cloudflare) against a nearby server
+
+# Bandwidth — you don't measure it. It's the rated link capacity.
+#  Speed tests measure throughput; you infer the ceiling from there.
+
+# Bufferbloat — the one test that catches the silent killer:
+ping vedmich.dev &               # keep a ping running...
+curl -o /dev/null https://speed.example.net/1GB.bin   # ...then saturate the link
+#  watch the RTT while it runs: flat = healthy, ballooning = bufferbloat
+```
+
+That last one is the single most useful diagnostic habit you can build: **run ping during a download.** If latency stays flat, your slowness is elsewhere. If it spikes, you've got bufferbloat or a saturated link, and no amount of extra bandwidth will save you. Here it is live. Start the download, watch the line, then apply the smart-queue fix:
+
+<HtmlEmbed src="/embeds/ltb/04-ping-during-download.html" minHeight={620}
+  title="Ping during a download, the one diagnostic for bufferbloat" />
 
 ## The one question to ask first
 

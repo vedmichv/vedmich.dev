@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ping during a download · the one diagnostic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F172A; --surface:#1E293B; --elev:#334155; --border:rgba(148,163,184,.16);
+    --teal:#14B8A6; --teal-deep:#0D9488; --amber:#F59E0B; --red:#F87171;
+    --text:#E2E8F0; --dim:#94A3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  .wrap{max-width:920px;margin:0 auto;padding:34px 26px 30px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(26px,5vw,40px);line-height:1.04;letter-spacing:-.025em;margin-bottom:8px}
+  h1 .em{color:var(--amber)}
+  .lead{color:var(--dim);font-size:clamp(14px,2.4vw,17px);line-height:1.5;max-width:700px;margin-bottom:26px}
+
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px 28px 22px}
+
+  /* the live chart */
+  .chart{position:relative;width:100%;height:230px;background:rgba(148,163,184,.05);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  .chart svg{display:block;width:100%;height:100%}
+  .axis-lbl{position:absolute;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.04em}
+  .axis-lbl.top{top:10px;left:14px}
+  .axis-lbl.bot{bottom:10px;left:14px}
+  .dl-band{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,rgba(245,158,11,.10),rgba(245,158,11,.04));border-left:2px dashed rgba(245,158,11,.5);border-right:2px dashed rgba(245,158,11,.5);opacity:0;transition:opacity .4s}
+  .dl-band.show{opacity:1}
+  .dl-tag{position:absolute;top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:.05em;transform:translateX(-50%);opacity:0;transition:opacity .4s;white-space:nowrap}
+  .dl-tag.show{opacity:1}
+
+  .liveval{position:absolute;top:10px;right:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,4.5vw,32px);letter-spacing:-.02em;transition:color .3s}
+
+  .ctrls{display:flex;gap:12px;align-items:center;margin-top:20px;flex-wrap:wrap}
+  .btn{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#04211D;background:var(--teal);border:0;border-radius:10px;padding:11px 20px;cursor:pointer;transition:transform .1s,background .15s}
+  .btn:hover{background:var(--teal-deep)}
+  .btn:active{transform:scale(.97)}
+  .btn.sec{color:var(--text);background:var(--elev)}
+  .hint{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+
+  .verdict{margin-top:20px;padding:16px 18px;border-radius:13px;border-left:5px solid var(--teal);background:linear-gradient(135deg,var(--surface),rgba(20,184,166,.07));font-size:clamp(13px,2.4vw,16px);line-height:1.5;color:var(--text);transition:all .3s}
+  .verdict b{color:var(--text)}
+  .verdict.bad{border-left-color:var(--red);background:linear-gradient(135deg,var(--surface),rgba(248,113,113,.08))}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+  .foot .who b{color:var(--text);font-weight:600}
+  .foot .formula{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)}
+  @media(max-width:560px){.liveval{position:static;display:block;text-align:right;margin-bottom:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Interactive · the one diagnostic habit</div>
+  <h1>Ping <span class="em">while</span> you download.</h1>
+  <p class="lead">This is the single most useful test you can run. Keep a ping going, then start a big download. If the line stays flat, your slowness is elsewhere. If it balloons the moment traffic starts, that is bufferbloat, and no extra bandwidth will fix it. Start a download and watch.</p>
+
+  <div class="panel">
+    <div class="chart">
+      <span class="axis-lbl top">RTT (ms)</span>
+      <span class="axis-lbl bot">time →</span>
+      <span class="liveval" id="liveval">20 ms</span>
+      <div class="dl-band" id="band"></div>
+      <div class="dl-tag" id="dltag">download running</div>
+      <svg id="svg" viewBox="0 0 600 230" preserveAspectRatio="none">
+        <polyline id="line" fill="none" stroke="#14B8A6" stroke-width="2.5"
+                  stroke-linejoin="round" stroke-linecap="round" points=""></polyline>
+      </svg>
+    </div>
+
+    <div class="ctrls">
+      <button class="btn" id="dlBtn">Start a download</button>
+      <button class="btn sec" id="fixBtn">Apply SQM fix</button>
+      <span class="hint" id="hint">idle line ≈ 20 ms</span>
+    </div>
+
+    <div class="verdict" id="verdict"><b>Idle and healthy.</b> Round-trip is flat near 20 ms. Interactive apps (video calls, SSH, gaming) feel instant. Now start a download and watch what an oversized buffer does.</div>
+  </div>
+
+  <div class="foot">
+    <div class="who"><b>Viktor Vedmich</b> · vedmich.dev</div>
+    <div class="formula">flat line = healthy · spike = bufferbloat</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var W=600, H=230, N=120;          // viewBox + sample count
+  var BASE=20, FLOOR=H-26, TOP=24;  // 20 ms baseline; chart vertical bounds
+  var MAXMS=320;                    // top of chart = 320 ms
+  var data=[]; for(var i=0;i<N;i++) data.push(BASE);
+  var downloading=false, sqm=false;
+  var line=document.getElementById('line');
+  var liveval=document.getElementById('liveval');
+  var verdict=document.getElementById('verdict');
+  var band=document.getElementById('band');
+  var dltag=document.getElementById('dltag');
+  var dlBtn=document.getElementById('dlBtn');
+  var fixBtn=document.getElementById('fixBtn');
+  var hint=document.getElementById('hint');
+  var reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function y(ms){ var t=Math.min(ms,MAXMS)/MAXMS; return (FLOOR - t*(FLOOR-TOP)); }
+  function rnd(a,b){ return a+(b-a)*pseudo(); }
+  // deterministic-ish jitter without Math.random dependence on first paint
+  var seed=7; function pseudo(){ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; }
+
+  // download starts ~35% across the window; band marks from there to the right edge
+  var DL_START=0.36;
+  band.style.left=(DL_START*100)+'%'; band.style.width=((1-DL_START)*100)+'%';
+  dltag.style.left=((DL_START+(1-DL_START)/2)*100)+'%';
+
+  function targetMs(idx){
+    var inDL = downloading && (idx/N) >= DL_START;
+    if(!inDL) return BASE + rnd(-2,3);
+    if(sqm)  return BASE + rnd(2,10);            // SQM keeps it tame
+    return 210 + rnd(-35,70);                     // bufferbloat: 175–280 ms
+  }
+
+  function render(){
+    var pts=[];
+    for(var i=0;i<N;i++){
+      var x=(i/(N-1))*W;
+      pts.push(x.toFixed(1)+','+y(data[i]).toFixed(1));
+    }
+    line.setAttribute('points', pts.join(' '));
+    var last=data[N-1];
+    liveval.textContent=Math.round(last)+' ms';
+    var bad = last>90;
+    liveval.style.color = bad? 'var(--red)' : 'var(--teal)';
+    line.setAttribute('stroke', bad? '#F87171' : '#14B8A6');
+  }
+
+  function tick(){
+    data.shift();
+    data.push(targetMs(N-1));
+    render();
+  }
+
+  function setVerdict(){
+    if(!downloading){
+      verdict.className='verdict';
+      verdict.innerHTML='<b>Idle and healthy.</b> Round-trip is flat near 20 ms. Interactive apps feel instant. Start a download and watch what an oversized buffer does.';
+    } else if(sqm){
+      verdict.className='verdict';
+      verdict.innerHTML='<b>Same download, smart queue.</b> CoDel / FQ-CoDel / BBR keep the buffer short, so RTT barely moves. The download still runs at full speed. This is the fix, not a bigger pipe.';
+    } else {
+      verdict.className='verdict bad';
+      verdict.innerHTML='<b>Bufferbloat.</b> The download filled an oversized buffer, so every packet now waits behind it. RTT jumped 10×. Your video call stutters even though bandwidth is fine. Adding Mbps makes this worse, not better.';
+    }
+  }
+
+  dlBtn.addEventListener('click', function(){
+    downloading=!downloading;
+    dlBtn.textContent = downloading? 'Stop download' : 'Start a download';
+    band.classList.toggle('show', downloading);
+    dltag.classList.toggle('show', downloading);
+    hint.textContent = downloading? (sqm?'with SQM: stays low':'buffer fills → RTT spikes') : 'idle line ≈ 20 ms';
+    setVerdict();
+  });
+  fixBtn.addEventListener('click', function(){
+    sqm=!sqm;
+    fixBtn.textContent = sqm? 'Remove SQM fix' : 'Apply SQM fix';
+    fixBtn.style.background = sqm? 'var(--teal)' : 'var(--elev)';
+    fixBtn.style.color = sqm? '#04211D' : 'var(--text)';
+    hint.textContent = downloading? (sqm?'with SQM: stays low':'buffer fills → RTT spikes') : 'idle line ≈ 20 ms';
+    setVerdict();
+  });
+
+  render();
+  if(!reduce){
+    setInterval(tick, 130);
+  } else {
+    // static: show a representative bufferbloat trace
+    downloading=true; band.classList.add('show'); dltag.classList.add('show');
+    for(var i=0;i<N;i++){ data[i] = (i/N)>=DL_START ? 210 : BASE; }
+    render(); setVerdict();
+  }
+})();
+</script>
+</body>
+</html>

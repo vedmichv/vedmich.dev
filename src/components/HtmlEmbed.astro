@@ -1,0 +1,81 @@
+---
+/**
+ * HtmlEmbed — embed a same-origin standalone HTML visualization (in /public/embeds/...) as an
+ * iframe that auto-sizes to its content, so there is never an inner scrollbar.
+ *
+ * Why a component: a raw <iframe height="760"> clips whenever the content is taller (fonts load,
+ * mobile reflow, an interactive widget grows), leaving an ugly scrollbar. Because the embed is
+ * first-party (same origin), we can read its document height directly and set the iframe height to
+ * match — on load, after fonts/animation settle, on viewport resize, and on any content resize
+ * (ResizeObserver) for interactive embeds like the BDP calculator whose verdict text reflows.
+ *
+ * minHeight is only the pre-fit placeholder height to avoid a layout jump before JS runs.
+ * loading="lazy" + scrolling="no": a post may carry several of these; never show a scrollbar.
+ */
+interface Props {
+  src: string;
+  title: string;
+  minHeight?: number;
+}
+const { src, title, minHeight = 560 } = Astro.props;
+---
+<figure class="my-8">
+  <iframe
+    src={src}
+    title={title}
+    loading="lazy"
+    scrolling="no"
+    data-html-embed
+    style={`width:100%;border:0;border-radius:18px;height:${minHeight}px;display:block;background:#0F172A`}
+  ></iframe>
+</figure>
+
+<script>
+  // One initializer for every HtmlEmbed on the page. Idempotent per iframe.
+  function initHtmlEmbeds() {
+    const fit = (f: HTMLIFrameElement) => {
+      try {
+        const doc = f.contentDocument || f.contentWindow?.document;
+        if (!doc) return;
+        // Measure body, not documentElement: the root element's scrollHeight never reports below
+        // the iframe's own viewport, which would block shrinking. These embeds reset body margin
+        // and leave body at content height, so body.scrollHeight is exact for grow AND shrink.
+        const h = doc.body ? doc.body.scrollHeight : (doc.documentElement?.scrollHeight ?? 0);
+        if (h > 0) f.style.height = h + 'px';
+      } catch (_) { /* cross-origin or not ready; ignore */ }
+    };
+
+    const frames = document.querySelectorAll<HTMLIFrameElement>('iframe[data-html-embed]');
+    frames.forEach((f) => {
+      if (f.dataset.fitInit) return;
+      f.dataset.fitInit = '1';
+
+      const attach = () => {
+        fit(f);
+        // re-fit as fonts and entrance animations settle
+        [250, 700, 1500].forEach((d) => setTimeout(() => fit(f), d));
+        try {
+          const doc = f.contentDocument || f.contentWindow?.document;
+          if (doc?.body && 'ResizeObserver' in window) {
+            new ResizeObserver(() => fit(f)).observe(doc.body);
+          }
+        } catch (_) { /* ignore */ }
+      };
+
+      f.addEventListener('load', attach);
+      // already loaded before this listener attached?
+      try {
+        if (f.contentDocument && f.contentDocument.readyState === 'complete') attach();
+      } catch (_) { /* ignore */ }
+    });
+
+    let t: ReturnType<typeof setTimeout>;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = setTimeout(() => frames.forEach((f) => fit(f)), 150);
+    });
+  }
+
+  initHtmlEmbeds();
+  document.addEventListener('astro:page-load', initHtmlEmbeds);
+</script>
