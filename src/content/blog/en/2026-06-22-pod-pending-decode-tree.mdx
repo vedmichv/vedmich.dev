@@ -7,6 +7,7 @@ draft: true
 ---
 
 import HtmlEmbed from '../../../components/HtmlEmbed.astro';
+import BookLink from '../../../components/BookLink.astro';
 
 A Pod sits in `Pending`. It's one of my favorite questions to ask in mock interviews on our DevOps podcast, because it sounds trivial and almost nobody gets it cleanly. Senior candidates included.
 
@@ -85,16 +86,7 @@ This is post one in a series I'm building from my book on Kubernetes: one senior
 
 ## Get the full playbook
 
-<figure class="my-6">
-  <img
-    src="/blog-assets/2026-06-22-pod-pending-decode-tree/book-cover.png"
-    alt="Cracking the Kubernetes Interview, by Viktor Vedmich and Alexander Dovnar"
-    loading="lazy"
-    width="420"
-    style="max-width: 320px; height: auto; margin: 0 auto;"
-  />
-  <figcaption class="text-sm text-text-muted mt-2 text-center">Cracking the Kubernetes Interview.</figcaption>
-</figure>
+<BookLink cover="/blog-assets/2026-06-22-pod-pending-decode-tree/book-cover.png" locale="en" />
 
 The Pending decode tree is one question. Want more like it? They're all in my book, *Cracking the Kubernetes Interview* (with Alexander Dovnar): control plane internals, scheduling, networking, storage, security, and the tricky follow-ups interviewers actually use to tell operators from doc-readers. If this breakdown was useful, that's the whole book.
 
