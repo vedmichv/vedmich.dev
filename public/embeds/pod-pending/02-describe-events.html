@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kubectl describe pod: the scheduler talks in the Events</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F172A; --code-bg:#0B1220; --surface:#1E293B; --border:rgba(148,163,184,.16);
+    --teal:#14B8A6; --teal2:#2DD4BF; --amber:#F59E0B; --amber2:#FBBF24;
+    --text:#E2E8F0; --dim:#94A3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  .wrap{max-width:760px;margin:0 auto;padding:30px 24px 28px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,4.4vw,32px);line-height:1.06;letter-spacing:-.025em;margin-bottom:8px}
+  h1 .em{color:var(--amber)}
+  .lead{color:var(--dim);font-size:clamp(14px,2.3vw,16px);line-height:1.5;max-width:620px;margin-bottom:20px}
+  .term{background:var(--code-bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;max-width:620px;margin:0 auto;box-shadow:0 0 50px rgba(20,184,166,.06)}
+  .term-bar{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border)}
+  .dot{width:12px;height:12px;border-radius:50%}
+  .dot.r{background:#EF4444}.dot.y{background:#F59E0B}.dot.g{background:#10B981}
+  .term-title{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim);letter-spacing:.05em}
+  .term pre{font-family:'JetBrains Mono',monospace;font-size:clamp(14px,2.7vw,18px);line-height:1.7;padding:22px 24px;white-space:pre-wrap;min-height:330px}
+  .ln{display:block;opacity:0;transition:opacity .25s ease}
+  .ln.show{opacity:1}
+  .cmt{color:#64748b;font-style:italic}
+  .warn{color:#fbbf24}
+  .amber{color:var(--amber);font-weight:600}
+  .dim{color:var(--dim)}
+  .cmd{color:var(--teal2)}
+  .cursor{display:inline-block;width:10px;height:20px;background:var(--teal);vertical-align:middle;animation:blink 1s step-end infinite;margin-left:2px}
+  @keyframes blink{50%{opacity:0}}
+  .caption{margin:14px auto 0;max-width:620px;color:var(--dim);font-size:13px;text-align:center;font-style:italic}
+  .replay{display:block;margin:16px auto 0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px}
+  .replay:hover{border-color:var(--teal)}
+  @media (prefers-reduced-motion: reduce){ .ln{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Step 1: read the events</div>
+  <h1>describe, <span class="em">not logs</span></h1>
+  <p class="lead">A Pending Pod has no container, so logs are empty. The scheduler writes its reasoning into the Pod's Events. Scroll to the bottom and read it, node by node.</p>
+
+  <div class="term">
+    <div class="term-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="term-title">kubectl describe pod &middot; Events</span>
+    </div>
+<pre id="term"><span class="ln" data-l="1"><span class="cmd">$ kubectl describe pod</span> api-7d9f</span><span class="ln" data-l="2"> </span><span class="ln cmt" data-l="3"># scroll to the bottom: the scheduler talks here</span><span class="ln" data-l="4">Events:</span><span class="ln" data-l="5">  <span class="warn">Warning</span>  FailedScheduling</span><span class="ln amber" data-l="6">  0/12 nodes are available:</span><span class="ln" data-l="7">   3 Insufficient cpu,</span><span class="ln" data-l="8">   4 node(s) had untolerated taint,</span><span class="ln" data-l="9">   5 didn't match node affinity/selector.</span><span class="cursor" id="cur"></span></pre>
+  </div>
+  <p class="caption">One FailedScheduling line, broken down per node. The scheduler already did the diagnosis. You just read it.</p>
+  <button class="replay" onclick="playTerm()">&#8635; replay</button>
+</div>
+
+<script>
+  function playTerm(){
+    var lines = Array.prototype.slice.call(document.querySelectorAll('#term .ln'));
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    lines.forEach(function(el){ el.classList.remove('show'); });
+    if(reduce){ lines.forEach(function(el){ el.classList.add('show'); }); return; }
+    lines.forEach(function(el,i){
+      setTimeout(function(){ el.classList.add('show'); }, 300 + i*420);
+    });
+  }
+
+  var played = false, loopTimer = null;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        if(!played){ played = true; playTerm(); }
+        if(!loopTimer){ loopTimer = setInterval(playTerm, 7000); }
+      } else {
+        if(loopTimer){ clearInterval(loopTimer); loopTimer = null; }
+      }
+    });
+  }, {threshold: .4});
+  io.observe(document.getElementById('term'));
+</script>
+</body>
+</html>

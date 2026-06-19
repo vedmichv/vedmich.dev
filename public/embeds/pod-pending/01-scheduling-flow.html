@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The scheduling flow: pass every gate or go Pending</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F172A; --surface:#1E293B; --border:rgba(148,163,184,.16);
+    --teal:#14B8A6; --teal-deep:#0D9488; --amber:#F59E0B;
+    --text:#E2E8F0; --dim:#94A3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  .wrap{max-width:760px;margin:0 auto;padding:30px 24px 28px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,4.4vw,32px);line-height:1.06;letter-spacing:-.025em;margin-bottom:8px}
+  h1 .em{color:var(--amber)}
+  .lead{color:var(--dim);font-size:clamp(14px,2.3vw,16px);line-height:1.5;max-width:620px;margin-bottom:18px}
+  .flowwrap{display:flex;justify-content:center;padding:6px 0}
+  svg{width:100%;max-width:560px;height:auto;font-family:'Space Grotesk',sans-serif}
+  .node rect{fill:var(--surface);stroke:var(--border);stroke-width:1.5}
+  .node.gate rect{stroke:var(--teal)}
+  .node.pass rect{stroke:var(--teal);stroke-width:2.5;filter:drop-shadow(0 0 14px rgba(20,184,166,.4))}
+  .node.fail rect{stroke:var(--amber);stroke-width:2.5;filter:drop-shadow(0 0 14px rgba(245,158,11,.4))}
+  .node text{fill:var(--text);font-size:21px;font-weight:600;text-anchor:middle}
+  .node text.meta{fill:var(--dim);font-size:15px;font-weight:500;font-family:'JetBrains Mono',monospace}
+  .node.fail text{fill:var(--amber)}
+  .node{opacity:0;transform:translateY(10px);transform-box:fill-box;transform-origin:center;transition:opacity .45s ease,transform .45s ease}
+  .node.show{opacity:1;transform:translateY(0)}
+  .edge{fill:none;stroke-width:3;stroke-linecap:round;stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset .6s ease}
+  .edge.main{stroke:var(--teal);marker-end:url(#ahTeal)}
+  .edge.fail{stroke:var(--amber);stroke-width:2.5;marker-end:url(#ahAmber);opacity:.9}
+  .edge.show{stroke-dashoffset:0}
+  .ylabel,.nlabel{font-family:'JetBrains Mono',monospace;font-size:14px;opacity:0;transition:opacity .4s ease}
+  .ylabel{fill:var(--teal)}
+  .nlabel{fill:var(--amber)}
+  .ylabel.show,.nlabel.show{opacity:1}
+  .caption{margin:14px auto 0;max-width:560px;color:var(--dim);font-size:13px;text-align:center;font-style:italic}
+  .replay{display:block;margin:16px auto 0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px}
+  .replay:hover{border-color:var(--teal)}
+  @media (prefers-reduced-motion: reduce){
+    .node,.edge,.ylabel,.nlabel{transition:none !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Scheduling cycle</div>
+  <h1>Pass every gate, or go <span class="em">Pending</span></h1>
+  <p class="lead">The scheduler runs each Pending Pod down a chain of filters. Stay on the green path and it lands on a node. Fail any one gate and that branch splits off to Pending.</p>
+
+  <div class="flowwrap">
+    <svg id="flow" viewBox="0 0 720 760" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ahTeal" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#14B8A6"/></marker>
+        <marker id="ahAmber" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#F59E0B"/></marker>
+      </defs>
+
+      <path class="edge main" d="M210,86 L210,150"/>
+      <path class="edge main" d="M210,224 L210,288"/>
+      <path class="edge main" d="M210,362 L210,426"/>
+      <path class="edge main" d="M210,500 L210,564"/>
+      <path class="edge fail" d="M320,187 C470,187 540,300 540,610 L540,628"/>
+      <path class="edge fail" d="M320,325 C460,325 525,360 525,610 L538,628"/>
+      <path class="edge fail" d="M320,463 C450,463 512,430 512,610 L526,628"/>
+
+      <g class="node gate" data-n="1"><rect x="70" y="40" width="280" height="46" rx="12"/><text x="210" y="69">New Pod accepted</text></g>
+      <g class="node gate" data-n="2"><rect x="70" y="150" width="280" height="74" rx="12"/><text x="210" y="181">Enough CPU / memory?</text><text class="meta" x="210" y="206">requests fit</text></g>
+      <g class="node gate" data-n="3"><rect x="70" y="288" width="280" height="74" rx="12"/><text x="210" y="319">Node taints tolerated?</text><text class="meta" x="210" y="344">tolerations</text></g>
+      <g class="node gate" data-n="4"><rect x="70" y="426" width="280" height="74" rx="12"/><text x="210" y="457">Affinity + PVC satisfied?</text><text class="meta" x="210" y="482">nodeAffinity / volume</text></g>
+      <g class="node pass" data-n="5"><rect x="70" y="564" width="280" height="56" rx="12"/><text x="210" y="598">Assigned to node</text></g>
+
+      <text class="ylabel" data-n="2" x="224" y="142">yes</text>
+      <text class="ylabel" data-n="3" x="224" y="280">yes</text>
+      <text class="ylabel" data-n="4" x="224" y="418">yes</text>
+
+      <text class="nlabel" data-n="2" x="334" y="180">no</text>
+      <text class="nlabel" data-n="3" x="334" y="318">no</text>
+      <text class="nlabel" data-n="4" x="334" y="456">no</text>
+
+      <g class="node fail" data-n="6"><rect x="430" y="628" width="240" height="80" rx="12"/><text x="550" y="662">Pending</text><text class="meta" x="550" y="688">FailedScheduling event</text></g>
+    </svg>
+  </div>
+  <p class="caption">One flow, two destinies: Assigned, or Pending with a FailedScheduling event you can read.</p>
+  <button class="replay" onclick="playFlow()">&#8635; replay</button>
+</div>
+
+<script>
+  function playFlow(){
+    var nodes = Array.prototype.slice.call(document.querySelectorAll('#flow .node'));
+    var mains = Array.prototype.slice.call(document.querySelectorAll('#flow .edge.main'));
+    var fails = Array.prototype.slice.call(document.querySelectorAll('#flow .edge.fail'));
+    var ylabels = Array.prototype.slice.call(document.querySelectorAll('#flow .ylabel'));
+    var nlabels = Array.prototype.slice.call(document.querySelectorAll('#flow .nlabel'));
+    [].concat(nodes,mains,fails,ylabels,nlabels).forEach(function(el){ el.classList.remove('show'); });
+
+    function nodeByN(n){ return document.querySelector('#flow .node[data-n="'+n+'"]'); }
+    function labByN(list,n){ for(var i=0;i<list.length;i++){ if(list[i].getAttribute('data-n')===String(n)) return list[i]; } return null; }
+
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce){
+      [].concat(nodes,mains,fails,ylabels,nlabels).forEach(function(el){ el.classList.add('show'); });
+      return;
+    }
+
+    var t = 250, STEP = 720;
+    setTimeout(function(){ nodeByN(1).classList.add('show'); }, t);
+    [2,3,4].forEach(function(n,i){
+      var base = t + STEP*(i+1);
+      setTimeout(function(){ mains[i].classList.add('show'); }, base);
+      setTimeout(function(){ var y=labByN(ylabels,n); if(y) y.classList.add('show'); }, base+120);
+      setTimeout(function(){ nodeByN(n).classList.add('show'); }, base+260);
+      setTimeout(function(){ fails[i].classList.add('show'); var nl=labByN(nlabels,n); if(nl) nl.classList.add('show'); }, base+440);
+    });
+    var endBase = t + STEP*4;
+    setTimeout(function(){ mains[3].classList.add('show'); }, endBase);
+    setTimeout(function(){ nodeByN(5).classList.add('show'); }, endBase+300);
+    setTimeout(function(){ nodeByN(6).classList.add('show'); }, endBase+600);
+  }
+
+  // play when scrolled into view; loop while visible
+  var played = false, loopTimer = null;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        if(!played){ played = true; playFlow(); }
+        if(!loopTimer){ loopTimer = setInterval(playFlow, 7000); }
+      } else {
+        if(loopTimer){ clearInterval(loopTimer); loopTimer = null; }
+      }
+    });
+  }, {threshold: .35});
+  io.observe(document.getElementById('flow'));
+</script>
+</body>
+</html>

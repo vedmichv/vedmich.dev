@@ -35,6 +35,7 @@ const authorDisplay = post.data.author === 'Viktor Vedmich'
   description={post.data.description}
   locale={locale}
   path={`/blog/${post.id.replace('ru/', '')}`}
+  noindex={post.data.draft}
 >
   <article class="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
     <header class="mb-10">
