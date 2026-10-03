@@ -2,7 +2,7 @@
 
 End-to-end runbook for publishing a Slidev deck as a first-party route under `vedmich.dev/slides/<slug>/`. The main site (`vedmich.dev`) and the deck artifact repo (`vedmichv/slidev:gh-pages`) live in two separate repos; this runbook walks through the submodule + CI pipeline that glues them together.
 
-**Ship status:** Phase 5 (milestone v1.0) — SHIPPED + automated. The autopilot `scripts/deploy-deck.sh` drives the whole flow; `vv-demo` is live at `vedmich.dev/slides/vv-demo/` (theme demo, deployed with `--no-undraft`). Current `/slides/*` consumers: `vv-demo`.
+**Ship status:** Infrastructure is active and automated through `scripts/deploy-deck.sh`. Read the current `SLIDES_WHITELIST` sentinel in `.github/workflows/deploy.yml` for served decks and `src/content/presentations/{en,ru}/` for published cards. Do not infer current deployment state from historical deck lists in this document.
 
 > **Normal operation is one command** — you should NOT run the steps below by hand:
 > ```bash
@@ -164,7 +164,7 @@ To activate a deck manually:
 
 Flip the presentation's MDX frontmatter from `draft: true` to `draft: false` so the deck appears on the homepage + presentations index + search index.
 
-Files to edit (both locales for bilingual parity per CLAUDE.md):
+Files to edit (both locales for bilingual parity per AGENTS.md):
 
 - `src/content/presentations/en/<slug>.md`
 - `src/content/presentations/ru/<slug>.md`
