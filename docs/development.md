@@ -27,9 +27,10 @@ Root `paseo.json` is shared project configuration, verified against installed
 Paseo 0.10.3. It provides automatic worktree setup, `dev` and `preview` services,
 build/test scripts, English metadata prompts, and Conventional Commit guidance.
 
-The service allocation range for isolated worktrees is 4400-4499. The main
-checkout uses declared defaults 4321 (dev) and 4322 (preview). Commands use
-Paseo's `PASEO_PORT` and `HOST`. Do not start a second server on an existing
+The service allocation range is 4400-4499, including the main workspace.
+Leave per-script `port` unset: a numeric port forces that same port in every
+worktree and overrides automatic allocation. Commands use Paseo's `PASEO_PORT`
+and `HOST`. Do not start a second server on an existing
 service's port. No teardown hook is needed: Paseo owns service processes and
 workspace lifecycle. Do not add hooks that delete data, reset Git, or commit.
 

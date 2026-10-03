@@ -6,13 +6,11 @@
   "scripts": {
     "dev": {
       "type": "service",
-      "command": "npm run dev -- --host \"${HOST:-127.0.0.1}\" --port \"$PASEO_PORT\"",
-      "port": 4321
+      "command": "npm run dev -- --host \"${HOST:-127.0.0.1}\" --port \"$PASEO_PORT\""
     },
     "preview": {
       "type": "service",
-      "command": "npm run build && npm run preview -- --host \"${HOST:-127.0.0.1}\" --port \"$PASEO_PORT\"",
-      "port": 4322
+      "command": "npm run build && npm run preview -- --host \"${HOST:-127.0.0.1}\" --port \"$PASEO_PORT\""
     },
     "build": { "type": "script", "command": "npm run build" },
     "unit-tests": { "type": "script", "command": "npm run test:unit" },
