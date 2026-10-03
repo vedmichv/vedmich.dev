@@ -5,7 +5,7 @@ date: 2026-03-03
 tags: ["personal", "announcement"]
 ---
 
-# Hello World
+## Hello World
 
 Welcome to **vedmich.dev** — my corner of the internet where I share what I learn while designing distributed systems, working with Kubernetes, and building cloud architecture at scale.
 

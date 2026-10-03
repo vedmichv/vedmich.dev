@@ -36,13 +36,15 @@ const authorDisplay = post.data.author === 'Viktor Vedmich'
   locale={locale}
   path={`/blog/${post.id.replace('ru/', '')}`}
   noindex={post.data.draft}
+  image={post.data.cover_image}
+  articleDate={post.data.date}
 >
   <article class="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
     <header class="mb-10">
       <a href="/ru/blog" class="text-sm text-accent hover:text-accent-light transition-colors mb-4 inline-block">
         &larr; Назад к блогу
       </a>
-      <time class="font-mono text-xs text-text-muted mb-2 block">
+      <time datetime={post.data.date.toISOString()} class="font-mono text-xs text-text-muted mb-2 block">
         {post.data.date.toLocaleDateString('ru-RU', {
           year: 'numeric',
           month: 'long',

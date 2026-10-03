@@ -25,8 +25,8 @@
 //     (lands on slide 1, not N).  Document-injection is the only form that lands
 //     on the correct slide AND keeps the clean /N URL.
 //
-// Any non-/slides/ miss just goes home (the site is bilingual and the root
-// index.astro re-routes to the user's locale).
+// Other misses retain their URL and show a recovery page with both locales.
+import '../styles/global.css';
 ---
 
 <!DOCTYPE html>
@@ -35,7 +35,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Redirecting…</title>
+    <title>Page not found | Viktor Vedmich</title>
     <script is:inline>
       (function () {
         var path = window.location.pathname;
@@ -58,20 +58,23 @@
               document.close();
             })
             .catch(function () {
-              // Deck shell unreachable (bad slug / not deployed) → home.
-              window.location.replace('/');
+              // Leave the recovery page visible when a deck is unavailable.
             });
           return;
         }
-        // Not a deck deep-link → send home (root re-routes to locale).
-        window.location.replace('/');
+        // Non-deck misses keep the requested URL and the real 404 response.
       })();
     </script>
-    <noscript>
-      <meta http-equiv="refresh" content="0;url=/" />
-    </noscript>
   </head>
-  <body style="background:#0F172A;color:#94A3B8;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui;margin:0;">
-    <p>Page not found — <a href="/" style="color:#14B8A6;">go home</a>.</p>
+  <body class="min-h-screen grid place-items-center px-6">
+    <main class="max-w-xl py-16">
+      <p class="font-mono text-brand-primary mb-4">404</p>
+      <h1 class="font-display text-4xl font-bold mb-4">Page not found</h1>
+      <p class="text-text-secondary mb-8">This link may have moved or the page may not be published yet.</p>
+      <nav aria-label="Home pages" class="flex flex-wrap gap-4">
+        <a href="/en/" class="text-brand-primary hover:underline">English home</a>
+        <a href="/ru/" lang="ru" class="text-brand-primary hover:underline">Главная на русском</a>
+      </nav>
+    </main>
   </body>
 </html>

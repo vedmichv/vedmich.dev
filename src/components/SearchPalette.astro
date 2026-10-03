@@ -12,12 +12,11 @@ const index = await buildSearchIndex(locale);
 const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
 ---
 
-<script type="application/json" id="search-index-data" set:html={JSON.stringify(sortedIndex)} />
+<script type="application/json" id="search-index-data" set:html={JSON.stringify(sortedIndex).replace(/</g, '\\u003c')} />
 
-<div
+<dialog
   id="search-palette"
-  class="fixed inset-0 z-[60] flex items-start justify-center hidden"
-  style="background: rgba(2,6,23,0.72); backdrop-filter: blur(6px); padding-top: 96px; animation: fadeIn 120ms ease-out;"
+  class="fixed inset-0 m-0 w-full max-w-none h-dvh max-h-none border-0 items-start justify-center bg-transparent text-text-primary"
   role="dialog"
   aria-modal="true"
   aria-labelledby="search-palette-label"
@@ -26,10 +25,11 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
   data-i18n-kind-slides={i.search.kind_slides}
   data-i18n-kind-post={i.search.kind_post}
   data-i18n-empty-hint={i.search.empty_hint}
+  data-i18n-results-count={i.search.results_count}
 >
   <div
     id="search-palette-card"
-    class="w-full max-w-[640px] mx-4 bg-bg-surface border border-border rounded-[14px] overflow-hidden"
+    class="w-full max-w-[640px] mx-4 flex flex-col min-h-0 bg-bg-surface border border-border rounded-[14px] overflow-hidden"
     style="box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(20,184,166,0.12);"
   >
     <h2 id="search-palette-label" class="sr-only">{i.nav.search_label}</h2>
@@ -42,14 +42,19 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
         placeholder={i.search.placeholder}
         autocomplete="off"
         spellcheck="false"
-        class="flex-1 bg-transparent border-none outline-none font-sans text-base text-text-primary placeholder:text-text-muted"
+        role="combobox"
+        aria-label={i.nav.search_label}
+        aria-controls="search-palette-results"
+        aria-expanded="false"
+        aria-autocomplete="list"
+        class="flex-1 min-w-0 bg-transparent border-none outline-none font-sans text-base text-text-primary placeholder:text-text-muted"
       />
       <kbd class="font-mono text-[11px] text-text-muted bg-bg-base px-[7px] py-[3px] rounded border border-border">Esc</kbd>
     </div>
 
-    <div id="search-palette-results" role="listbox" aria-label={i.nav.search_label} class="overflow-y-auto" style="max-height: 380px;"></div>
+    <div id="search-palette-results" role="listbox" aria-label={i.nav.search_label} class="overflow-y-auto min-h-0" style="max-height: 380px;"></div>
 
-    <div class="flex items-center justify-between px-[18px] py-[10px] border-t border-border font-mono text-[11px] text-text-muted">
+    <div class="flex flex-wrap gap-2 shrink-0 items-center justify-between px-[18px] py-[10px] border-t border-border font-mono text-[11px] text-text-muted">
       <div class="flex gap-[14px]">
         <span class="inline-flex items-center gap-1">
           <kbd class="font-mono text-[10px] text-text-secondary px-[5px] py-[1px] rounded border border-border" style="background: rgba(148,163,184,0.08);">↑</kbd>
@@ -61,12 +66,25 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
           <span class="ml-1">{i.search.footer_open}</span>
         </span>
       </div>
-      <span id="search-palette-count"></span>
+      <span id="search-palette-count" role="status" aria-live="polite"></span>
     </div>
   </div>
-</div>
+</dialog>
 
 <style is:global>
+  #search-palette {
+    padding: min(96px, 10dvh) 0 16px;
+  }
+  #search-palette[open] {
+    display: flex;
+  }
+  #search-palette::backdrop {
+    background: rgb(2 6 23 / 0.72);
+    backdrop-filter: blur(6px);
+  }
+  #search-palette-card {
+    max-height: 100%;
+  }
   @keyframes fadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -163,7 +181,7 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
       .replace(/'/g, '&#39;');
   }
 
-  const palette = document.getElementById('search-palette');
+  const palette = document.getElementById('search-palette') as HTMLDialogElement | null;
   const card = document.getElementById('search-palette-card');
   const input = document.getElementById('search-palette-input') as HTMLInputElement | null;
   const resultsEl = document.getElementById('search-palette-results');
@@ -180,6 +198,7 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
     const noResultsLabel = palette.getAttribute('data-i18n-no-results') || 'No matches for';
     const slidesLabel = palette.getAttribute('data-i18n-kind-slides') || 'Slides';
     const postLabel = palette.getAttribute('data-i18n-kind-post') || 'Post';
+    const countLabel = palette.getAttribute('data-i18n-results-count') || 'Results: {n} of {total}';
 
     function computeResults(q: string): SearchItem[] {
       if (!q.trim()) return index.slice(0, 6);
@@ -208,7 +227,7 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
             const badgeLabel = r.kind === 'slides' ? slidesLabel : postLabel;
             const badgeClass = r.kind === 'slides' ? 'kind-slides' : 'kind-post';
             return `
-              <div class="search-result ${isSelected ? 'is-selected' : ''}" role="option" aria-selected="${isSelected}" data-idx="${i}">
+              <div id="search-result-${i}" class="search-result ${isSelected ? 'is-selected' : ''}" role="option" aria-selected="${isSelected}" data-idx="${i}">
                 <span class="kind-badge ${badgeClass}">${escapeHtml(badgeLabel)}</span>
                 <div style="min-width: 0;">
                   <div class="title">${escapeHtml(r.title)}</div>
@@ -223,18 +242,29 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
 
       const n = currentResults.length;
       const m = index.length;
-      countEl!.textContent = `${n} result${n === 1 ? '' : 's'} · ${m} indexed`;
+      countEl!.textContent = countLabel.replace('{n}', String(n)).replace('{total}', String(m));
+      if (n) input!.setAttribute('aria-activedescendant', `search-result-${selectedIndex}`);
+      else input!.removeAttribute('aria-activedescendant');
 
       resultsEl!.querySelectorAll<HTMLElement>('.search-result').forEach((el) => {
         const idx = Number(el.dataset.idx);
         el.addEventListener('click', () => {
           if (currentResults[idx]) go(currentResults[idx]);
         });
-        el.addEventListener('mouseenter', () => {
-          selectedIndex = idx;
-          render();
+        el.addEventListener('pointermove', () => {
+          select(idx);
         });
       });
+    }
+
+    function select(idx: number, scroll = false) {
+      selectedIndex = idx;
+      resultsEl!.querySelectorAll<HTMLElement>('.search-result').forEach((el, i) => {
+        el.classList.toggle('is-selected', i === idx);
+        el.setAttribute('aria-selected', String(i === idx));
+        if (i === idx && scroll) el.scrollIntoView({ block: 'nearest' });
+      });
+      if (currentResults.length) input!.setAttribute('aria-activedescendant', `search-result-${idx}`);
     }
 
     function go(item: SearchItem): void {
@@ -247,20 +277,22 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
     }
 
     function open(): void {
-      if (!palette!.classList.contains('hidden')) return;
+      if (palette!.open) return;
       lastFocused = (document.activeElement as HTMLElement) || null;
-      palette!.classList.remove('hidden');
+      palette!.showModal();
+      input!.setAttribute('aria-expanded', 'true');
       document.body.setAttribute('data-search-open', 'true');
       document.body.style.overflow = 'hidden';
       query = '';
       selectedIndex = 0;
       input!.value = '';
       render();
-      setTimeout(() => input!.focus(), 10);
+      input!.focus();
     }
 
     function close(): void {
-      palette!.classList.add('hidden');
+      palette!.close();
+      input!.setAttribute('aria-expanded', 'false');
       document.body.removeAttribute('data-search-open');
       document.body.style.overflow = '';
       if (lastFocused && typeof lastFocused.focus === 'function') {
@@ -283,12 +315,10 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
         close();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        selectedIndex = Math.min(selectedIndex + 1, Math.max(0, currentResults.length - 1));
-        render();
+        select(Math.min(selectedIndex + 1, Math.max(0, currentResults.length - 1)), true);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        selectedIndex = Math.max(selectedIndex - 1, 0);
-        render();
+        select(Math.max(selectedIndex - 1, 0), true);
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (currentResults[selectedIndex]) go(currentResults[selectedIndex]);
@@ -299,14 +329,13 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
       if (e.target === palette) close();
     });
 
-    palette.addEventListener('keydown', (e) => {
-      if (e.key !== 'Tab') return;
+    palette.addEventListener('cancel', (e) => {
       e.preventDefault();
-      input!.focus();
+      close();
     });
 
     document.addEventListener('keydown', (e) => {
-      const isOpen = !palette!.classList.contains('hidden');
+      const isOpen = palette!.open;
       const target = e.target as HTMLElement | null;
       const isEditable =
         !!target &&

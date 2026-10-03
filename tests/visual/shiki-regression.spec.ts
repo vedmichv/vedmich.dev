@@ -36,7 +36,8 @@ test.describe('Shiki + code-block regression — .prose parity on 4 posts × 2 l
         await prose.waitFor({ state: 'visible' });
 
         // WOFF2 settle — Inter/Space Grotesk/JetBrains Mono load async.
-        await page.waitForTimeout(300);
+        await page.evaluate(() => document.fonts.ready);
+        await page.addStyleTag({ content: '#site-header { visibility: hidden !important; }' });
 
         await expect(prose).toHaveScreenshot(`shiki-regression-${slug}-${locale}.png`, {
           maxDiffPixels: 150,

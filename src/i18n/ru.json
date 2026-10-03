@@ -1,5 +1,7 @@
 {
   "nav": {
+    "menu_label": "Меню",
+    "skip_to_content": "Перейти к содержимому",
     "about": "Обо мне",
     "podcasts": "Подкасты",
     "speaking": "Выступления",
@@ -11,6 +13,7 @@
     "search_placeholder": "Поиск…"
   },
   "search": {
+    "results_count": "Результаты: {n} из {total}",
     "placeholder": "Поиск по слайдам, постам, тегам…",
     "empty_hint": "Начните вводить запрос. Попробуйте: «karpenter», «mcp», «kubernetes».",
     "no_results": "Ничего не найдено для",

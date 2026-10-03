@@ -11,7 +11,8 @@
     <script is:inline>
       (function() {
         // Check if user has a stored preference
-        var saved = localStorage.getItem('vedmich-lang');
+        var saved;
+        try { saved = localStorage.getItem('vedmich-lang'); } catch (_) {}
         if (saved === 'ru' || saved === 'en') {
           window.location.replace('/' + saved + '/');
           return;
@@ -22,7 +23,7 @@
         var target = (lang.startsWith('ru') || lang.startsWith('be') || lang.startsWith('uk')) ? 'ru' : 'en';
 
         // Save preference and redirect
-        localStorage.setItem('vedmich-lang', target);
+        try { localStorage.setItem('vedmich-lang', target); } catch (_) {}
         window.location.replace('/' + target + '/');
       })();
     </script>

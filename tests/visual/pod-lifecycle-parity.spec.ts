@@ -24,8 +24,9 @@ test.describe('PodLifecycleAnimation refactor — pixel parity', () => {
     const figure = page.locator('figure.pod-lifecycle, figure.vv-stage').first();
     await figure.waitFor({ state: 'visible' });
 
-    // 300ms settle for font loading — Inter/Space Grotesk/JetBrains Mono are WOFF2
-    await page.waitForTimeout(300);
+    // Wait for self-hosted fonts before comparing pixels.
+    await page.evaluate(() => document.fonts.ready);
+    await page.addStyleTag({ content: '#site-header { visibility: hidden !important; }' });
 
     await expect(figure).toHaveScreenshot('pod-lifecycle-frozen.png', {
       maxDiffPixels: 150,

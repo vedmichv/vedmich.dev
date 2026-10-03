@@ -3,22 +3,36 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SearchPalette from '../components/SearchPalette.astro';
-import { type Locale, getAlternateLocale, getLocalizedPath } from '../i18n/utils';
+import { getCollection } from 'astro:content';
+import { type Locale, getAlternateLocale, getLocalizedPath, t } from '../i18n/utils';
 
 interface Props {
   title: string;
   description?: string;
   locale: Locale;
   path?: string;
+  image?: string;
+  articleDate?: Date;
   /** Unlisted pages (e.g. draft blog posts): emit <meta robots="noindex"> so the
-   *  private direct link is not indexed by search engines until it is promoted. */
+   *  public direct link is not indexed by search engines until it is promoted. */
   noindex?: boolean;
 }
 
 const { title, description = 'Viktor Vedmich — Senior Solutions Architect @ AWS, CNCF Kubestronaut, Author, Speaker', locale, path = '', noindex = false } = Astro.props;
 const altLocale = getAlternateLocale(locale);
+const i = t(locale);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const altURL = new URL(getLocalizedPath(path, altLocale), Astro.site);
+const normalizedPath = path.replace(/\/$/, '');
+const detail = normalizedPath.match(/^\/(blog|speaking)\/(.+)$/);
+let hasTranslation = true;
+if (detail) {
+  const entries = await getCollection(detail[1] as 'blog' | 'speaking');
+  hasTranslation = entries.some((entry) => entry.id === `${altLocale}/${detail[2]}` && !entry.data.draft);
+}
+const altPath = getLocalizedPath(`${normalizedPath}/`, altLocale);
+const altURL = new URL(altPath, Astro.site);
+const switchPath = hasTranslation ? altPath : `/${altLocale}/${detail?.[1] || ''}/`;
+const imageURL = new URL(Astro.props.image || '/og-default.png', Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -33,8 +47,8 @@ const altURL = new URL(getLocalizedPath(path, altLocale), Astro.site);
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <link rel="canonical" href={canonicalURL} />
-    <link rel="alternate" hreflang={altLocale} href={altURL} />
-    <link rel="alternate" hreflang={locale} href={canonicalURL} />
+    {!noindex && hasTranslation && <link rel="alternate" hreflang={altLocale} href={altURL} />}
+    {!noindex && <link rel="alternate" hreflang={locale} href={canonicalURL} />}
 
     <!-- Icons + PWA manifest -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -58,7 +72,12 @@ const altURL = new URL(getLocalizedPath(path, altLocale), Astro.site);
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={Astro.props.articleDate ? 'article' : 'website'} />
+    <meta property="og:image" content={imageURL} />
+    <meta property="og:image:alt" content={Astro.props.image ? title : 'Viktor Vedmich: Architect, Author, Speaker'} />
+    {!Astro.props.image && <meta property="og:image:width" content="1200" />}
+    {!Astro.props.image && <meta property="og:image:height" content="630" />}
+    {Astro.props.articleDate && <meta property="article:published_time" content={Astro.props.articleDate.toISOString()} />}
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:locale" content={locale === 'en' ? 'en_US' : 'ru_RU'} />
 
@@ -67,10 +86,13 @@ const altURL = new URL(getLocalizedPath(path, altLocale), Astro.site);
     <meta name="twitter:site" content="@vedmichv" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageURL} />
+    <meta name="twitter:image:alt" content={Astro.props.image ? title : 'Viktor Vedmich: Architect, Author, Speaker'} />
   </head>
   <body class="min-h-screen flex flex-col">
-    <Header locale={locale} />
-    <main class="flex-1">
+    <a href="#main-content" class="skip-link">{i.nav.skip_to_content}</a>
+    <Header locale={locale} alternatePath={switchPath} />
+    <main id="main-content" tabindex="-1" class="flex-1">
       <slot />
     </main>
     <Footer locale={locale} />

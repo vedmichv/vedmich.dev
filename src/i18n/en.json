@@ -1,5 +1,7 @@
 {
   "nav": {
+    "menu_label": "Menu",
+    "skip_to_content": "Skip to content",
     "about": "About",
     "podcasts": "Podcasts",
     "speaking": "Speaking",
@@ -11,6 +13,7 @@
     "search_placeholder": "Search…"
   },
   "search": {
+    "results_count": "Results: {n} of {total}",
     "placeholder": "Search slides, posts, tags…",
     "empty_hint": "Start typing to search. Try: “karpenter”, “mcp”, “kubernetes”.",
     "no_results": "No matches for",

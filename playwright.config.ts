@@ -1,27 +1,25 @@
 import { defineConfig } from '@playwright/test';
 
-/**
- * Playwright config for vedmich.dev visual + DOM regression tests.
- * - reducedMotion: 'reduce' globally → deterministic frozen state for SMIL packets,
- *   eliminating time-dependent flakiness in pod-lifecycle-parity.spec.ts.
- * - webServer: boots `npm run dev` on :4321 for local runs; re-uses an existing dev
- *   server when one is already running (CI never reuses).
- * - snapshotDir: colocated with the spec as `tests/visual/__snapshots__/<spec-name>/`.
- */
+// Test production output. Never import node:test unit files or silently attach
+// to a different worktree's dev server. Override the URL only deliberately.
+const port = process.env.PLAYWRIGHT_PORT || '4323';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${port}`;
 export default defineConfig({
   testDir: './tests',
+  testMatch: '**/*.spec.ts',
   retries: 2,
   fullyParallel: false,
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL,
+    channel: process.env.PLAYWRIGHT_CHANNEL,
     reducedMotion: 'reduce',
     trace: 'retain-on-failure',
   },
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:4321',
-    reuseExistingServer: !process.env.CI,
-    timeout: 30_000,
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
+    command: `npm run build && npm run preview -- --host 127.0.0.1 --port ${port}`,
+    url: baseURL,
+    reuseExistingServer: false,
+    timeout: 120_000,
   },
   projects: [
     {

@@ -45,6 +45,7 @@ const cap = caption ?? d.cap;
   .book-link {
     display: block;
     width: max-content;
+    max-width: 100%;
     margin: 0 auto;
     border-radius: 8px;
     transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -53,7 +54,7 @@ const cap = caption ?? d.cap;
   }
   .book-link-img {
     display: block;
-    max-width: 320px;
+    max-width: min(320px, 100%);
     height: auto;
   }
   .book-link:hover,
