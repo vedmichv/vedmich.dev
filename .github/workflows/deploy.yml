@@ -32,8 +32,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run unit tests
+        run: npm run test:unit
+
       - name: Build Astro
         run: npm run build
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Check browser behavior
+        run: npm run test:smoke
 
       - name: Copy Slidev decks to dist/slides
         run: |

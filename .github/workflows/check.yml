@@ -1,0 +1,25 @@
+name: Check site
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:unit
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:smoke
+      # Existing screenshots were captured on macOS. Keep that visual suite local
+      # until reviewed Linux baselines exist; do not auto-approve new snapshots.

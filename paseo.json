@@ -1,0 +1,29 @@
+{
+  "worktree": {
+    "setup": ["bash scripts/setup-worktree.sh"],
+    "servicePorts": { "range": "4400-4499" }
+  },
+  "scripts": {
+    "dev": {
+      "type": "service",
+      "command": "npm run dev -- --host \"${HOST:-127.0.0.1}\" --port \"$PASEO_PORT\"",
+      "port": 4321
+    },
+    "preview": {
+      "type": "service",
+      "command": "npm run build && npm run preview -- --host \"${HOST:-127.0.0.1}\" --port \"$PASEO_PORT\"",
+      "port": 4322
+    },
+    "build": { "type": "script", "command": "npm run build" },
+    "unit-tests": { "type": "script", "command": "npm run test:unit" },
+    "smoke-tests": { "type": "script", "command": "npm run test:smoke" },
+    "visual-tests": { "type": "script", "command": "npm run test:visual" },
+    "deploy-script-tests": { "type": "script", "command": "bash scripts/tests/run.sh" }
+  },
+  "metadataGeneration": {
+    "title": { "instructions": "Use a concise English task title for vedmich.dev. Name the concrete user-visible change." },
+    "branchName": { "instructions": "Use a short English kebab-case branch with fix/, feat/, docs/, or chore/. Never use main for generated worktree branches." },
+    "commitMessage": { "instructions": "Use English Conventional Commits. Describe one logical change. Do not add Co-authored-by trailers." },
+    "pullRequest": { "instructions": "Write in English. Explain the concrete problem and resulting behavior, list validation actually run, and disclose remaining limitations. Distinguish local checks from deployment. Do not claim production acceptance without live evidence." }
+  }
+}
