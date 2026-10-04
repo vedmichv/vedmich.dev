@@ -1,5 +1,5 @@
 ---
-title: "Beyond DevOps Copilots: RCA-агент на Amazon Bedrock AgentCore"
+title: "Building an RCA Agent with Amazon Bedrock AgentCore"
 event: "AWS Community Day Central Asia"
 city: "Tashkent"
 date: 2026-09-25
