@@ -15,7 +15,7 @@ You know what happens next, because you have done it. You open the alert. You ru
 
 That gathering and correlating is exactly the part a machine can do first. Not a chat assistant that explains the log you paste into it: that is a copilot, and a copilot answers. What I want at 2AM is an agent. An agent chooses the next check, calls the systems itself and hands me a report with the evidence attached. A copilot answers. An agent investigates.
 
-This post is the written version of [the talk](/en/speaking/2026-rca-agent-agentcore/) I gave at AWS Community Day Central Asia 2026 in Tashkent. It follows the same route:
+This post is the written version of [my talk on building a root cause analysis (RCA) agent](/en/speaking/2026-rca-agent-agentcore/) at AWS Community Day Central Asia 2026 in Tashkent. It follows the same route:
 
 1. What capabilities does an agent need?
 2. What does it take to operate one?
@@ -41,9 +41,9 @@ The clearest way I know to explain an agent: take one question and keep answerin
 
 ### A model alone: plausible and generic
 
-Ask a generative model "why is this pod restarting?" and you get a good answer to a different question. Common causes: the container ran out of memory (OOMKilled), the process crashed on start, a health probe is failing, or the config or image is bad. Run `kubectl describe pod` and check the last termination reason.
+Ask a generative model "why is this pod restarting?" and you get a good answer to a different question. Common causes: the container ran out of memory (OOMKilled), the process crashed on start, a liveness or startup probe is failing, or the config or image is bad. Run `kubectl describe pod` and check the last termination reason.
 
-That is correct, and at 2AM it is useless. It could be any pod, anywhere. The reason is mechanical. A model predicts the next token from what is in its prompt. Its knowledge stops at its training cutoff, it has no memory between calls, and it has no access to your cluster. **Context is the only channel into the model.** Everything that follows is a way to put better things into that channel.
+That is useful general advice, and at 2AM it explains nothing. It could be any pod, anywhere. The reason is mechanical. A model predicts the next token from what is in its prompt. Its knowledge stops at its training cutoff, it has no memory between calls, and it has no access to your cluster. **Context is the only channel into the model.** Everything that follows is a way to put better things into that channel.
 
 ### Add our knowledge with RAG
 
@@ -57,7 +57,7 @@ Now it is grounded in our knowledge. But notice what is still missing: nobody ha
 
 This is where it starts to feel different. With tools, the model can ask for an observation. Through the Model Context Protocol (MCP), the application offers the model a list of tools such as `eks_describe_pod`. The model proposes a call, and the application runs it.
 
-The context now contains a real result: last termination `OOMKilled`, exit code 137, memory limit 512Mi. And the answer is finally about *this* pod: "The previous container was OOMKilled (exit 137) against a 512Mi limit. Next check: the memory working set for the last hour and the deployment history. Not yet established: why memory grew."
+The context now contains a tool result (synthetic, like every value here): last termination `OOMKilled`, exit code 137, memory limit 512Mi. And the answer is finally about *this* pod: "The previous container was OOMKilled (exit 137) against a 512Mi limit. Next check: the memory working set for the last hour and the deployment history. Not yet established: why memory grew."
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={11} clicks={4} title="How tools add live observations" caption="The model proposes eks_describe_pod(pod). The application checks policy and calls the EKS tool server through MCP. The observation (OOMKilled, exit 137) goes back into the prompt." />
 
@@ -65,11 +65,11 @@ One detail on this slide matters more than anything else in the first half: **th
 
 ### Let the loop choose the next check
 
-A single tool call is still one step that we planned. The agent part is the loop. Look at the evidence so far, choose the next check within the allowed scope, call a scoped tool, look at the observed result, then decide: retry, check something else, or stop.
+A tool call gives the model one observation. The agent part is the loop that uses it. Look at the evidence so far, choose the next check within the allowed scope, call a scoped tool, look at the observed result, then decide: retry, check something else, or stop.
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={12} clicks={4} title="The agent loop chooses the next check" caption="A bounded investigation loop: evidence, choose the next check, scoped tool, observed result. It ends with a supported report when the evidence is sufficient or the budget is reached." />
 
-Two properties make this loop safe to run. It is **bounded**: there is a budget, and when it runs out the agent stops and says what it could not establish. And **only an observed result can trigger another check**. The loop moves forward on evidence, not on the model talking itself into something.
+Two properties keep this loop under control. It is **bounded**: the application, not the model, enforces limits on tool calls, time and tokens, and when a limit is reached the agent stops and says what it could not establish. And **only an observed result can trigger another check**, an error included. The loop moves forward on evidence, not on the model talking itself into something. Permissions and untrusted content need their own controls, and they come up below.
 
 ### Not everything needs to be an agent
 
@@ -152,9 +152,13 @@ Three notes from building on it.
 
 **The session is not your job record.** Runtime manages sessions, but the investigation record (status and report, findable after the session ends) belongs in a store your application owns. Retries and duplicate alerts are your decisions too. A session does not make them for you.
 
-**Memory stores leads, not truth.** Today the prototype retrieves runbooks. Recalling past incidents is the planned extension. A reviewed incident outcome is ingested into long-term memory (AgentCore Memory gained a direct `IngestData` API for this in September 2026). The configured extraction strategies process it asynchronously, and the resulting records are retrieved, scoped, for the next incident. If ingestion fails, inspect the failure before you redrive it.
+**Memory stores leads, not truth.** Today the prototype retrieves runbooks. Recalling past incidents is a planned extension, not built yet. In that design, a reviewed incident outcome would go into long-term memory through `IngestData`, the direct ingestion API that AgentCore Memory gained in September 2026. The configured extraction strategies would process it asynchronously, and a later investigation would retrieve the resulting records within its own scope. If ingestion fails, inspect the failure before you redrive it.
 
-**Observability is three switches, and you have to flip them.** The three records map to three AWS features. AWS CloudTrail records API audit events, but not all of them by default. Bedrock model calls such as `InvokeModel` and `Converse` arrive as management events. Calls to AgentCore Runtime, Gateway and Memory, and Knowledge Base retrievals, are data events, and those you have to enable explicitly. AgentCore Observability stores traces, spans and metrics in Amazon CloudWatch, in an OpenTelemetry-compatible format. Amazon Bedrock model invocation logging captures the content to CloudWatch Logs or Amazon S3, and it is disabled by default. Three records, three switches. And you still compare the diagnosis with the actual observation.
+**Observability is three switches, and you have to flip them.** The three records map to three AWS features. AWS CloudTrail records API audit events, but not all of them by default. Bedrock model calls such as `InvokeModel` and `Converse` arrive as management events. Calls to AgentCore Runtime, Gateway and Memory, and Knowledge Base retrievals, are data events, and those you have to enable explicitly.
+
+The second switch is in your code: instrument the application to emit OpenTelemetry traces, and AgentCore Observability stores the traces, spans and metrics in Amazon CloudWatch.
+
+The third is Amazon Bedrock model invocation logging, which captures model inputs and outputs to CloudWatch Logs, Amazon S3 or both. It is disabled by default. Three records, three switches. And you still compare the diagnosis with the actual observation.
 
 ## Building the RCA agent
 
@@ -166,7 +170,7 @@ Time for the worked example. The first job is deliberately small: the 2AM pod.
 
 The hypothesis is to reduce repeated evidence gathering, not to replace the engineer.
 
-<SlideEmbed slug="ai-agents-devops-tashkent" slide={34} clicks={5} title="System architecture" caption="A custom RCA agent selects tools through an MCP gateway in front of four tool servers (EKS, CloudWatch, Prometheus, Knowledge Base) and produces a diagnosis with a remediation plan." />
+<SlideEmbed slug="ai-agents-devops-tashkent" slide={34} clicks={5} title="System architecture" caption="A custom RCA agent selects tools through an MCP gateway in front of four tool servers (EKS, CloudWatch, Prometheus, Knowledge Base) and produces a diagnosis with a remediation plan. The diagram shows the source structure; it does not prove runtime behavior." />
 
 It is one investigator behind a gateway with four MCP tool servers:
 
