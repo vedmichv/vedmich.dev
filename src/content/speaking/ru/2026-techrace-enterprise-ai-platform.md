@@ -3,10 +3,12 @@ title: "Building the Production-Grade Platform for Enterprise AI"
 event: "Tech Race Summit"
 city: "Warsaw"
 date: 2026-09-10
-tags: ["AI", "Agents", "AWS", "Bedrock", "AgentCore"]
+tags: ["AI", "Agents", "AWS", "AgentCore", "Platform Engineering"]
 draft: false
 ---
 
-Что ломается, когда AI-прототип должен пережить реальный трафик, настоящие аудиты и дежурства, и как выглядит production-grade агентная платформа на AWS: Amazon Bedrock и Amazon Bedrock AgentCore, плюс безопасность, управление и контроль затрат для enterprise AI в масштабах iGaming.
+Что происходит, когда ваш первый AI-агент превращается в пятьсот, и как построить платформу, на которой их безопасно и быстро выпускать. [Сергей Курсон](https://www.linkedin.com/in/sergey-kurson/) начал с того, почему агентные платформы нужны уже сейчас (agent sprawl, shadow AI, хаос интеграций, невидимые затраты), показал стек build, deploy и operate на открытых протоколах (MCP, A2A, OpenTelemetry), четырёхуровневую модель зрелости платформы и федеративную операционную модель.
 
-Совместный доклад с [Сергеем Курсоном](https://www.linkedin.com/in/sergey-kurson/), Principal Solutions Architect в AWS, на Stage 2 (Solution Track) первого Tech Race Summit от SOFTSWISS в Centrum Praskie Koneser, Варшава.
+Моя часть была глубоким погружением через три вопроса к каждому агенту в проде: можете ли вы его остановить, видите ли вы, что он делает, и можете ли вы его безопасно поменять. Контроль живёт снаружи агента. Governance plane задаёт политику: Cedar с default-deny, собственная identity у каждого агента и реестр как единственный путь к учётным данным. Enforcement plane применяет её на каждом запросе через четыре точки остановки: входной шлюз, guardrails, human-in-the-loop и выходной шлюз. Дальше наблюдаемость на уровне всей траектории агента, оценка offline, on-demand и online, CI/CD для агентов, где артефакт это код, промпты, версия модели, схемы инструментов, политика и состояние, и сторона платформы: жёсткие бюджеты, учёт затрат по агентам и изоляция тенантов вплоть до векторного хранилища.
+
+Совместный доклад с Сергеем Курсоном, Principal Solutions Architect в AWS, на Stage 2 (Solution Track) первого Tech Race Summit от SOFTSWISS в Centrum Praskie Koneser, Варшава.
