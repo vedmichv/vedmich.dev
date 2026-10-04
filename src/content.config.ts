@@ -1,6 +1,9 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// Same-locale companion article for a talk or deck, e.g. "/en/blog/<slug>/".
+const companionPost = z.string().regex(/^\/(en|ru)\/blog\/[^/]+\/$/).optional();
+
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
   schema: z.object({
@@ -25,6 +28,7 @@ const speaking = defineCollection({
     tags: z.array(z.string()),
     video: z.string().url().optional(),
     slides: z.string().url().optional(),
+    post: companionPost,
     rating: z.string().optional(),
     highlight: z.string().optional(),
     draft: z.boolean().default(false),
@@ -42,6 +46,7 @@ const presentations = defineCollection({
     tags: z.array(z.string()),
     slides: z.string().url().optional(),
     video: z.string().url().optional(),
+    post: companionPost,
     draft: z.boolean().default(false),
   }),
 });

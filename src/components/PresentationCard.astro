@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { t } from '../i18n/utils';
 
 interface Props {
   deck: CollectionEntry<'presentations'>;
@@ -11,18 +12,16 @@ const { data, id } = deck;
 const slug = id.replace(/^(en|ru)\//, '');
 const deckUrl = data.slides ?? `/slides/${slug}/`;
 const displayUrl = `vedmich.dev/slides/${slug}`;
+const i = t(id.startsWith('ru/') ? 'ru' : 'en');
 
 const dateStr = data.date.toISOString().slice(0, 10);
 
 const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
 ---
 
-<a
-  href={deckUrl}
-  target="_blank"
-  rel="noopener noreferrer"
-  class="group flex flex-col p-6 rounded-xl bg-surface border border-border card-glow animate-on-scroll"
->
+<!-- The title link is stretched over the card, so the whole card still opens the deck.
+     The optional article link sits above that overlay; links are never nested. -->
+<article class="group relative flex flex-col p-6 rounded-xl bg-surface border border-border card-glow animate-on-scroll">
   <!-- Row 1: Overline -->
   <div class="font-mono text-xs text-text-muted mb-2">
     {overlineParts.join(' · ')}
@@ -30,7 +29,14 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
 
   <!-- Row 2: Title -->
   <h3 class="font-display text-lg font-semibold leading-snug mt-0 text-text-primary group-hover:text-brand-primary transition-colors">
-    {data.title}
+    <a
+      href={deckUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="after:absolute after:inset-0 after:rounded-xl"
+    >
+      {data.title}
+    </a>
   </h3>
 
   <!-- Row 3: Description -->
@@ -43,6 +49,16 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
     {displayUrl}
   </div>
 
+  <!-- Row 4b: Companion article -->
+  {data.post && (
+    <a
+      href={data.post}
+      class="relative z-10 self-start font-mono text-xs text-brand-accent hover:text-brand-accent-hover transition-colors mb-2.5"
+    >
+      → {i.presentations.read_article}
+    </a>
+  )}
+
   <!-- Row 5: Tags -->
   <div class="flex flex-wrap gap-1.5" role="list">
     {data.tags.map((tag) => (
@@ -54,4 +70,4 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
       </span>
     ))}
   </div>
-</a>
+</article>

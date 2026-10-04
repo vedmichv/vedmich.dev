@@ -55,6 +55,7 @@
     "back_link": "Back to Speaking",
     "watch_video": "Watch on YouTube",
     "view_slides": "View Slides",
+    "read_article": "Read the Article",
     "all_talks": "All talks"
   },
   "book": {
@@ -66,7 +67,8 @@
   "presentations": {
     "title": "Recent decks",
     "subtitle": "{N} talks · all on vedmich.dev/slides",
-    "all_decks": "All decks"
+    "all_decks": "All decks",
+    "read_article": "Read the article"
   },
   "blog": {
     "title": "Blog",

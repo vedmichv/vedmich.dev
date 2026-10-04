@@ -55,6 +55,7 @@
     "back_link": "Назад к выступлениям",
     "watch_video": "Смотреть на YouTube",
     "view_slides": "Посмотреть слайды",
+    "read_article": "Читать статью",
     "all_talks": "Все выступления"
   },
   "book": {
@@ -66,7 +67,8 @@
   "presentations": {
     "title": "Свежие доклады",
     "subtitle": "{N} докладов · все на vedmich.dev/slides",
-    "all_decks": "Все доклады"
+    "all_decks": "Все доклады",
+    "read_article": "Читать статью"
   },
   "blog": {
     "title": "Блог",

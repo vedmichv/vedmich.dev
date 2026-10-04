@@ -58,8 +58,8 @@ const i = t(locale);
       </div>
     )}
 
-    {(talk.data.video || talk.data.slides) && (
-      <div class="flex gap-3 mb-8">
+    {(talk.data.video || talk.data.slides || talk.data.post) && (
+      <div class="flex flex-wrap gap-3 mb-8">
         {talk.data.video && (
           <a
             href={talk.data.video}
@@ -80,6 +80,14 @@ const i = t(locale);
             aria-label={`${i.speaking.view_slides} (opens in new tab)`}
           >
             {i.speaking.view_slides}
+          </a>
+        )}
+        {talk.data.post && (
+          <a
+            href={talk.data.post}
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-brand-primary text-brand-primary hover:bg-brand-primary-soft transition-colors font-semibold"
+          >
+            {i.speaking.read_article}
           </a>
         )}
       </div>
