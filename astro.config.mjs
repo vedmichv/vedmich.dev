@@ -21,23 +21,23 @@ import icon from 'astro-icon';
 // the `!data.draft` filters in those components. Promote = flip `draft:false`.
 function draftBlogUrls() {
   const urls = new Set();
-  for (const locale of ['en', 'ru']) {
+  for (const [collection, locale] of [['blog', 'en'], ['blog', 'ru'], ['speaking', 'en'], ['speaking', 'ru']]) {
     let files = [];
     try {
-      files = readdirSync(new URL(`./src/content/blog/${locale}/`, import.meta.url));
+      files = readdirSync(new URL(`./src/content/${collection}/${locale}/`, import.meta.url));
     } catch {
       continue;
     }
     for (const file of files) {
       if (!/\.mdx?$/.test(file)) continue;
       const raw = readFileSync(
-        new URL(`./src/content/blog/${locale}/${file}`, import.meta.url),
+        new URL(`./src/content/${collection}/${locale}/${file}`, import.meta.url),
         'utf8',
       );
       const fm = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
       if (fm && /^draft:\s*true\s*$/m.test(fm[1])) {
         const slug = file.replace(/\.mdx?$/, '');
-        urls.add(`https://vedmich.dev/${locale}/blog/${slug}/`);
+        urls.add(`https://vedmich.dev/${locale}/${collection}/${slug}/`);
       }
     }
   }

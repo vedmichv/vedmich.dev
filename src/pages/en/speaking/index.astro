@@ -24,7 +24,7 @@ const talksByYear = talks.reduce((acc, talk) => {
 ---
 
 <BaseLayout
-  title="Speaking — Viktor Vedmich"
+  title="Speaking · Viktor Vedmich"
   description="Conference talks and presentations on Kubernetes, AWS, and cloud architecture"
   locale={locale}
   path="/speaking"
@@ -48,7 +48,7 @@ const talksByYear = talks.reduce((acc, talk) => {
                     {talk.data.event} <span class="font-normal text-text-muted">· {talk.data.city}</span>
                   </div>
                   <a
-                    href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}`}
+                    href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}/`}
                     class="font-body text-sm text-text-muted mt-2 block hover:text-brand-primary transition-colors"
                   >
                     <span class="text-brand-primary">→</span> {talk.data.title}

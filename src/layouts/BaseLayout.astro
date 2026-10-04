@@ -18,7 +18,7 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, description = 'Viktor Vedmich — Senior Solutions Architect @ AWS, CNCF Kubestronaut, Author, Speaker', locale, path = '', noindex = false } = Astro.props;
+const { title, description = 'Viktor Vedmich: Senior Solutions Architect @ AWS, CNCF Kubestronaut, Author, Speaker', locale, path = '', noindex = false } = Astro.props;
 const altLocale = getAlternateLocale(locale);
 const i = t(locale);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);

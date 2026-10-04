@@ -55,7 +55,7 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
       href={data.post}
       class="relative z-10 self-start font-mono text-xs text-brand-accent hover:text-brand-accent-hover transition-colors mb-2.5"
     >
-      → {i.presentations.read_article}
+      → {i.presentations.read_article}<span class="sr-only">: {data.title}</span>
     </a>
   )}
 

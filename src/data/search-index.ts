@@ -52,7 +52,7 @@ export async function buildSearchIndex(locale: Locale): Promise<SearchItem[]> {
       kind: 'post',
       title: entry.data.title,
       sub: dateStr,
-      url: `/${locale}/blog/${idWithoutLocale}`,
+      url: `/${locale}/blog/${idWithoutLocale}/`,
       tags: entry.data.tags,
       body: entry.data.description,
       date: dateStr,

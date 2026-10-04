@@ -27,7 +27,7 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
       <h2 class="font-display text-3xl font-bold">{i.presentations.title}</h2>
       {totalCount > 0 && (
         <a
-          href={`/${locale}/presentations`}
+          href={`/${locale}/presentations/`}
           class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
         >
           {i.presentations.all_decks} →
@@ -47,7 +47,7 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
 
         <div class="mt-10 animate-on-scroll">
           <a
-            href={`/${locale}/presentations`}
+            href={`/${locale}/presentations/`}
             class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
           >
             {i.presentations.all_decks} →

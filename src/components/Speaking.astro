@@ -47,7 +47,7 @@ const talksByYear = talks.reduce((acc, talk) => {
                   {talk.data.event} <span class="font-normal text-text-muted">· {talk.data.city}</span>
                 </div>
                 <a
-                  href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}`}
+                  href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}/`}
                   class="font-body text-sm text-text-muted mt-2 block hover:text-brand-primary transition-colors"
                 >
                   <span class="text-brand-primary">→</span> {talk.data.title}
@@ -63,7 +63,7 @@ const talksByYear = talks.reduce((acc, talk) => {
     </div>
 
     <div class="mt-10 animate-on-scroll">
-      <a href={`/${locale}/speaking`} class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap">
+      <a href={`/${locale}/speaking/`} class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap">
         {i.speaking.all_talks} →
       </a>
     </div>

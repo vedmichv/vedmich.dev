@@ -12,7 +12,12 @@ import Contact from '../../components/Contact.astro';
 const locale = 'ru';
 ---
 
-<BaseLayout title="Виктор Ведмич — Solutions Architect, Автор, Спикер" locale={locale} path="/">
+<BaseLayout
+  title="Виктор Ведмич · Solutions Architect, автор, спикер"
+  description="Виктор Ведмич: Senior Solutions Architect в AWS, CNCF Kubestronaut, автор книги и спикер. Kubernetes, облачная архитектура и AI для DevOps."
+  locale={locale}
+  path="/"
+>
   <Hero locale={locale} />
   <About locale={locale} />
   <Podcasts locale={locale} />
