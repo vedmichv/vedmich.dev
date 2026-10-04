@@ -5,6 +5,7 @@ city: "Tashkent"
 date: 2026-09-25
 tags: ["AI Agents", "AWS", "Bedrock", "Kubernetes"]
 slides: "https://vedmich.dev/slides/ai-agents-devops-tashkent/"
+post: "/en/blog/2026-10-04-rca-agent-bedrock-agentcore/"
 draft: false
 ---
 
