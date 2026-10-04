@@ -2,7 +2,7 @@
 title: "Безопасность Kubernetes"
 event: "AWS Community Day Armenia"
 city: "Yerevan"
-date: 2024-09-21
+date: 2024-09-14
 tags: ["Kubernetes", "Security", "Best Practices"]
 draft: false
 ---

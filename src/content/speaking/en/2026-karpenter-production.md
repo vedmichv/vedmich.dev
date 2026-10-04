@@ -1,8 +1,8 @@
 ---
 title: "Karpenter in Production: Architecting Cost-Efficient K8s Clusters"
 event: "AWS Community Day Slovakia"
-city: "Bratislava"
-date: 2026-02-15
+city: "Košice"
+date: 2026-03-11
 tags: ["Kubernetes", "AWS", "Karpenter", "Cost Optimization"]
 draft: false
 ---
