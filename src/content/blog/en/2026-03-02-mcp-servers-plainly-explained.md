@@ -79,5 +79,5 @@ If you've ever built integrations for 5 different AI tools, you know why that ma
 
 ## Related
 
-- AWS Summit Warsaw 2026 (DOP202): *Integrated AI Agents & Code Assistants with MCP & AWS* — upcoming chalk talk, 2026-05-06
+- AWS Summit Warsaw 2026 (DOP202): *Integrated AI Agents & Code Assistants with MCP & AWS*, chalk talk, 2026-05-06
 - Anthropic's MCP specification: https://modelcontextprotocol.io (external, canonical)

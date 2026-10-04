@@ -79,5 +79,5 @@ MCP — это открытый стандарт. Anthropic передали е�
 
 ## Связанные материалы
 
-- AWS Summit Warsaw 2026 (DOP202): *Integrated AI Agents & Code Assistants with MCP & AWS* — предстоящий chalk talk, 2026-05-06
+- AWS Summit Warsaw 2026 (DOP202): *Integrated AI Agents & Code Assistants with MCP & AWS*, chalk talk, 2026-05-06
 - Спецификация MCP от Anthropic: https://modelcontextprotocol.io (внешний ресурс)

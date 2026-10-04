@@ -4,6 +4,7 @@ event: "AWS Community Day Central Asia"
 city: "Tashkent"
 date: 2026-09-25
 tags: ["AI Agents", "AWS", "Bedrock", "Kubernetes"]
+video: "https://www.youtube.com/watch?v=e1PsDlzj6og&t=4500s"
 slides: "https://vedmich.dev/slides/ai-agents-devops-tashkent/"
 post: "/ru/blog/2026-10-04-rca-agent-bedrock-agentcore/"
 draft: false
