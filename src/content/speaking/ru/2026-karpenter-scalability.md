@@ -9,4 +9,4 @@ draft: false
 
 Глубокое погружение в архитектуру Karpenter и паттерны развертывания в продакшене для экономичного автомасштабирования Kubernetes кластеров.
 
-Трек Infrastructure/DevOps на Code Europe 2025 (EXPO Kraków, 30 июня – 1 июля 2025).
+Трек Infrastructure/DevOps на [Code Europe](https://codeeurope.pl/) 2025 ([EXPO Kraków](https://expokrakow.com/), 30 июня – 1 июля 2025).
