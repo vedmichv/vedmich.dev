@@ -1,64 +1,69 @@
 ---
 title: "Why I still write Kubernetes manifests by hand"
-description: "Helm and Kustomize are great. Here's why I don't reach for them first."
+description: "Helm and Kustomize are great tools, but I don't start with them. Why, and where that rule stops working."
 date: 2026-02-10
 tags: ["kubernetes", "opinion"]
 ---
 
-I have a kubectl apply alias that points at raw YAML files, and it has served me for years. Last month a colleague asked why I don't just use Helm. Here's why.
+Most of my Kubernetes work starts the same way: a folder of raw manifests and `kubectl apply -f`. No chart, no overlays. The obvious question: why not just use Helm? Here's why, and where that answer stops being true.
 
 ## Debuggability
 
-Raw manifests are greppable, diffable, pasteable into Slack. When something breaks at 2am, I don't want to trace through three layers of Helm templating to figure out which value override produced the broken YAML that landed in the cluster.
+Raw manifests are easy to grep, diff, and paste into Slack. When something breaks at 2am, I don't want to dig through three layers of templating to find which value override produced the broken YAML.
 
-I've spent hours debugging Helm charts where the rendered manifest looked nothing like what I expected because of a nested template include that was pulling values from a parent chart's dependencies. The error message pointed to line 47 of the rendered output, but there was no line 47 in any of the source templates — it was synthesized from five different files.
+A typical Helm failure: a nested `include` pulls a value from a parent chart's dependency, and the parse error points at a rendered line that exists in no template you can open. `helm template --debug` shows the rendered output even when it fails to parse. Mapping it back to the source is still on you.
 
-With raw manifests, what you write is what you get. If the Deployment fails to create Pods, I open the Deployment manifest, read the spec, and see the problem. No rendering step. No "which values.yaml file is actually being used?"
+Git diffs stay honest, too. `git diff` on a manifest shows the field that changed. On a chart, the diff shows changed values or a changed Go template, and to see what changes in the actual resources, the reviewer has to render the chart first.
 
-Git diffs are clean. `git diff` on a raw manifest shows exactly what changed — one field, one line. `git diff` on a Helm chart shows changes to Go templates, and you have to mentally render them to understand the actual Kubernetes resource change. Code review gets slower.
+Here's the catch, though: raw YAML is not what runs in the cluster either. It removes template rendering, not the API server. Defaulting fills in fields your file never set. Mutating admission can add tolerations, default resource requests from a LimitRange, or a service mesh sidecar. Controllers keep writing status, revision annotations, and autoscaler replica counts. So when debugging, look at the live Deployment, the Pods it creates, and the warning events:
 
-## Skill depth
+```bash
+# what would change if you applied the file right now
+kubectl diff -f deployment.yaml
+# the live object, after defaulting and admission
+kubectl get deployment web -o yaml
+# the Pods it created: LimitRange defaults and sidecars land here
+kubectl get pods -l app=web -o yaml
+# rejections and other warnings
+kubectl events --types=Warning
+```
 
-Writing raw manifests keeps me fluent in the underlying API. I know what fields exist on a Deployment because I've typed them dozens of times. I know the difference between `strategy.type: RollingUpdate` and `strategy.type: Recreate` because I've used both and watched the rollout behavior.
+With raw YAML, that is the only gap. With a chart, there are two: values versus rendered output, then rendered output versus live.
 
-When Helm abstractions break — and they do — I can still reason about what's actually being sent to the API server. Helm is a tool that generates YAML. If you don't understand the YAML it generates, you're debugging blind.
+## Staying fluent in the API
 
-I've seen engineers who learned Kubernetes through Helm struggle when they encounter a cluster where nothing is templated. They know how to modify `values.yaml`, but they don't know what a PodSecurityPolicy does or why a ServiceAccount needs a RoleBinding. The abstraction became their ceiling, not their floor.
+Writing manifests by hand keeps the API in my head. I know which fields a Deployment has because I've typed them many times. I know how `strategy.type: RollingUpdate` differs from `strategy.type: Recreate` because I've watched both roll out. Abstractions break eventually, and when they do, I can still reason about what goes to the API server. Helm generates YAML. If you don't understand that YAML, you're debugging blind.
 
-Raw manifests force you to learn the API. That knowledge transfers to every cluster, every tool, every debugging session. Helm knowledge transfers to other Helm users.
+A common pattern: engineers who learned Kubernetes through Helm freeze on a cluster where nothing is templated. They can edit `values.yaml`, but can't explain why a Deployment in a namespace labeled `pod-security.kubernetes.io/enforce: restricted` never gets its Pods, or what their ServiceAccount is allowed to do. The abstraction became their ceiling instead of their floor.
+
+Both answers are short once you know the API. Pod Security Admission replaced PodSecurityPolicy, which was removed in Kubernetes 1.25. In `enforce` mode it rejects the noncompliant Pods, not the Deployment, so the rejection shows up in the ReplicaSet events (the `warn` and `audit` modes do flag the Deployment's Pod template). With default RBAC, a ServiceAccount can discover the API and inspect its own identity and permissions, nothing more. Access to Pods or Secrets needs a RoleBinding or ClusterRoleBinding for the account or one of its groups. An app that never calls the API needs no binding just to run. That knowledge works on every cluster. Knowing one chart's values works with that chart.
 
 ## The abstraction tax
 
-Helm charts for toy services introduce more cognitive overhead than the services they describe. A three-file Kubernetes app (Deployment, Service, Ingress) becomes a Helm chart with templates/, values.yaml, Chart.yaml, _helpers.tpl, and a dozen files of boilerplate.
+For a small service, a chart adds more cognitive overhead than the service itself. A three-file app (Deployment, Service, HTTPRoute) becomes `Chart.yaml`, `values.yaml`, `_helpers.tpl`, and a `templates/` folder. `helm create` alone scaffolds a dozen files. For one service in one environment, you pay the tax (template language, release lifecycle, chart versioning), and release history with `helm rollback` rarely pays it back.
 
-For a single service with one environment, Helm is overkill. You pay the abstraction tax — learning Helm's templating language, dealing with its release lifecycle, managing its versioning — for no benefit. The YAML is simpler than the Helm chart.
+Kustomize overlays aren't free either. In a four-layer stack (base, cluster, namespace, app), you open four directories to find out why an annotation sits on the final object. Elegant on a whiteboard, opaque at 2am.
 
-Kustomize overlay stacks can become their own maintenance problem. I've seen four-layer Kustomize hierarchies (base → cluster-level → namespace-level → app-level) where you have to trace through all four layers to understand why a particular annotation exists on the final resource. The composition was elegant in theory. In practice, it was opaque.
+The tax pays off when configurations really differ at scale: many environments, many services, a platform team running shared infrastructure. On a small fleet where everything looks alike, it doesn't.
 
-Abstractions are expensive. You pay the cost in cognitive load, onboarding time, and debugging complexity. That cost is worth it when you have variation at scale — 10 environments, 100 services, a platform team managing shared infrastructure. It's not worth it for small fleets where the variation is low.
+## When Helm is worth it
 
-## When I'd use Helm anyway
+Many services of the same shape call for templating. Nobody wants to copy a hundred Deployments and bump image tags by hand. Helm gives you parameters, versioned charts, and `helm rollback`. Here the tax is cheaper than a hundred manifest sets maintained by hand.
 
-A 100-service platform team needs templating. You can't copy-paste 100 Deployments and manually update image tags. Helm gives you parameterization, versioning, and rollback. The abstraction tax is justified because the alternative — managing 100 raw manifest sets — is worse.
+The other case is packaged software. A team needs a database or a monitoring stack running and doesn't want to start with the StatefulSet docs. A maintained chart packages someone else's operational knowledge. That's real value for people who don't live in Kubernetes every day.
 
-An ops team that doesn't read YAML daily needs Helm's batteries. They want `helm install postgres bitnami/postgresql` and a running database, not 15 minutes reading the PostgreSQL StatefulSet docs. Helm charts package operational knowledge. That's valuable when you're not a Kubernetes expert.
+## My rule of thumb
 
-A multi-cluster GitOps fleet needs Kustomize overlays. When you have 20 clusters in different regions with slightly different configs (image registries, storage classes, ingress controllers), Kustomize lets you define the base once and layer cluster-specific overrides. Clean separation. No copy-paste drift.
+Start with raw YAML. My personal threshold for moving past it is roughly five environments or ten services. That's a rule of thumb from my own work, not a law: the real signal is how much your configuration varies and how often it changes.
 
-## Practical heuristic
-
-Start with raw YAML. If you have fewer than 5 environments and fewer than 10 services, raw manifests are simpler, clearer, and easier to debug.
-
-Move to Helm when you have more than ~5 environments or ~10 services. At that scale, parameterization pays for itself. But keep the Helm charts simple — prefer values over complex templating. The goal is "one place to change the image tag," not "a Turing-complete configuration language."
-
-Move to Kustomize when you need clean overlays without templating. Kustomize is better than Helm for multi-cluster scenarios where each cluster needs small tweaks to a shared base. It's worse than Helm when you need heavy parameterization or you want to package and version your deployments as artifacts.
+If environments differ by small tweaks to a shared base (an image registry, a storage class, a replica count), Kustomize is the natural middle ground: still raw YAML plus patches, built into kubectl as `kubectl apply -k`. If you need real parameters or want to version deployments as artifacts, Helm earns its place. Either way, keep it boring. In Helm, put what varies into values and keep the template logic simple. The goal is one place to change the image tag, not a Turing-complete configuration language.
 
 ## The real question
 
-The real question isn't "Helm or raw manifests?" It's "what level of abstraction matches my team's scale and skill?"
+The real question isn't "Helm or raw manifests?" It's "what level of abstraction fits my team's scale and skills?"
 
-If you're a solo developer running two services in one cluster, raw manifests are faster than learning Helm. If you're a platform team managing 50 microservices across 10 environments, Helm is mandatory. If you're somewhere in between, the answer depends on how much variation you have and how often it changes.
+A solo developer with two services ships faster with raw manifests than by learning Helm. A platform team with fifty microservices across ten environments will almost certainly want templating or overlays: Helm, Kustomize, or both. But scale alone doesn't pick the tool. Configuration variation, packaging needs, and the way the team works do.
 
-I write raw manifests by hand because most of my work is at the small end of that scale — one-off engagements, proof-of-concept clusters, troubleshooting customer setups. The cognitive overhead of Helm would slow me down more than it speeds me up.
+I write manifests by hand because most of my work sits at the small end: demos, proof-of-concept clusters, troubleshooting sessions where I need to see exactly what was applied. There, Helm would slow me down more than it speeds me up.
 
-Your mileage will vary.
+Your setup may be different. Pick the level of abstraction you can still debug at 2am.
