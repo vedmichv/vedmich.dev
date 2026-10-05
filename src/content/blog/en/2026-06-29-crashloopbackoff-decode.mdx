@@ -1,0 +1,119 @@
+---
+title: "CrashLoopBackOff in 4 steps: decode the restart loop"
+description: "The single most common K8s troubleshooting question, and the trap is treating CrashLoopBackOff as the error when it's a state. Here is the four-step first response, the exit-code table, and the liveness-probe case that produces a crash loop with zero application errors."
+date: 2026-06-29
+tags: ["kubernetes", "devops", "sre", "interview", "troubleshooting"]
+draft: true
+---
+
+`CrashLoopBackOff` is the single most common troubleshooting question I ask in mock interviews on our DevOps podcast. It's reproducible, everyone has hit it, and it sorts people instantly. The trap is right there in the name: candidates treat `CrashLoopBackOff` as the error, when it's a state. The error already happened. This is Kubernetes telling you it happened more than once.
+
+![CrashLoopBackOff in 4 steps](/blog-assets/2026-06-29-crashloopbackoff-decode/loop.png)
+
+When I ask "a Pod is in `CrashLoopBackOff`, walk me through it," I'm not testing whether you can read a status column. I'm testing whether you know a symptom from a cause, and whether your first move is something other than guessing.
+
+## It's a state, not a cause
+
+The kubelet starts your container. It exits non-zero, almost immediately. The kubelet, following the Pod's `restartPolicy`, restarts it. It crashes again. After a few cycles the kubelet stops restarting on contact and starts waiting between attempts, and that waiting period is the backoff.
+
+The delay grows exponentially: roughly 10s, then 20s, then 40s, doubling up to a cap of 300s, five minutes. If the container runs successfully for 10 minutes, the timer resets and the next crash climbs from the bottom again. That's the whole mechanism. `CrashLoopBackOff` is the kubelet rate-limiting a container that keeps dying, so a tight loop doesn't burn the node.
+
+Which means the status tells you nothing about *why*. The why is in the logs and the events, and step one is reading the right ones.
+
+## The four-step first response
+
+This is the part I actually want to hear. Not every `kubectl` command you know, but a short ordered sequence that finds the cause.
+
+### Step 1: logs from the crashed container
+
+![The --previous flag reads the crashed container, not the fresh one](/blog-assets/2026-06-29-crashloopbackoff-decode/logs-previous.png)
+
+```bash
+kubectl logs <pod> --previous
+```
+
+This is the single most-skipped command in the whole exercise. By the time you run `kubectl logs`, the container has already restarted, so plain `logs` reads the *fresh* instance, which has barely started and shows nothing. The `--previous` flag reads the instance that actually crashed. That's where the stack trace, the panic, the "config file not found" line is sitting. Skip this flag and you stare at an empty log and conclude there's "no error," when the error is one instance back.
+
+### Step 2: describe the Pod
+
+```bash
+kubectl describe pod <pod>
+```
+
+Scroll to `Events` and `Last State`. The events show what the kubelet saw. `Last State` gives you the exit code and reason of the previous run, specific enough to point you at the cause before you've read a line of application output.
+
+### Step 3: config and mounts
+
+If the logs say "no such file" or the process dies before it logs anything useful, look at what you're mounting. A `ConfigMap` or `Secret` referenced in the spec but missing from the namespace. A volume at the wrong path. A broken config file, an `nginx.conf` with a typo that makes the binary refuse to start. The container is fine. What you handed it isn't.
+
+### Step 4: resources
+
+If `Last State` shows the process was killed rather than exiting on its own, suspect memory. A limit set too tight gets the container killed by the kernel the moment it allocates past the ceiling, over and over, which reads as a crash loop. This is `OOMKilled`, and it has its own exit code.
+
+## Reading the exit code
+
+The exit code in `Last State` is the fastest triage you have.
+
+![The exit code tells you who killed the container](/blog-assets/2026-06-29-crashloopbackoff-decode/exit-codes.png)
+
+| Exit code | Meaning | What to look at |
+|---|---|---|
+| `137` | SIGKILL, usually `OOMKilled` | `128 + 9`, where 9 is SIGKILL. The `OOMKilled` reason in `Last State` confirms a memory limit. Raise the limit or fix the leak. |
+| `1`–`127` | Application exited | Your code threw and quit: bad migration, missing config, unhandled exception. Read `logs --previous`. |
+| `Error`, no logs | Entrypoint failed instantly | The command never ran: wrong binary path, missing exec bit, bad `command`. |
+
+`137` is worth memorizing. It's `128 + 9`, where 9 is `SIGKILL`. Most of the time that's the kernel's OOM killer hitting your container for crossing its own memory limit, which is why the `OOMKilled` reason string in `Last State` is what you actually key on, not the number alone. A probe-triggered kill or a node eviction can land on 137 too. When it is OOM, it's not a node problem and not your app being slow: a ceiling that's too low or a leak that's real.
+
+## What most candidates get wrong
+
+Here's the case that separates people who've operated clusters from people who've read about them, and it's the part of the answer I'm really waiting for.
+
+The Pod is in `CrashLoopBackOff`. You run `logs --previous`. There are no application errors. The app started clean, logged that it was listening, and got killed anyway. Most people loop back to the code, convinced they missed something. They didn't.
+
+Check the liveness probe.
+
+A liveness probe with an `initialDelaySeconds` that's too short, or a `timeoutSeconds` that's too aggressive, marks a healthy-but-slow-to-warm container as unhealthy and tells the kubelet to restart it. The app boots, the probe fires before the app can answer, the probe fails, the kubelet kills the container, and the cycle repeats forever. A textbook crash loop with a perfectly healthy application underneath it. The app is fine. The probe is wrong. Almost nobody checks the probe, because the name says "crash" so they go looking for a crash.
+
+## The tricky follow-up: OOMKilled is not eviction
+
+Once a candidate handles all that, I push on one distinction, because conflating these two is the most common senior-level mistake I hear.
+
+`OOMKilled` is the **Linux kernel** (the cgroup) sending `SIGKILL` to a process that exceeded its container's *own* memory limit. It's local to the container, produces exit code `137`, and happens regardless of how much room the node has. Your container hit *its* ceiling.
+
+Eviction is the **kubelet** acting under *node-level* memory pressure. When the whole node runs low, the kubelet removes Pods to reclaim resources, in QoS-class order: `BestEffort` first, then `Burstable`, then `Guaranteed` last. Eviction can remove a Pod that's well within its own limits, because its neighbors made the node desperate. That's a node problem, not a container problem. Same symptom on the surface, two different root causes, two different fixes. Mixing them up sends you tuning the wrong thing.
+
+One modern note, in case an interviewer probes the timing. The classic answer is that backoff caps at five minutes, and as of 2026 that's becoming tunable. `ReduceDefaultCrashLoopBackOffDecay` starts retries at 1s and doubles up to a 60s cap instead of 300s. `KubeletCrashLoopBackOffMax` lets you set the max delay per node via `maxContainerRestartPeriod`, anywhere from "1s" to "300s". Both are alpha, neither is on by default, so "10s to 300s" is still the correct textbook answer. Knowing the docs have moved on is the kind of thing that lands.
+
+## The answer, end to end
+
+Put together, the response is short:
+
+1. `CrashLoopBackOff` is a state, not the error. It's the kubelet rate-limiting a container that keeps dying.
+2. `kubectl logs <pod> --previous`. Read the dead container, not the fresh one.
+3. `kubectl describe pod`. Read the exit code and `Last State`: 137 is SIGKILL (usually `OOMKilled`), 1 to 127 is your app, `Error` with no logs is a broken entrypoint.
+4. No application errors at all? Check the liveness probe before you touch the code.
+5. Follow-up: `OOMKilled` (kernel, container's own limit, exit 137) is not eviction (kubelet, node pressure, QoS order).
+
+That takes about thirty seconds to say and it shows you've debugged this for real, not memorized a command list. Which is the entire point of the question.
+
+This is part of a series I'm building: one senior Kubernetes interview question every week, broken down the way I'd want to hear it answered.
+
+## Get the full playbook
+
+<figure class="my-6">
+  <img
+    src="/blog-assets/2026-06-29-crashloopbackoff-decode/book-cover.png"
+    alt="Cracking the Kubernetes Interview"
+    loading="lazy"
+    width="420"
+    style="max-width: 320px; height: auto; margin: 0 auto;"
+  />
+  <figcaption class="text-sm text-text-muted mt-2 text-center">Cracking the Kubernetes Interview.</figcaption>
+</figure>
+
+The crash-loop decode is one question. Want more like it? They're in my book, *Cracking the Kubernetes Interview*: control plane internals, scheduling, networking, storage, security, and the follow-ups interviewers actually use to tell operators from doc-readers. If this breakdown was useful, that's the whole book.
+
+## Related
+
+- LinkedIn carousel: *CrashLoopBackOff in 4 steps.* The visual version of this post.
+- Previously in the series: reading a Pod stuck in `Pending` with the decode tree.

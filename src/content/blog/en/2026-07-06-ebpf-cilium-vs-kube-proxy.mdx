@@ -1,0 +1,107 @@
+---
+title: "eBPF did not kill kube-proxy: the senior version of the story"
+description: "The viral take is that eBPF replaced kube-proxy and that kube-proxy is O(n). Both are half true. Here is which kube-proxy mode is actually O(n), how Cilium replaces it at connect() time, the config flag everyone still types wrong, and why EKS still ships kube-proxy by default."
+date: 2026-07-06
+tags: ["kubernetes", "devops", "sre", "networking", "ebpf", "cilium"]
+draft: true
+---
+
+"eBPF killed kube-proxy." I hear some version of it from the audience when I speak at conferences, usually right after someone has read a viral thread. It's a great example of a claim that is half right, and the wrong half is exactly what trips up even senior engineers.
+
+So when someone tells me eBPF replaced kube-proxy and that kube-proxy is O(n) and slow, I don't argue. I ask one question: which kube-proxy *mode* do you mean?
+
+## kube-proxy is not one thing
+
+That question matters because kube-proxy has three Linux backends, and only one of them is the O(n) villain from the threads.
+
+![iptables mode is O(n), not kube-proxy](/blog-assets/2026-07-06-ebpf-cilium-vs-kube-proxy/backends.png)
+
+**iptables mode** is the default, and it genuinely is O(n). kube-proxy programs a chain of iptables rules proportional to the number of Services and endpoints, and when a packet arrives the kernel walks that chain to find a match. More Services, longer walk, higher first-packet latency. This is the real scaling problem, and it is the one everyone is actually describing when they say "kube-proxy is slow."
+
+**IPVS mode** was built for this. It uses a kernel hash table instead of a linear chain, so the lookup cost stays roughly flat as Services grow. It has been around for years precisely because large clusters outgrew iptables.
+
+**nftables mode** is the newer one, and it is the part of the story most people have not caught up to. It uses nftables verdict maps and sets, so service dispatch is a single map lookup that is roughly O(1) regardless of cluster size. It went GA in Kubernetes v1.33, released in April 2025.
+
+So "kube-proxy is O(n)" was never true about kube-proxy. It was true about one of its three modes. And the project already shipped a fast one.
+
+## kube-proxy fixed itself
+
+![nftables backend went GA in v1.33](/blog-assets/2026-07-06-ebpf-cilium-vs-kube-proxy/nftables-ga.png)
+
+This is the nuance that lands in an interview. "kube-proxy is legacy and slow" is increasingly wrong, because the slow part was always the iptables mode, and kube-proxy now has an O(1) backend of its own.
+
+Two honest caveats so you don't overcorrect. First, iptables stays the *default* in vanilla Kubernetes for compatibility, even after nftables went GA. nftables is the recommended mode going forward, not the automatic one. Second, IPVS is now deprecated (as of v1.35), because maintaining it alongside nftables was not worth the technical debt once nftables matched its performance. And one more for the pedant in your panel: the total ruleset size is still O(n) for both iptables and nftables. What nftables fixes is the per-packet match (O(1)) and the cost of incremental updates. That precision is the kind of thing that signals you have actually read the KEP.
+
+## What Cilium actually does
+
+If kube-proxy can be fast on its own, what is eBPF for? The answer is more interesting than "replace iptables."
+
+![Cilium resolves the Service at connect() with socket-level load balancing](/blog-assets/2026-07-06-ebpf-cilium-vs-kube-proxy/socket-lb.png)
+
+For east-west traffic (Pod to ClusterIP inside the cluster), Cilium's kube-proxy replacement does **socket-level load balancing**. When your application calls `connect()` to a Service's virtual IP, a cgroup eBPF hook fires once, looks up a backend in an eBPF hash map, and connects the socket directly to a backend Pod IP. The application thinks it is talking to the Service VIP. The kernel socket is wired straight to a real Pod.
+
+The consequence is the actual win: the translation happens **once, at connection setup**, not on every packet. There is no per-packet DNAT rewrite for east-west ClusterIP traffic, because the destination was resolved at the socket layer before the first packet was ever built. (Be precise here: Cilium still keeps a BPF connection-tracking table for policy and for north-south NAT. The "once, not per packet" claim is about DNAT on the east-west hot path, not a blanket "no conntrack anywhere.")
+
+For north-south traffic (NodePort and LoadBalancer from outside the node), there is no client `connect()` to hook, so Cilium handles those at the tc and XDP layers instead. With XDP it can process load-balancing in the NIC driver before the kernel even allocates a socket buffer, and Maglev consistent hashing keeps backend selection stable across nodes without state sync. Different path, also fast, but not the same socket-LB mechanism.
+
+## The catch: kube-proxy-free has prerequisites
+
+Here is where I separate people who have run this from people who have read about it.
+
+The flag is `kubeProxyReplacement: true`. Not `strict`. The old string values (`strict`, `partial`, `disabled`) were removed in Cilium v1.15, and `probe` went even earlier. The only valid values now are `true` and `false`, and the default is `false`. If a candidate confidently types `strict`, I know which blog they learned this from and roughly what year.
+
+Three things that bite in production:
+
+- **Kernel floor.** Current Cilium recommends kernel 5.10 or later (4.18 on RHEL 8.10). Below that, the features you want for a full replacement are not all there.
+- **No fallback.** Once you set `kubeProxyReplacement: true` and remove the kube-proxy DaemonSet, there is no safety net. If the kernel cannot do what you asked, the Cilium agent fails closed and bails out. It does not silently fall back to iptables, because iptables is gone.
+- **Socket-LB side effects.** NFS and SMB mounted against a Service ClusterIP can break under socket-LB on older kernels, which catches storage stacks like Longhorn. And only TCP and UDP are fully supported as Service transports. SCTP is not.
+
+None of this means do not do it. It means it is a deliberate architecture choice with prerequisites, not a free upgrade you toggle on a Friday.
+
+## So how do you run it on EKS?
+
+![Three ways to run Cilium on EKS: default, chaining, primary CNI](/blog-assets/2026-07-06-ebpf-cilium-vs-kube-proxy/providers.png)
+
+Since I work on AWS, the question I actually get is the practical one: how do you run this on EKS? There are three ways to land it, and knowing which one you want is the senior part of the answer.
+
+- **Default: the Amazon VPC CNI plus a managed kube-proxy add-on.** Pods get real, routable VPC IP addresses on ENIs, which is a deliberate design: native AWS networking, security groups, and flow logs that behave like the rest of your VPC. For a lot of clusters this is exactly what you want, and there is nothing to add.
+- **Chain Cilium on top (`cni.chainingMode=aws-cni`).** The VPC CNI keeps owning IP address management and the device setup, so you keep VPC-native Pod IPs and security-groups-for-pods, and Cilium layers on NetworkPolicy, load balancing, encryption, and Hubble observability. The documented limits in chaining mode are Layer 7 policy and IPsec, so reach for primary mode if you need the full datapath.
+- **Run Cilium as the primary CNI (`eni.enabled=true`).** Cilium replaces the VPC CNI, still allocates routable ENI IP addresses per Pod, and this is where you unlock the full eBPF datapath including kube-proxy replacement, XDP acceleration, and host routing. The trade-off is real: you give up the VPC-CNI-only security-groups-for-pods feature and you take ownership of the CNI lifecycle and upgrades.
+
+To go kube-proxy-free on EKS, you remove the managed kube-proxy add-on, then install Cilium with `kubeProxyReplacement=true` and point `k8sServiceHost` and `k8sServicePort` at the EKS API server endpoint (port 443), because there is no kube-proxy left to provision the `kubernetes` Service. One thing that is no longer a blocker: the kernel. Cilium recommends 5.10 or newer for the full datapath, and EKS-optimized AL2023 AMIs ship kernel 6.1, so you clear it with room to spare. (AWS also now offers AWS support for Cilium, including kube-proxy replacement, on EKS Hybrid Nodes.)
+
+Cilium itself is a CNCF graduated project (October 2023), so the foundation is solid. The point is that on EKS, "use eBPF" is a deliberate choice with a clear ladder, not a default you flip on.
+
+## The answer, end to end
+
+Put together, the senior version of "eBPF replaced kube-proxy" is short:
+
+1. kube-proxy is not one thing. It has three backends, and only the iptables mode is O(n) per packet.
+2. kube-proxy already fixed that: the nftables backend went GA in v1.33 and is roughly O(1). iptables just stays the default for compatibility.
+3. Cilium's real win is socket-level load balancing: it resolves east-west ClusterIP at `connect()` time, so there is no per-packet DNAT on that path.
+4. kube-proxy-free is `kubeProxyReplacement: true` (not `strict`), needs kernel 5.10+, and fails closed with no fallback once kube-proxy is gone.
+5. GKE Dataplane V2 is Cilium by default, AKS is opt-in, and EKS still ships kube-proxy by default.
+
+That answer takes under a minute and it shows you can tell a viral headline from how the thing actually works. Which is the entire point of asking.
+
+This is part of a series I'm building: one senior Kubernetes interview question every week, broken down the way I'd want to hear it answered.
+
+## Get the full playbook
+
+<figure class="my-6">
+  <img
+    src="/blog-assets/2026-07-06-ebpf-cilium-vs-kube-proxy/book-cover.png"
+    alt="Cracking the Kubernetes Interview"
+    loading="lazy"
+    width="420"
+    style="max-width: 320px; height: auto; margin: 0 auto;"
+  />
+  <figcaption class="text-sm text-text-muted mt-2 text-center">Cracking the Kubernetes Interview.</figcaption>
+</figure>
+
+The kube-proxy versus eBPF question is one of dozens like it. Want more? They're in my book, *Cracking the Kubernetes Interview*: control plane internals, scheduling, networking, storage, security, and the follow-ups interviewers actually use to tell operators from doc-readers. If this breakdown was useful, that's the whole book.
+
+## Related
+
+- LinkedIn carousel: *eBPF did not kill kube-proxy.* The visual version of this post.
+- Previously in the series: decoding a Pod stuck in `CrashLoopBackOff` in four steps.
