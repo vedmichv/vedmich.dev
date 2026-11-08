@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cluster Autoscaler и Karpenter: два пути от ожидающего пода до новой ноды</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F172A; --code-bg:#0B1220; --surface:#1E293B; --border:rgba(148,163,184,.16);
+    --teal:#14B8A6; --amber:#F59E0B;
+    --text:#E2E8F0; --dim:#94A3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  .wrap{max-width:860px;margin:0 auto;padding:30px 24px 26px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+  h1{font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;font-size:clamp(22px,4.6vw,34px);line-height:1.08;letter-spacing:-.025em;margin-bottom:8px}
+  h1 .em{color:var(--amber)}
+  .lead{color:var(--dim);font-size:clamp(14px,2.3vw,16px);line-height:1.5;max-width:680px;margin-bottom:22px}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--teal))}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:22px;padding-top:14px;border-top:1px solid var(--border)}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+  .foot .who b{color:var(--text);font-weight:600}
+  .legend{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.45;color:var(--dim);max-width:520px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;column-gap:22px;row-gap:14px;align-items:stretch}
+  .grid > *{grid-row:var(--r);grid-column:var(--c)}
+  .ca{--lane:var(--amber)}
+  .kp{--lane:var(--teal)}
+  .shared{grid-column:1 / -1;text-align:center;font-size:clamp(14px,2.4vw,15px);color:var(--text);background:var(--code-bg);border:1px solid var(--border);border-radius:12px;padding:12px 16px}
+  .head{border-bottom:2px solid var(--lane);padding:0 2px 8px}
+  .head b{display:block;font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;font-size:clamp(18px,3.4vw,24px);letter-spacing:-.02em;color:var(--lane)}
+  .head span{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+  .cell{position:relative;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--lane);border-radius:12px;padding:11px 14px 12px}
+  .cell .chip{--c:var(--lane);display:block;margin-bottom:4px}
+  .cell p{font-size:clamp(14px,2.3vw,15px);line-height:1.45;color:var(--text)}
+  .cell.link::after,.head.link::after{content:'';position:absolute;left:50%;bottom:-14px;width:2px;height:14px;background:var(--lane);opacity:.55}
+  .head{position:relative}
+  .head.link::after{bottom:-15px}
+  .direct{border-style:solid;box-shadow:0 0 28px rgba(20,184,166,.12)}
+  .cell .skip{display:inline-block;margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.4;letter-spacing:.04em;color:var(--teal);border:1px dashed var(--teal);border-radius:8px;padding:4px 8px}
+  .hop{border-color:rgba(245,158,11,.5);border-style:dashed;border-left:4px solid var(--amber)}
+  .hop .skip{color:var(--amber);border-color:var(--amber)}
+  .note{font-size:clamp(13px,2.2vw,14px);line-height:1.5;color:var(--dim);padding:2px 4px}
+  .rv{opacity:0;transform:translateY(8px);animation:rv .5s ease-out forwards;animation-delay:calc(var(--i,0) * 130ms)}
+  @keyframes rv{to{opacity:1;transform:none}}
+  @media(max-width:620px){
+    .wrap{padding:24px 16px 22px}
+    .grid{grid-template-columns:1fr}
+    .grid > *{grid-row:var(--rm);grid-column:1}
+    .shared{grid-column:1}
+  }
+  @media(prefers-reduced-motion:reduce){ .rv{opacity:1;transform:none;animation:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">От ожидающего пода до новой ноды</div>
+  <h1>Старт один, <span class="em">середина</span> разная.</h1>
+  <p class="lead">Оба реагируют на под, который планировщик не смог разместить. Cluster Autoscaler меняет размер группы нод, а инстанс запускает группа Auto Scaling. Karpenter выбирает инстанс сам.</p>
+
+  <div class="grid">
+    <div class="shared rv" style="--r:1;--rm:1;--i:0">Под не удалось разместить: планировщик не нашёл ему ноду.</div>
+
+    <div class="head ca link rv" style="--r:2;--c:1;--rm:2;--i:1"><b>Cluster Autoscaler</b><span>масштабирует группы нод</span></div>
+    <div class="head kp link rv" style="--r:2;--c:2;--rm:8;--i:1"><b>Karpenter</b><span>масштабирует ноды</span></div>
+
+    <div class="cell ca link rv" style="--r:3;--c:1;--rm:3;--i:2"><span class="chip">заметить</span><p>Раз в 10 секунд (по умолчанию) ищет поды, которые планировщик не смог разместить.</p></div>
+    <div class="cell kp link rv" style="--r:3;--c:2;--rm:9;--i:2"><span class="chip">заметить</span><p>Следит за подами, которые не удалось разместить, и собирает их в пачку. Окно закрывается после секунды без новых подов и длится не больше 10 секунд.</p></div>
+
+    <div class="cell ca link rv" style="--r:4;--c:1;--rm:4;--i:3"><span class="chip">выбрать</span><p>Выбирает группу, новые ноды которой смогут принять эти поды.</p></div>
+    <div class="cell kp link rv" style="--r:4;--c:2;--rm:10;--i:3"><span class="chip">выбрать</span><p>Плотно раскладывает пачку по запросам ресурсов и ограничениям размещения.</p></div>
+
+    <div class="cell ca link rv" style="--r:5;--c:1;--rm:5;--i:4"><span class="chip">увеличить</span><p>Увеличивает размер этой группы.</p></div>
+    <div class="cell kp direct rv" style="--r:5 / span 2;--c:2;--rm:11;--i:4"><span class="chip">запустить</span><p>Запускает инстансы напрямую через EC2 Fleet, выбирая из типов, которые разрешает NodePool.</p><span class="skip">группы нод по дороге нет</span></div>
+
+    <div class="cell ca hop rv" style="--r:6;--c:1;--rm:6;--i:5"><span class="chip">запустить</span><p>Инстанс запускает группа Auto Scaling.</p><span class="skip">через группу Auto Scaling</span></div>
+
+    <div class="note ca rv" style="--r:7;--c:1;--rm:7;--i:6">Рассчитывает, что у нод одной группы одинаковые ресурсы, поэтому для другого набора ресурсов нужна отдельная группа.</div>
+    <div class="note kp rv" style="--r:7;--c:2;--rm:12;--i:6">Посредника в виде группы нод нет, поэтому при нехватке мощностей Karpenter пробует другой вариант за миллисекунды, а не за минуты.</div>
+
+    <div class="shared rv" style="--r:8;--rm:13;--i:7">Нода переходит в Ready, и планировщик привязывает под к ней.</div>
+  </div>
+
+  <div class="foot">
+    <div class="who"><b>Виктор Ведмич</b> · vedmich.dev</div>
+    <div class="legend">Полное время не задокументировано ни для одного из инструментов. Замерь его в своём кластере.</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "title": "Разделение на время миграции между Cluster Autoscaler и Karpenter",
+  "descEn": "Системные поды имеют toleration для taint CriticalAddonsOnly и обязательную node affinity к системной группе нод, которая остаётся за Cluster Autoscaler или с фиксированным размером. У подов приложений toleration нет, поэтому группа нод с taint им не подходит, а ноды для них запускают NodePool в Karpenter. Системные поды Karpenter игнорирует, потому что не знает их обязательную метку.",
+  "descRu": "Системные поды имеют toleration для taint CriticalAddonsOnly и обязательную node affinity к системной группе нод, которая остаётся за Cluster Autoscaler или с фиксированным размером. У подов приложений toleration нет, поэтому группа нод с taint им не подходит, а ноды для них запускают NodePool в Karpenter. Системные поды Karpenter игнорирует, потому что не знает их обязательную метку."
+}

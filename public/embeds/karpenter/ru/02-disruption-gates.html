@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Консолидация: бюджет нод и PDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F172A; --code-bg:#0B1220; --surface:#1E293B; --border:rgba(148,163,184,.16);
+    --teal:#14B8A6; --amber:#F59E0B;
+    --text:#E2E8F0; --dim:#94A3B8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  .wrap{max-width:860px;margin:0 auto;padding:30px 24px 26px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+  h1{font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;font-size:clamp(22px,4.6vw,34px);line-height:1.08;letter-spacing:-.025em;margin-bottom:8px}
+  h1 .em{color:var(--amber)}
+  .lead{color:var(--dim);font-size:clamp(14px,2.3vw,16px);line-height:1.5;max-width:680px;margin-bottom:22px}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--teal))}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:22px;padding-top:14px;border-top:1px solid var(--border)}
+  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+  .foot .who b{color:var(--text);font-weight:600}
+  .legend{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.45;color:var(--dim);max-width:520px}
+
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;margin-bottom:20px}
+  fieldset{border:1px solid var(--border);border-radius:12px;padding:10px 12px 12px;background:var(--surface);min-width:0}
+  legend{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:0 6px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{position:relative}
+  .opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+  .opt span{display:block;font-size:14px;font-weight:600;color:var(--dim);border:1px solid var(--border);border-radius:9px;padding:8px 12px;background:var(--code-bg);transition:border-color .2s,color .2s,background .2s}
+  .opt input:checked + span{color:var(--text);border-color:var(--teal);background:rgba(20,184,166,.14)}
+  .opt input:focus-visible + span{outline:2px solid var(--teal);outline-offset:2px}
+  .opt:hover span{border-color:var(--teal)}
+  .flow{display:flex;flex-direction:column;gap:0}
+  .step{position:relative;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:12px;padding:12px 16px 14px;transition:border-color .25s,opacity .25s}
+  .step + .step{margin-top:18px}
+  .step + .step::before{content:'';position:absolute;left:28px;top:-19px;width:2px;height:18px;background:var(--teal);opacity:.55}
+  .step h2{font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;font-size:clamp(16px,3vw,19px);letter-spacing:-.01em;margin-bottom:3px}
+  .step p{font-size:clamp(14px,2.3vw,15px);line-height:1.45;color:var(--dim)}
+  .step p b{color:var(--text);font-weight:600}
+  .step code{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text);background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:1px 6px;white-space:nowrap}
+  .step.stop{border-left-color:var(--amber)}
+  .step.skipped{opacity:.55}
+  .state{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:middle;color:var(--teal);border:1px solid var(--teal)}
+  .stop .state{color:var(--amber);border-color:var(--amber)}
+  .pods{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+  .pod{width:34px;height:34px;border-radius:9px;border:2px solid var(--teal);background:rgba(20,184,166,.16);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);transition:border-color .2s,background .2s}
+  .pod.go{border-color:var(--amber);border-style:dashed;background:rgba(245,158,11,.14)}
+  .keys{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)}
+  .keys i{display:inline-block;width:16px;height:16px;border-radius:5px;border:2px solid var(--teal);background:rgba(20,184,166,.16);vertical-align:-4px;margin-right:6px}
+  .keys i.go{border-color:var(--amber);border-style:dashed;background:rgba(245,158,11,.14)}
+  .outcome{border-left-color:var(--teal);box-shadow:0 0 30px rgba(20,184,166,.10)}
+  .outcome.stop{border-left-color:var(--amber);box-shadow:0 0 30px rgba(245,158,11,.10)}
+  .event{display:block;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.45;color:var(--amber);background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
+  .step code.event{white-space:normal;overflow-wrap:anywhere}
+  .event[hidden]{display:none}
+  @media(max-width:620px){
+    .wrap{padding:24px 16px 22px}
+    .controls{grid-template-columns:1fr}
+    .step{padding:11px 13px 13px}
+  }
+  @media(prefers-reduced-motion:reduce){ .step,.opt span,.pod{transition:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Одна попытка консолидации</div>
+  <h1>Между консолидацией и <span class="em">вытеснением</span> два барьера.</h1>
+  <p class="lead">Консолидация выбирает ноду. Бюджеты NodePool ограничивают, сколько нод можно трогать. PDB ограничивает, сколько подов одного приложения вытесняется за раз. Меняй условия и следи за попыткой.</p>
+
+  <div class="controls">
+    <fieldset>
+      <legend>Когда</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="time" value="window"><span>Пн-Пт 09:00-18:00 UTC</span></label>
+        <label class="opt"><input type="radio" name="time" value="open" checked><span>Вне этого окна</span></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Реплик frontend</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="rep" value="2" checked><span>2</span></label>
+        <label class="opt"><input type="radio" name="rep" value="3"><span>3</span></label>
+        <label class="opt"><input type="radio" name="rep" value="4"><span>4</span></label>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="flow">
+    <section class="step" id="s0">
+      <h2>Консолидация выбирает ноду</h2>
+      <p>По запросам ресурсов поды этой ноды помещаются на других нодах или на более дешёвой.</p>
+    </section>
+
+    <section class="step" id="s1">
+      <h2>Барьер 1: бюджеты NodePool<span class="state" id="s1_state">открыт</span></h2>
+      <p id="s1_p">Активен только постоянный бюджет: 10% нод с округлением вверх до целой ноды.</p>
+    </section>
+
+    <section class="step stop" id="s2">
+      <h2>Барьер 2: PDB frontend-pdb<span class="state" id="s2_state">закрыт</span></h2>
+      <p>minAvailable: 2. Добровольное вытеснение, после которого останется меньше двух здоровых подов, блокируется.</p>
+      <div class="pods" id="pods" aria-hidden="true"><div class="pod">1</div><div class="pod">2</div></div>
+      <div class="keys" aria-hidden="true"><span><i></i>остаётся</span><span><i class="go"></i>можно вытеснить</span></div>
+      <p id="s2_p2" style="margin-top:8px">Реплик: 2, поэтому вытеснить нельзя ни одного пода.</p>
+    </section>
+
+    <section class="step outcome stop" id="s3" aria-live="polite">
+      <h2 id="s3_h">Пропуск: PDB блокирует вытеснение</h2>
+      <p id="s3_p">Karpenter не станет добровольно убирать ноду, пока PDB блокирует хотя бы один её под. Консолидация пропускает такую ноду.</p>
+      <code class="event" id="s3_event">pdb default/frontend-pdb prevents pod evictions</code>
+    </section>
+  </div>
+
+  <div class="foot">
+    <div class="who"><b>Виктор Ведмич</b> · vedmich.dev</div>
+    <div class="legend">Оба барьера работают только для добровольных замен. Отзыв Spot или отказ железа заберёт поды в любом случае.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var T = {"s2_none": "Реплик: {n}, поэтому вытеснить нельзя ни одного пода.", "event": "pdb default/frontend-pdb prevents pod evictions", "o_budget_p": "В этом окне добровольных замен нет. Ноды для подов, которые не удалось разместить, Karpenter всё равно запускает.", "s2_some": "Реплик: {n}, поэтому за раз можно вытеснить {k}.", "o_pdb_p": "Karpenter не станет добровольно убирать ноду, пока PDB блокирует хотя бы один её под. Консолидация пропускает такую ноду.", "open": "открыт", "not_reached": "не дошли", "s1_out": "Активен только постоянный бюджет: 10% нод с округлением вверх до целой ноды.", "s1_in": "Активны два бюджета, nodes: 10% и nodes: 0. Karpenter берёт самый строгий, поэтому сейчас можно трогать 0 нод.", "o_budget_h": "Пропуск: бюджет разрешает 0 нод", "o_pdb_h": "Пропуск: PDB блокирует вытеснение", "o_ok_p": "Karpenter может поставить на ноду taint и вытеснить её поды, но за раз не больше {k} таких подов.", "o_ok_h": "Оба барьера открыты", "closed": "закрыт"};
+  var $ = function(id){ return document.getElementById(id); };
+  function val(name){ var el = document.querySelector('input[name="'+name+'"]:checked'); return el ? el.value : null; }
+  function fmt(s, o){ return s.replace(/\{(\w+)\}/g, function(_, k){ return o[k]; }); }
+  function render(){
+    var inWindow = val('time') === 'window';
+    var n = parseInt(val('rep'), 10);
+    var k = Math.max(0, n - 2);
+    var s1 = $('s1'), s2 = $('s2'), s3 = $('s3');
+    $('s1_state').textContent = inWindow ? T.closed : T.open;
+    $('s1_p').textContent = inWindow ? T.s1_in : T.s1_out;
+    s1.classList.toggle('stop', inWindow);
+    var pods = $('pods');
+    while (pods.firstChild) pods.removeChild(pods.firstChild);
+    for (var i = 0; i < n; i++) {
+      var d = document.createElement('div');
+      d.className = 'pod' + (i >= n - k ? ' go' : '');
+      d.textContent = String(i + 1);
+      pods.appendChild(d);
+    }
+    var pdbOpen = k > 0;
+    s2.classList.toggle('skipped', inWindow);
+    s2.classList.toggle('stop', !inWindow && !pdbOpen);
+    $('s2_state').textContent = inWindow ? T.not_reached : (pdbOpen ? T.open : T.closed);
+    $('s2_p2').textContent = fmt(pdbOpen ? T.s2_some : T.s2_none, {n: n, k: k});
+    var ev = $('s3_event');
+    ev.hidden = true;
+    if (inWindow) {
+      s3.classList.add('stop');
+      $('s3_h').textContent = T.o_budget_h;
+      $('s3_p').textContent = T.o_budget_p;
+    } else if (!pdbOpen) {
+      s3.classList.add('stop');
+      $('s3_h').textContent = T.o_pdb_h;
+      $('s3_p').textContent = T.o_pdb_p;
+      ev.textContent = T.event;
+      ev.hidden = false;
+    } else {
+      s3.classList.remove('stop');
+      $('s3_h').textContent = T.o_ok_h;
+      $('s3_p').textContent = fmt(T.o_ok_p, {k: k});
+    }
+    if (inWindow) { s3.classList.add('stop'); }
+  }
+  var inputs = document.querySelectorAll('input[type="radio"]');
+  for (var j = 0; j < inputs.length; j++) inputs[j].addEventListener('change', render);
+  render();
+})();
+</script>
+</body>
+</html>
