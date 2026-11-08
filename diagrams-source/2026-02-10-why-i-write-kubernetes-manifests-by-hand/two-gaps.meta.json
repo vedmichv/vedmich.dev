@@ -1,0 +1,4 @@
+{
+  "title": "Raw YAML has one gap, a Helm chart has two",
+  "descEn": "Two paths from what you write to the live object. Raw YAML: your file goes through the API server, which applies defaulting, admission and controllers, to the live object, so there is one gap. Helm chart: values and templates go through template rendering to rendered YAML, then through the same API server step to the live object, so there are two gaps."
+}

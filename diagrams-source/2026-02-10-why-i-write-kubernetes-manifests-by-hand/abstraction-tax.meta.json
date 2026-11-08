@@ -1,0 +1,4 @@
+{
+  "title": "The abstraction tax: three manifests versus a chart",
+  "descEn": "A small service as raw YAML is three files: Deployment, Service and HTTPRoute. As a Helm chart it is Chart.yaml, values.yaml, _helpers.tpl and a templates folder holding the same three kinds. The chart adds a template language, a release lifecycle and chart versioning, and helm create alone scaffolds a dozen files."
+}
