@@ -11,9 +11,9 @@ Salesforce runs more than 1,000 Amazon EKS clusters, and since mid-2025 it has b
 
 It is not the savings. Manual operational overhead dropped by 80%, through automation and self-service node pools. Scaling latency went from minutes to seconds. Thousands of node groups are gone. Here is the counter-intuitive part: the cost line is the modest one. Salesforce saved 5% in FY2026 through better bin-packing and less idle capacity, and projects another 5 to 10% for FY2027 as the rollout continues.
 
-At that scale, single digits still matter. But the case does not say "Karpenter halves your bill". It says Karpenter takes a lot of toil off the platform team, and that the hard part is disruption. The lessons Salesforce lists are overly restrictive PodDisruptionBudgets that blocked node replacements, parallel cordoning that hurt cluster health, and consolidation that hit single-replica pods.
+At that scale, single digits still matter. But the case does not say "Karpenter halves your bill". It says Karpenter takes a lot of toil off the platform team, and that the hard part is disruption. The lessons Salesforce lists are overly restrictive PodDisruptionBudgets (PDBs) that blocked node replacements, parallel cordoning that hurt cluster health, and consolidation that hit single-replica pods.
 
-This post follows the same shape: why Karpenter behaves differently, three traps that turn its strengths against you, a staged rollout, and what to watch. The configs target the `karpenter.sh/v1` API and are checked against the Karpenter v1.14 docs. Full disclosure: I work at AWS.
+This post follows the same shape: why Karpenter behaves differently, three traps that turn its strengths against you, a staged rollout, and what to watch. The configs target the `karpenter.sh/v1` API and are checked against the Karpenter v1.14 docs. Full disclosure: I work at AWS; this is my own view.
 
 ## Why Karpenter is different
 
@@ -88,7 +88,7 @@ Here is what actually happens. Both controllers react to pods the scheduler mark
 
 Note what does not happen: Karpenter does not drain the Cluster Autoscaler node. It disrupts only nodes it launched itself, the ones backed by a NodeClaim from a NodePool. Everything else is never a candidate, so the popular story of both autoscalers consolidating the same nodes is wrong. The real interaction is quieter. When Karpenter decides whether one of its own nodes can go, it counts free room on every node in the cluster, node group nodes included. Cluster Autoscaler asks the same question about its own nodes: can these pods move elsewhere? So pods drift between the two pools, and you pay for duplicate launches.
 
-The fix is to decide which pods may land where. Splitting node ownership alone does not do that, and neither does a taint on its own: a toleration lets pods onto the tainted nodes; it does not keep them there. For dedicated nodes, the Kubernetes docs say to pair the taint with a label and a required node affinity, so the pods use only those nodes. A common EKS convention for system nodes is the `CriticalAddonsOnly=true:NoSchedule` taint: the EKS docs note that many add-ons, CoreDNS among them, tolerate it, and so does the Karpenter Helm chart by default.
+The fix is to decide which pods may land where. Splitting node ownership alone does not do that, and neither does a taint on its own: a toleration lets pods onto the tainted nodes; it does not keep them there. For dedicated nodes, the Kubernetes docs say to pair the taint with a label and a required node affinity, so the pods use only those nodes. For system nodes, the built-in `system` NodePool of EKS Auto Mode has a taint with the key `CriticalAddonsOnly`. The EKS docs note that many add-ons, CoreDNS among them, tolerate it, and so does the Karpenter Helm chart by default. In this setup, the system node group has the same taint.
 
 ```yaml
 # Pod template of a system Deployment (for example, metrics-server)
