@@ -33,7 +33,7 @@ Kubernetes already solves half of this with a **Service**: a stable virtual IP a
 
 ## Why Ingress was not enough
 
-It is worth being precise about what Ingress got structurally wrong, because Gateway API addresses each of these in the model itself, not by adding more configuration.
+The problems with Ingress come from its API model, so more settings could never fix them. There are four, and Gateway API solves each one with the design of its resources.
 
 1. **Most behavior lived in annotations.** Rewrites, timeouts, CORS, canary: all untyped strings. ingress-nginx had over a hundred of them. TLS did have a native `spec.tls` field, but almost everything beyond host, path, and TLS did not. A misspelled annotation key is silently ignored, and you find out at 3am.
 2. **One object, one owner.** A developer who just wanted to add a path route edited the same object that held the TLS configuration and the load balancer behavior. There was no clean way to split those between teams.
