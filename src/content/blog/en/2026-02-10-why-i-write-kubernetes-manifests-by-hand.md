@@ -15,7 +15,7 @@ A typical Helm failure: a nested `include` pulls a value from a parent chart's d
 
 Git diffs stay honest, too. `git diff` on a manifest shows the field that changed. On a chart, the diff shows changed values or a changed Go template, and to see what changes in the actual resources, the reviewer has to render the chart first.
 
-Here's the catch, though: raw YAML is not what runs in the cluster either. It removes template rendering, not the API server. Defaulting fills in fields your file never set. Mutating admission can add tolerations, default resource requests from a LimitRange, or a service mesh sidecar. Controllers keep writing status, revision annotations, and autoscaler replica counts. So when debugging, look at the live Deployment, the Pods it creates, and the warning events:
+Here's the catch, though: raw YAML is not what runs in the cluster either. It removes template rendering, not the API server. Defaulting fills in fields your file never set. Mutating admission can add `tolerations`, default resource requests from a LimitRange, or a service mesh sidecar. Controllers keep writing status, revision annotations, and autoscaler replica counts. So when debugging, look at the live Deployment, the Pods it creates, and the warning events:
 
 ```bash
 # what would change if you applied the file right now
@@ -36,7 +36,7 @@ Writing manifests by hand keeps the API in my head. I know which fields a Deploy
 
 A common pattern: engineers who learned Kubernetes through Helm freeze on a cluster where nothing is templated. They can edit `values.yaml`, but can't explain why a Deployment in a namespace labeled `pod-security.kubernetes.io/enforce: restricted` never gets its Pods, or what their ServiceAccount is allowed to do. The abstraction became their ceiling instead of their floor.
 
-Both answers are short once you know the API. Pod Security Admission replaced PodSecurityPolicy, which was removed in Kubernetes 1.25. In `enforce` mode it rejects the noncompliant Pods, not the Deployment, so the rejection shows up in the ReplicaSet events (the `warn` and `audit` modes do flag the Deployment's Pod template). With default RBAC, a ServiceAccount can discover the API and inspect its own identity and permissions, nothing more. Access to Pods or Secrets needs a RoleBinding or ClusterRoleBinding for the account or one of its groups. An app that never calls the API needs no binding just to run. That knowledge works on every cluster. Knowing one chart's values works with that chart.
+Both answers are short once you know the API. Pod Security Admission replaced PodSecurityPolicy, which was removed in Kubernetes 1.25. In `enforce` mode it rejects the noncompliant Pods, not the Deployment, so the rejection shows up in the ReplicaSet events (the `warn` and `audit` modes do flag the Deployment's Pod template). With default RBAC, a ServiceAccount can discover the API, read non-sensitive cluster information, and inspect its own identity and permissions, nothing more. Access to Pods or Secrets needs a RoleBinding or ClusterRoleBinding for the account or one of its groups. An app that never calls the API needs no binding just to run. That knowledge works on every cluster. Knowing one chart's values works with that chart.
 
 ## The abstraction tax
 
@@ -56,7 +56,7 @@ The other case is packaged software. A team needs a database or a monitoring sta
 
 Start with raw YAML. My personal threshold for moving past it is roughly five environments or ten services. That's a rule of thumb from my own work, not a law: the real signal is how much your configuration varies and how often it changes.
 
-If environments differ by small tweaks to a shared base (an image registry, a storage class, a replica count), Kustomize is the natural middle ground: still raw YAML plus patches, built into kubectl as `kubectl apply -k`. If you need real parameters or want to version deployments as artifacts, Helm earns its place. Either way, keep it boring. In Helm, put what varies into values and keep the template logic simple. The goal is one place to change the image tag, not a Turing-complete configuration language.
+If environments differ by small tweaks to a shared base (an image registry, a storage class, a replica count), Kustomize is the natural middle ground: still raw YAML plus patches, built into kubectl as `kubectl apply -k`. If you need real parameters or want to version deployments as artifacts, Helm earns its place. Either way, keep it boring. In Helm, put what varies into `values.yaml` and keep the template logic simple. The goal is one place to change the image tag, not a Turing-complete configuration language.
 
 ## The real question
 
