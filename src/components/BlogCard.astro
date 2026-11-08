@@ -17,7 +17,7 @@ const formattedDate = locale === 'ru'
   ? data.date
       .toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })
       .replace(/\s*г\.?$/, '')
-  : data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  : data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
 ---
 
 <a

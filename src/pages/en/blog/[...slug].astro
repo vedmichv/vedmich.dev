@@ -35,7 +35,7 @@ const readingTime = post.data.reading_time ?? remarkPluginFrontmatter.minutesRea
         &larr; Back to blog
       </a>
       <time datetime={post.data.date.toISOString()} class="font-mono text-xs text-text-muted mb-2 block">
-        {post.data.date.toLocaleDateString('en-US', {
+        {post.data.date.toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'short',
           day: 'numeric',
