@@ -7,4 +7,4 @@ tags: ["Kubernetes", "IaC", "cdk8s", "DevOps"]
 draft: false
 ---
 
-Изучение cdk8s как типобезопасной альтернативы YAML для управления инфраструктурой Kubernetes.
+Сессия на AWS Summit Amsterdam о том, как писать на cdk8s безопасные и грамотно спроектированные приложения для Kubernetes на привычных языках программирования, с демо, где Amazon CodeWhisperer помогает писать код cdk8s. Код сессии: DOP301.
