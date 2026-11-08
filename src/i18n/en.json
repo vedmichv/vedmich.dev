@@ -35,7 +35,7 @@
   "about": {
     "title": "About Me",
     "bio_before": "Solutions Architect and AI Engineer with 15+ years designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and GenAI / agentic platforms. CNCF Kubestronaut and author of ",
-    "bio_accent": "«Cracking the Kubernetes Interview»",
+    "bio_accent": "“Cracking the Kubernetes Interview”",
     "bio_after": ".",
     "skills_title": "Expertise"
   },
@@ -51,7 +51,7 @@
   },
   "speaking": {
     "title": "Speaking",
-    "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5–4.7/5.0",
+    "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5-4.7/5.0",
     "back_link": "Back to Speaking",
     "watch_video": "Watch on YouTube",
     "view_slides": "View Slides",
@@ -79,7 +79,7 @@
   "contact": {
     "title": "Let's Connect",
     "subtitle": "Find me on these platforms",
-    "opens_in_new_tab": "opens in new tab",
+    "opens_in_new_tab": "opens in a new tab",
     "write_me_cta": "Write me a message",
     "form": {
       "name_label": "Name",
@@ -93,7 +93,7 @@
     },
     "success": {
       "heading": "Check your email client",
-      "body": "Your default mail app should have opened with a draft. Send when ready — I'll reply as soon as I can.",
+      "body": "Your default mail app should have opened with a draft. Send when ready. I'll reply as soon as I can.",
       "fallback": "If it didn't open, email",
       "close": "Close"
     }
