@@ -72,3 +72,17 @@
   localized. Gateway API v1.7.0 and the Kubernetes log behavior were verified by hand.
 - Build, smoke (20) and visual (9, baselines refreshed after inspection) pass.
   A 320px sweep found eight pre-existing overflows, recorded in the report.
+
+## Article improvements and site review (2026-11-08/09)
+
+- Round 3 closed the remaining unverified facts (BOA310 date 27 November 2023 from a
+  session report, AWS disclaimers, TLSRoute minimum 1.31, EKS system-node taint).
+- Narrow screens: prose tables scroll inside the column, inline code and links wrap,
+  long title words hyphenate; 0 of 55 pages overflow at 320 or 390 px.
+- Improvement round: all posts polished with both skills; new diagrams (manifests,
+  MCP, Karpenter), new demos (MCP, Karpenter x2, Gateway API, latency, Pod Pending,
+  RCA), RU latency demos, old dark-on-dark diagrams redrawn, unused PNGs removed.
+- Site review report: `docs/reviews/2026-11-09-site-review.md`. Its top finding, the
+  broken `<head>`, is fixed. The rest needs Viktor's decisions.
+- Posts mirrored to the vault (`40-Content/47-Blog/47.10-Site-Mirror/`) for comments.
+- Build, smoke (20), visual (9, baselines refreshed after inspection), unit (69) pass.
