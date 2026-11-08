@@ -168,7 +168,7 @@ Time for the worked example. The first job is deliberately small: the 2AM pod.
 - **Explain:** a diagnosis tied to those observations, and what is missing.
 - **Hand over:** the engineer reviews and decides the remedy.
 
-The hypothesis is to reduce repeated evidence gathering, not to replace the engineer.
+The hypothesis is that the agent reduces repeated evidence gathering without replacing the engineer.
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={34} clicks={5} title="System architecture" caption="A custom RCA agent selects tools through an MCP gateway in front of four tool servers (EKS, CloudWatch, Prometheus, Knowledge Base) and produces a diagnosis with a remediation plan. The diagram shows the source structure; it does not prove runtime behavior." />
 
@@ -302,15 +302,15 @@ I closed the talk with a question, and it is still the one I would ask you: what
 
 ## Sources
 
-*AWS, Strands and MCP statements checked against these official sources on 2026-10-03.*
+*AWS, Strands and MCP statements checked against these official sources on 2026-11-08.*
 
 - [What is Amazon Bedrock AgentCore?](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html) and [how AgentCore Runtime works](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-how-it-works.html)
-- [AgentCore Gateway](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html) and [AgentCore Policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html)
-- [AgentCore Memory direct ingestion (IngestData)](https://aws.amazon.com/about-aws/whats-new/2026/09/agentcore-memory-direct-ingest)
+- [AgentCore Gateway](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html), [AgentCore Policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html) and [Policy core concepts](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-core-concepts.html)
+- [AgentCore Memory direct ingestion (IngestData)](https://aws.amazon.com/about-aws/whats-new/2026/09/agentcore-memory-direct-ingest) and [ingesting content into long-term memory](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/long-term-ingest-data.html)
 - [AgentCore Observability](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability.html) and [AgentCore Evaluations GA](https://aws.amazon.com/about-aws/whats-new/2026/03/agentcore-evaluations-generally-available/)
 - [AgentCore Harness](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness.html)
 - [AWS DevOps Agent: directed actions](https://docs.aws.amazon.com/devopsagent/latest/userguide/working-with-devops-agent-working-with-directed-actions.html)
-- [CloudTrail logging for Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/logging-using-cloudtrail.html) and [Bedrock model invocation logging](https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html)
+- [CloudTrail logging for Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/logging-using-cloudtrail.html), [CloudTrail data event resource types](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html) and [Bedrock model invocation logging](https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html)
 - [Knowledge Bases Retrieve API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_Retrieve.html)
 - [Strands Agents: MCP tools](https://strandsagents.com/docs/user-guide/sdk/tools/mcp-tools/)
 - [MCP specification: tools](https://modelcontextprotocol.io/specification/latest/server/tools)

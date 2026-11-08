@@ -51,7 +51,7 @@ Retrieval-augmented generation (RAG) добавляет в промпт наши
 
 Ответ меняется: «В вашем ранбуке лимиты памяти match-api указаны как известный риск. Проверьте последнюю причину завершения и сравните потребление памяти с настроенным лимитом за период инцидента».
 
-Теперь ответ опирается на наши знания. Но посмотрите, чего всё ещё нет: на сам под никто не взглянул. Поиск возвращает текст ранбука, а не текущие данные из кластера.
+Теперь ответ опирается на наши знания. Но посмотрите, чего всё ещё нет: на сам под никто не взглянул. Поиск находит текст. Он ничего не наблюдает.
 
 ### Добавляем живые инструменты через MCP
 
@@ -65,11 +65,11 @@ Retrieval-augmented generation (RAG) добавляет в промпт наши
 
 ### Цикл сам выбирает следующую проверку
 
-Один вызов инструмента даёт модели одно наблюдение. Агентной систему делает цикл, который это наблюдение использует. Смотрим на собранные улики, выбираем следующую проверку в разрешённых рамках, вызываем ограниченный инструмент, смотрим на наблюдаемый результат и решаем: повторить, проверить что-то другое или остановиться.
+Один вызов инструмента даёт модели одно наблюдение. Агентной систему делает цикл, который это наблюдение использует. Смотрим на собранные улики, выбираем следующую проверку в разрешённых рамках, вызываем инструмент с ограниченной областью действия, смотрим на наблюдаемый результат и решаем: повторить, проверить что-то другое или остановиться.
 
-<SlideEmbed slug="ai-agents-devops-tashkent" slide={12} clicks={4} title="Цикл агента выбирает следующую проверку" caption="Ограниченный цикл расследования: улики, выбор следующей проверки, ограниченный инструмент, наблюдаемый результат. Заканчивается обоснованным отчётом, когда улик достаточно или бюджет исчерпан." />
+<SlideEmbed slug="ai-agents-devops-tashkent" slide={12} clicks={4} title="Цикл агента выбирает следующую проверку" caption="Ограниченный цикл расследования: улики, выбор следующей проверки, инструмент с ограниченной областью действия, наблюдаемый результат. Заканчивается обоснованным отчётом, когда улик достаточно или бюджет исчерпан." />
 
-Два свойства держат этот цикл под контролем. Он **ограничен**: лимиты на число вызовов инструментов, время и токены соблюдает приложение, а не модель, и когда лимит достигнут, агент останавливается и говорит, что установить не смог. И **только наблюдаемый результат, в том числе ошибка, может запустить следующую проверку**. Цикл движется вперёд на уликах, а не на том, что модель сама себя в чём-то убедила. Права доступа и недоверенный контент требуют отдельных механизмов, о них ниже.
+Два свойства держат этот цикл под контролем. Он **ограничен**: лимиты на число вызовов инструментов, время и токены жёстко держит приложение, а не модель, и когда лимит достигнут, агент останавливается и говорит, что установить не смог. И **только наблюдаемый результат, в том числе ошибка, может запустить следующую проверку**. Цикл движется вперёд на уликах, а не на том, что модель сама себя в чём-то убедила. Права доступа и недоверенный контент требуют отдельных механизмов, о них ниже.
 
 ### Не всё должно быть агентом
 
@@ -168,7 +168,7 @@ return Agent(
 - **Объяснить:** диагноз, привязанный к этим наблюдениям, и чего не хватает.
 - **Передать:** инженер проверяет и выбирает исправление.
 
-Гипотеза в том, чтобы сократить повторяющийся сбор улик, а не заменить инженера.
+Гипотеза в том, что агент сократит повторяющийся сбор улик, не заменяя инженера.
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={34} clicks={5} title="Архитектура системы" caption="Собственный RCA-агент выбирает инструменты через MCP gateway, за которым четыре tool servers (EKS, CloudWatch, Prometheus, Knowledge Base), и выдаёт диагноз с планом исправления. Схема показывает структуру исходного кода и не доказывает, как система ведёт себя в работе." />
 
@@ -181,7 +181,7 @@ return Agent(
 | Prometheus | Как менялся нужный ряд метрик? |
 | Knowledge Base | Какой ранбук подходит? |
 
-Вокруг него обычное приложение. Алерт из CloudWatch, Alertmanager или ручной запуск попадает в бэкенд, который его нормализует, сохраняет расследование и вызывает Runtime. Расследователь опрашивает инструменты и генерирует отчёт. Приложение сохраняет результат, а UI периодически его запрашивает.
+Вокруг него обычное приложение. Алерт из CloudWatch, Alertmanager или ручной запуск попадает в бэкенд, который его нормализует, сохраняет расследование и вызывает Runtime. Расследователь опрашивает инструменты и генерирует отчёт. Представление отчёта сохраняет результат, а UI периодически его запрашивает.
 
 Проект не публичный, но вот два фрагмента, которые я показывал со сцены. Расследователь собирается по стандартному паттерну Strands, а инструменты приходят из gateway:
 
@@ -234,7 +234,7 @@ def eks_describe_pod(
 - **Улики:** что вернули инструменты и чего не хватает.
 - **Исправление:** рекомендуемые действия и шаг проверки.
 
-И одно правило: прежде чем доверять сгенерированному отчёту, сверьте приведённые в нём наблюдения с результатами инструментов. Ценность отчёта в уликах, текст вокруг них лишь упаковка.
+И одно правило: прежде чем доверять сгенерированному отчёту, проверьте зафиксированные наблюдения. Ценность отчёта в уликах, текст вокруг них лишь упаковка.
 
 ## Демо
 
@@ -302,15 +302,15 @@ AWS Community Day Central Asia 2026 прошёл в пятницу, 25 сент�
 
 ## Источники
 
-*Утверждения про AWS, Strands и MCP сверены с этими официальными источниками 2026-10-03.*
+*Утверждения про AWS, Strands и MCP сверены с этими официальными источниками 2026-11-08.*
 
 - [What is Amazon Bedrock AgentCore?](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html) и [как устроен AgentCore Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-how-it-works.html)
-- [AgentCore Gateway](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html) и [AgentCore Policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html)
-- [Прямая загрузка в AgentCore Memory (IngestData)](https://aws.amazon.com/about-aws/whats-new/2026/09/agentcore-memory-direct-ingest)
+- [AgentCore Gateway](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html), [AgentCore Policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html) и [основные понятия Policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-core-concepts.html)
+- [Прямая загрузка в AgentCore Memory (IngestData)](https://aws.amazon.com/about-aws/whats-new/2026/09/agentcore-memory-direct-ingest) и [загрузка контента в долговременную память](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/long-term-ingest-data.html)
 - [AgentCore Observability](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability.html) и [AgentCore Evaluations GA](https://aws.amazon.com/about-aws/whats-new/2026/03/agentcore-evaluations-generally-available/)
 - [AgentCore Harness](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness.html)
 - [AWS DevOps Agent: directed actions](https://docs.aws.amazon.com/devopsagent/latest/userguide/working-with-devops-agent-working-with-directed-actions.html)
-- [CloudTrail для Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/logging-using-cloudtrail.html) и [логирование вызовов моделей Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html)
+- [CloudTrail для Amazon Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/logging-using-cloudtrail.html), [типы ресурсов для событий данных CloudTrail](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html) и [логирование вызовов моделей Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html)
 - [Knowledge Bases Retrieve API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_Retrieve.html)
 - [Strands Agents: MCP tools](https://strandsagents.com/docs/user-guide/sdk/tools/mcp-tools/)
 - [Спецификация MCP: tools](https://modelcontextprotocol.io/specification/latest/server/tools)
