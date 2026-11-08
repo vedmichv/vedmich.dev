@@ -32,7 +32,9 @@
     "cta": "Связаться",
     "cta_secondary": "Подробнее",
     "kubestronaut_aria": "Проверить бейдж CNCF Kubestronaut на Credly",
-    "author_pill": "Автор «Cracking the Kubernetes Interview»"
+    "author_pill": "Автор «Cracking the Kubernetes Interview»",
+    "speaker_pill": "Спикер re:Invent и keynote-докладов",
+    "host_pill": "Ведущий · DKT + AWS RU"
   },
   "about": {
     "title": "Обо мне",

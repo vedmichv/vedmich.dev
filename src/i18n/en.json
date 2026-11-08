@@ -32,7 +32,9 @@
     "cta": "Get in touch",
     "cta_secondary": "Read more",
     "kubestronaut_aria": "Verify the CNCF Kubestronaut badge on Credly",
-    "author_pill": "Author “Cracking the Kubernetes Interview”"
+    "author_pill": "Author “Cracking the Kubernetes Interview”",
+    "speaker_pill": "re:Invent & keynote speaker",
+    "host_pill": "Host · DKT + AWS RU"
   },
   "about": {
     "title": "About me",
