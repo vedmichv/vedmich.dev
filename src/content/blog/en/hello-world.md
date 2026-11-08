@@ -14,12 +14,12 @@ Welcome to **vedmich.dev**, my corner of the internet where I share what I learn
 - **Architecture notes:** patterns and anti-patterns from real enterprise engagements
 - **Kubernetes deep-dives:** from CKA/CKS prep to production cluster design
 - **Conference talk write-ups:** expanded versions of my talks at re:Invent, AWS Summits, and community events
-- **Podcast companion posts:** deeper technical context for DevOps Kitchen Talks and AWS RU Podcast episodes
+- **Podcast companion posts:** deeper technical context for episodes of DevOps Kitchen Talks and my Russian-language AWS podcast (AWS на русском)
 
 ## Why a personal site?
 
 After years of creating content across YouTube, podcasts, and conferences, I wanted a single place to tie it all together. A home base that isn't owned by any platform.
 
-This site is built with [Astro](https://astro.build), styled with Tailwind CSS, and deployed to GitHub Pages. Zero JavaScript shipped to the client by default. Just the way I like my infrastructure: lean and efficient.
+This site is built with [Astro](https://astro.build), styled with Tailwind CSS, and deployed to GitHub Pages. The pages are static HTML. Small scripts add search, scroll effects, and animated embeds, and the core content still reads without JavaScript. Just the way I like my infrastructure: lean and efficient.
 
 Stay tuned.
