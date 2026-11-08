@@ -1,6 +1,6 @@
 ---
 title: "Latency vs throughput vs bandwidth: the three numbers everyone confuses"
-description: "Doubling bandwidth often fixes nothing. Latency, throughput and bandwidth on one analogy, the bandwidth-delay product math, and how to diagnose each."
+description: "Why doubling bandwidth often fixes nothing: latency, throughput and bandwidth on a water pipe, the bandwidth-delay product, and how to diagnose each."
 date: 2026-06-11
 tags:
   - networking
@@ -15,7 +15,7 @@ The app feels slow, so the request comes in: double the bandwidth.
 
 Someone doubles it. Nothing changes.
 
-That outcome is common, because "slow" is often not a capacity problem. A chatty service pays a full round trip on every call, and a buffer somewhere balloons the moment traffic picks up. Extra megabits per second can't remove round trips, and they don't cure a bloated buffer. The money goes into widening a road that was never the bottleneck.
+This happens a lot, because "slow" is often not a capacity problem. A chatty service (one that makes many small calls in sequence) pays a full round trip on every call, and a buffer somewhere fills up as soon as traffic grows. Extra megabits per second can't remove round trips, and they don't cure a bloated buffer. The money goes into a wider pipe that was never the bottleneck.
 
 The mix-up almost always comes from blurring three different numbers into one vague idea called "network speed." Speed isn't one number. It's three, and each tells a different story:
 
@@ -25,16 +25,17 @@ The mix-up almost always comes from blurring three different numbers into one va
 
 Mix them up and you'll fix the wrong problem. Here are all three on the same connection, animated. Watch one packet's trip, the stream that arrives, and the channel they share:
 
-<HtmlEmbed src="/embeds/ltb/01-three-lanes.html" minHeight={720}
+<HtmlEmbed src="/embeds/ltb/01-three-lanes.html" minHeight={880}
   title="Latency vs throughput vs bandwidth, animated" />
 
-## One analogy that carries the whole post
+## The pipe: one analogy for all three numbers
 
-Forget the highway for a second. The cleanest mental model is a **water pipe**.
+A **water pipe** shows all three numbers at once.
 
 - The **width of the pipe** is bandwidth. It sets the maximum.
 - The **water actually flowing out the far end** per second is throughput.
 - The **time it takes the first drop to travel the length of the pipe** is latency.
+- The **volume of water inside the pipe** is the data in flight. You will meet it below as the bandwidth-delay product.
 
 Hold that picture. Every definition below maps back to it, and where the analogy bends, I'll say so.
 
@@ -42,13 +43,18 @@ Hold that picture. Every definition below maps back to it, and where the analogy
 
 **Plain version:** how long a single packet takes to make the trip from A to B.
 
-**Precise version:** one-way latency is the time from source to destination. Round-trip time (RTT) is the trip there and back, and it's what you usually measure. Ping and TCP both see round trips, and one clock is enough for that, while one-way measurements need synchronized clocks at both ends. Don't assume RTT is twice the one-way delay. The forward and return paths can take different routes, and even on the same route each direction has its own queues (RFC 7679 calls out both). Either way, the delay is the sum of four parts: propagation (distance over the speed of the signal), transmission, also called serialization (pushing the packet's bits onto the wire), processing (a router reading the header), and queueing (waiting in a buffer).
+**Precise version:** one-way latency is the time from source to destination. Round-trip time (RTT) is the trip there and back, and it's what you usually measure. Ping and TCP both see round trips, and one clock is enough for that. One-way measurements need synchronized clocks at both ends. Don't assume RTT is twice the one-way delay. The forward and return paths can take different routes, and even on the same route each direction has its own queues (RFC 7679 names both). Whichever you measure, the delay is the sum of four parts:
+
+- Propagation: the distance divided by the speed of the signal.
+- Transmission, also called serialization: pushing the packet's bits onto the wire.
+- Processing: a router reading the header.
+- Queueing: waiting in a buffer.
 
 **Unit:** milliseconds (ms), sometimes microseconds.
 
-**A real number:** New York to London has a physics floor near 55 ms round-trip over fiber. That's the theoretical best case for a straight cable along the great circle, about 5,570 km each way. Measured RTT between well-connected servers in the two cities sits around 70 ms once real cable routes, routing and switching are added, and more from a home connection. The floor is the humbling part: light in fiber travels at roughly 200,000 km/s (about two-thirds of its speed in a vacuum), so we're already within a small factor of the physical limit. You can't "upgrade" your way out of the speed of light. You can only shorten the distance, which is exactly why CDNs exist, or pay it fewer times by cutting round trips.
+**A real number:** New York to London has a physics floor near 55 ms round-trip over fiber. That's the theoretical best case for a straight cable along the great circle (the shortest path over the Earth's surface), about 5,570 km each way. Measured RTT between well-connected servers in the two cities is around 70 ms once real cable routes, routing and switching are added, and more from a home connection. The floor is a hard limit: light in fiber travels at roughly 200,000 km/s (about two-thirds of its speed in a vacuum), so we're already within a small factor of it. You can't "upgrade" your way out of the speed of light. You can only shorten the distance, which is exactly why content delivery networks (CDNs) exist, or pay it fewer times by cutting round trips.
 
-In the pipe analogy: latency is mostly about the length of the pipe and how fast the drop moves through it. Here the analogy bends a little. Width does matter for two of the four parts: a wider pipe pushes each packet onto the wire faster, so serialization shrinks, and a bottleneck with spare capacity keeps its queue shorter. Propagation, usually the biggest part on a long path, doesn't care about width at all.
+In the pipe analogy: latency is mostly about the length of the pipe and how fast the drop moves through it. This is where the analogy bends. Width does matter for two of the four parts: a wider pipe pushes each packet onto the wire faster, so serialization shrinks, and a bottleneck with spare capacity keeps its queue shorter. Propagation, usually the biggest part on a long path, doesn't care about width at all.
 
 ## Throughput: how much actually arrives
 
@@ -58,9 +64,9 @@ In the pipe analogy: latency is mostly about the length of the pipe and how fast
 
 **Unit:** bits per second, scaled up: Kbps, Mbps, Gbps.
 
-**A real number:** a "100 Mbps" connection might deliver 62 Mbps when you test it. That gap is normal. Congestion, packet loss, retransmissions, protocol overhead, Wi-Fi and a busy server on the far end all skim off the top.
+**A real number:** a "100 Mbps" connection might deliver 62 Mbps when you test it. That gap is normal. Congestion, packet loss, retransmissions (packets sent again), protocol overhead, Wi-Fi and a busy server on the far end all take their share.
 
-In the pipe analogy: throughput is the liters per second actually coming out the end. Never the theoretical max, always the real, messy, conditions-on-the-day number.
+In the pipe analogy: throughput is the liters per second actually coming out the end. Never the theoretical maximum, always the real, messy number you measure on that day.
 
 ## Bandwidth: the ceiling
 
@@ -70,26 +76,26 @@ In the pipe analogy: throughput is the liters per second actually coming out the
 
 **Unit:** same as throughput. Bits per second: Mbps, Gbps.
 
-**A real number:** the "100 Mbps" on your plan. You pay for this number. You rarely see it on a real transfer, and it only describes your access link: the bottleneck for a given transfer can just as well be your Wi-Fi, a congested link between networks, or the server.
+**A real number:** the "100 Mbps" on your plan. You pay for this number. You rarely see it on a real transfer. It describes only your access link; the bottleneck for a given transfer can just as well be your Wi-Fi, a congested link between networks, or the server.
 
 In the pipe analogy: bandwidth is the width of the pipe. It caps everything, but it never guarantees the pipe is full.
 
-## How the three fit together
+## Throughput never beats bandwidth, and latency is separate
 
-Here's the relationship that clears up most of the confusion:
+One relationship clears up most of the confusion:
 
 **Throughput is always less than or equal to bandwidth. Never more.**
 
-<HtmlEmbed src="/embeds/ltb/02-throughput-ceiling.html" minHeight={520}
+<HtmlEmbed src="/embeds/ltb/02-throughput-ceiling.html" minHeight={690}
   title="Throughput never beats bandwidth" />
 
-Bandwidth is the ceiling (of the narrowest link); throughput is what you actually get after the real world takes its cut. If your link is rated 100 Mbps and you measure 62 Mbps, those numbers aren't in conflict. One is the ceiling, the other is the delivery.
+Bandwidth is the ceiling of the narrowest link. Throughput is what you actually get after losses, overhead and the rest of the real world. If your link is rated 100 Mbps and you measure 62 Mbps, those numbers aren't in conflict. One is the ceiling, the other is the delivery.
 
 And then the part people miss most:
 
 **Latency lives on a separate axis. It's time, not volume.**
 
-A pipe can be enormously wide (high bandwidth) and still take a long time to deliver the first drop (high latency). A transcontinental link with huge capacity still has the RTT of the distance baked in. More bandwidth reduces serialization delay: a 1,500-byte packet takes 120 µs at 100 Mbps and 12 µs at 1 Gbps. It can also reduce queueing delay, which often dominates under load. It never shortens propagation. That's why "just add more bandwidth" so often changes nothing: when the time goes to distance and round trips, widening the pipe barely touches it.
+A pipe can be enormously wide (high bandwidth) and still take a long time to deliver the first drop (high latency). A transcontinental link with huge capacity still has the RTT of the distance built in. More bandwidth reduces serialization delay: a 1,500-byte packet takes 120 µs at 100 Mbps and 12 µs at 1 Gbps. It can also reduce queueing delay, which often dominates under load. It never shortens propagation. That's why "just add more bandwidth" so often changes nothing: when the time goes to distance and round trips, widening the pipe barely touches it.
 
 | Metric | Question it answers | Unit | Pipe analogy |
 |---|---|---|---|
@@ -97,48 +103,56 @@ A pipe can be enormously wide (high bandwidth) and still take a long time to del
 | Throughput | How much arrives per second? | Mbps | Liters flowing out |
 | Bandwidth | What's the maximum? | Mbps | Width of the pipe |
 
-## A quick units trap: bits vs bytes
+## The units trap: bits vs bytes
 
 Network speeds are in **bits** per second (Mbps). File sizes are in **bytes** (MB). There are 8 bits in a byte, so:
 
-> A 100 Mbps connection tops out at about 12.5 MB/s (100 ÷ 8), and file data gets slightly less, because packet headers take a few percent.
+> A 100 Mbps connection carries at most about 12.5 MB/s (100 ÷ 8), and file data gets slightly less, because packet headers take a few percent.
 
-This is why a "fast" connection can feel slow when you watch a file download counter. A 1 GB file over a perfect 100 Mbps link needs at least 80 seconds, not 8 (in decimal units: 8,000 megabits ÷ 100 Mbps). Divide Mbps by 8 to get MB/s, then divide the file size by that rate to estimate the transfer time.
+This is why a "fast" connection can feel slow when you watch a file download counter. A 1 GB file over a perfect 100 Mbps link needs at least 80 seconds, not the 10 you get by reading Mbps as MB/s (in decimal units: 8,000 megabits ÷ 100 Mbps). Divide Mbps by 8 to get MB/s, then divide the file size by that rate to estimate the transfer time. Try other links and files:
+
+<HtmlEmbed src="/embeds/ltb/05-bits-vs-bytes.html" minHeight={890}
+  title="Bits vs bytes: download time calculator" />
 
 ## The formula behind "high bandwidth, low throughput"
 
-If you want the one piece of math that explains why a 1 Gbps link can crawl, it's the **bandwidth-delay product (BDP)**:
+One piece of math explains why a 1 Gbps link can crawl: the **bandwidth-delay product (BDP)**.
 
-```
+```text
 BDP (bits) = bandwidth (bits/s) × round-trip time (s)
 ```
 
 BDP is the amount of data that has to be in flight, sent but not yet acknowledged, to keep the link busy for a whole round trip. The pipe's volume, not its width.
 
-Here's why it matters. TCP doesn't stop and wait after each batch: it uses a sliding window, and every ACK for new data slides it forward, so the sender keeps transmitting within its flow-control and congestion limits. The sender limits new transmissions to the smaller of two windows (RFC 5681). The congestion window (cwnd) is the sender's estimate of what the network can take. The receive window (rwnd) is what the receiver has advertised it can buffer. If the smaller of the two is below the BDP, this connection can't keep the bottleneck busy: part of every round trip goes unused, however the sender paces its packets. So for one connection:
+Here's why it matters. TCP doesn't stop and wait after each batch. It uses a sliding window: every acknowledgment (ACK) for new data slides the window forward, so the sender keeps transmitting within its flow-control and congestion limits. The sender limits new transmissions to the smaller of two windows (RFC 5681):
 
-```
+- The congestion window (cwnd) is the sender's estimate of what the network can take.
+- The receive window (rwnd) is what the receiver has advertised it can buffer.
+
+If the smaller of the two is below the BDP, this connection can't keep the bottleneck busy: part of every round trip goes unused, however the sender paces its packets. So for one connection:
+
+```text
 throughput ≤ min(cwnd, rwnd) × 8 ÷ RTT    (windows in bytes, result in bits/s)
 throughput ≤ bottleneck bandwidth         (always)
 ```
 
 When the window is the limit, a steady flow runs close to that first bound. Now plug in real numbers. To fill a **1 Gbps** link with **100 ms** RTT:
 
-```
+```text
 BDP = 1,000,000,000 bits/s × 0.1 s = 100,000,000 bits = 12.5 MB
 ```
 
-You need 12.5 MB in flight to keep that pipe full. But the window field in the TCP header is 16 bits, so without scaling the receive window tops out at 65,535 bytes, about 64 KB. With rwnd stuck there:
+You need 12.5 MB in flight to keep that pipe full. But the window field in the TCP header is 16 bits, so without scaling the receive window can't exceed 65,535 bytes, about 64 KB. With rwnd stuck there:
 
-```
+```text
 65,535 bytes × 8 ÷ 0.1 s ≈ 5.2 Mbps
 ```
 
 Here's the uncomfortable result: a single connection uses about **0.5% of a 1 Gbps pipe**, purely because of the round-trip time and a small window. The fix is TCP window scaling (RFC 7323), which lets the receive window grow up to 1 GiB. It's on by default on modern systems; on Linux, `net.ipv4.tcp_window_scaling` defaults to 1.
 
-It still trips people up, for three reasons:
+It still causes trouble, for three reasons:
 
-- The scale factor is negotiated only in the SYN, and RFC 7323 notes that some middleboxes have been known to strip the option.
+- The scale factor is negotiated only in the SYN (the first packet of the connection), and RFC 7323 notes that some middleboxes (devices on the path) have been known to strip the option.
 - The receive window can't outgrow the socket's receive buffer. On Linux, an application that sets `SO_RCVBUF` switches off buffer autotuning for that socket.
 - A big rwnd removes only one limit. cwnd still has to grow large enough for the BDP, which takes round trips, and congestion events can cut it back.
 
@@ -146,26 +160,50 @@ RFC 7323 calls paths like this "long, fat networks." On these paths, a longer RT
 
 Don't take my word for it. Drag the round-trip time up and watch a gigabit link collapse, then switch on window scaling and watch it recover:
 
-<HtmlEmbed src="/embeds/ltb/03-bdp-calculator.html" minHeight={680}
+<HtmlEmbed src="/embeds/ltb/03-bdp-calculator.html" minHeight={960}
   title="Interactive bandwidth-delay product calculator" />
 
 ## Why your app feels slow even when bandwidth looks fine
 
-When something feels slow, resist the urge to buy more Mbps. Walk through the actual suspects first:
+When something feels slow, resist the urge to buy more Mbps. Check these five suspects first.
 
-1. **The bottleneck is latency.** A chatty protocol pays the round-trip cost on every request it makes in sequence. For most web pages, built from many small requests, latency rather than bandwidth sets the pace once the link is reasonably fast. Distance and round trips dominate. The fix is fewer round trips: batch calls, reuse connections instead of repeating TCP and TLS handshakes, send independent requests concurrently (HTTP/2 multiplexes them over one connection), or move the caller closer to the data.
+### 1. Latency: every request in sequence pays a round trip
 
-2. **Bufferbloat.** Oversized buffers in routers and modems fill up under load. Your idle ping is, say, 20 ms; then you start a download and it jumps to 200 ms or worse. Everything interactive (video calls, gaming, SSH) suffers. The fix is queue management at the bottleneck: an AQM algorithm such as CoDel or FQ-CoDel (RFC 8289, RFC 8290), usually with shaping set a little below the link rate so the queue forms where it can be managed. OpenWrt packages this as SQM (smart queue management). BBR works at a different layer: it's sender-side congestion control that aims for high throughput with low queueing delay, but it doesn't guarantee a short queue or manage the router's other traffic. A faster link drains the same buffer sooner, so more bandwidth may shrink the spike, but a sustained transfer can still build a long queue whenever the sender pushes faster than the bottleneck drains.
+A chatty protocol pays the round-trip cost on every request it makes in sequence. For most web pages, built from many small requests, latency rather than bandwidth sets the pace once the link is reasonably fast. Distance and round trips dominate.
 
-3. **Packets per second, not bits.** In high-traffic systems the real ceiling is often the packet rate the hardware or virtual NIC can process, not the raw bandwidth. Small packets hit the PPS limit long before the link fills, and the arithmetic shows why: at the same bit rate, 100-byte packets mean 15 times as many packets per second as 1,500-byte packets. On EC2, each instance has a maximum PPS based on its type and size. The ENA driver counts packets queued or dropped over that maximum as `pps_allowance_exceeded` (it shows up in `ethtool -S` for the ENA interface, often `ens5` rather than `eth0`). For bulk transfers, jumbo frames (bigger packets, fewer of them) cut the packet rate, but only when both endpoints and the entire path support the larger MTU. Current-generation EC2 instances support an MTU of 9001 bytes on compatible paths inside a VPC. Through an internet gateway the limit is 1500 bytes, and AWS Site-to-Site VPN allows at most 1446, less with some encryption and NAT traversal settings. Check the path MTU before you turn them on. `tracepath` helps when the path returns the ICMP messages it needs; for AWS Site-to-Site VPN, go by the documented MTU and MSS limits.
+The fix is to wait on fewer round trips, or make each one shorter: batch calls, reuse connections instead of repeating TCP and TLS handshakes, send independent requests concurrently (HTTP/2 multiplexes them over one connection), or move the caller closer to the data.
 
-4. **One connection, small window.** A single TCP flow over a long path caps far below the line rate whenever its window is smaller than the BDP (see the math above). Parallel TCP connections can raise aggregate throughput, because each one brings its own cwnd and rwnd. The Amazon S3 docs also recommend concurrent byte-range requests for large objects: they give higher aggregate throughput than a single whole-object request. HTTP/2 doesn't do this for you. Its streams share one TCP connection, so they share that connection's congestion and receive windows: multiplexing saves round trips, not window. On EC2 there's one more single-flow limit: with standard networking, one TCP or UDP flow between instances outside a cluster placement group is capped at 5 Gbps whatever the instance's bandwidth. ENA Express raises that to 25 Gbps between supported instances, still within the instance limit.
+### 2. Bufferbloat: a queue that fills under load
 
-5. **Packet loss.** Loss-based congestion control (Reno, CUBIC) reads loss as congestion and cuts its window. Long fat networks suffer most: RFC 7323 says losses there can have a "catastrophic effect on throughput." Even 1 to 2% loss can tank a single flow on a high-RTT link. Find the cause of the loss first: more capacity can relieve an overloaded bottleneck, but it won't fix a faulty link.
+Bufferbloat means oversized buffers in routers and modems fill up under load. It is the queueing part of latency, grown large. Your idle ping is, say, 20 ms; then you start a download and it jumps to 200 ms or worse. Everything interactive (video calls, gaming, SSH) suffers.
+
+The fix is queue management at the bottleneck: an active queue management (AQM) algorithm such as CoDel or FQ-CoDel (RFC 8289, RFC 8290), usually with shaping set a little below the link rate so the queue forms where it can be managed. OpenWrt packages this as SQM (smart queue management).
+
+Two things only partly help. BBR works at a different layer: it's sender-side congestion control that aims for high throughput with low queueing delay, but it doesn't guarantee a short queue or manage the router's other traffic. A faster link drains the same buffer sooner, so more bandwidth may shrink the spike, but a sustained transfer can still build a long queue whenever the sender pushes faster than the bottleneck drains.
+
+### 3. Packets per second, not bits
+
+In high-traffic systems the real ceiling is often the packet rate the hardware or virtual NIC can process, not the raw bandwidth. Small packets hit the packets-per-second (PPS) limit long before the link fills, and the arithmetic shows why: at the same bit rate, 100-byte packets mean 15 times as many packets per second as 1,500-byte packets.
+
+On EC2, each instance has a maximum PPS based on its type and size. The Elastic Network Adapter (ENA) driver counts packets queued or dropped over that maximum as `pps_allowance_exceeded` (it shows up in `ethtool -S` for the ENA interface, often `ens5` rather than `eth0`).
+
+For bulk transfers, jumbo frames (bigger packets, fewer of them) cut the packet rate, but only when both endpoints and the entire path support the larger MTU (maximum transmission unit, the largest packet a link accepts). Current-generation EC2 instances support an MTU of 9001 bytes on compatible paths inside a VPC. Through an internet gateway the limit is 1500 bytes, and AWS Site-to-Site VPN allows at most 1446, less with some encryption and NAT traversal settings. Check the path MTU before you turn jumbo frames on. `tracepath` helps when the path returns the ICMP messages it needs; for AWS Site-to-Site VPN, go by the documented MTU and MSS (the largest TCP payload per packet) limits.
+
+### 4. One connection with a small window
+
+A single TCP flow over a long path caps far below the line rate whenever its window is smaller than the BDP (see the math above). Parallel TCP connections can raise aggregate throughput, because each one brings its own cwnd and rwnd. The Amazon S3 docs also recommend concurrent byte-range requests for large objects: they give higher aggregate throughput than a single whole-object request.
+
+HTTP/2 doesn't do this for you. Its streams share one TCP connection, so they share that connection's congestion and receive windows: multiplexing saves round trips, not window.
+
+On EC2 there's one more single-flow limit: with standard networking, one TCP or UDP flow between instances outside a cluster placement group is capped at 5 Gbps whatever the instance's bandwidth. ENA Express raises that to 25 Gbps between supported instances, still within the instance limit.
+
+### 5. Packet loss
+
+Loss-based congestion control (Reno, CUBIC) reads loss as congestion and cuts its window. Long fat networks suffer most: RFC 7323 says losses there can have a "catastrophic effect on throughput." Even 1 to 2% loss can cripple a single flow on a high-RTT link. Find the cause of the loss first: more capacity can relieve an overloaded bottleneck, but it won't fix a faulty link.
 
 Notice how many of these are latency, packet loss or packet-rate problems wearing a "we need more bandwidth" disguise.
 
-## How to actually measure each one
+## How to measure each one
 
 You can't fix what you can't see. Each metric has its own tool, and none of them is "look at your plan's Mbps."
 
@@ -202,23 +240,28 @@ iperf3 -c "${TEST_SERVER:?set TEST_SERVER to your test server}" -R -t 30
 #  RTT climbing and staying high = a queue building at the bottleneck
 ```
 
-That last one is the single most useful diagnostic habit you can build: **run ping during a download.** If latency stays flat, this test showed no added delay for those probes. Make sure the transfer really saturated the bottleneck, and test upload as well as download. If it climbs the moment the link fills and stays up, a queue is building at the bottleneck. More bandwidth might shrink that spike; queue management at the bottleneck keeps a standing queue from building. Here it is live. Start the download, watch the line, then apply the smart-queue fix:
+The last test is the most useful diagnostic habit you can build: **run ping during a download.** Read the line like this:
 
-<HtmlEmbed src="/embeds/ltb/04-ping-during-download.html" minHeight={620}
+- If latency stays flat, this test showed no added delay for those probes. Make sure the transfer really saturated the bottleneck, and test upload as well as download.
+- If it climbs the moment the link fills and stays up, a queue is building at the bottleneck. More bandwidth might shrink that spike; queue management at the bottleneck keeps a standing queue from building.
+
+Here it is live. Start the download and watch the line. The red area is the extra delay the queue adds. Then apply the smart-queue fix:
+
+<HtmlEmbed src="/embeds/ltb/04-ping-during-download.html" minHeight={930}
   title="Ping during a download, the one diagnostic for bufferbloat" />
 
-## The one question to ask first
+## Find the bottleneck before you buy bandwidth
 
-So when an app feels slow, the first question is never "how much bandwidth do we have."
+When an app feels slow, the first question is never "how much bandwidth do we have." It's: **which of the three is actually the bottleneck?**
 
-It's: **which of the three is actually the bottleneck?**
-
-- If it's latency, move the data closer or cut the round trips.
+- If it's latency (high RTT, many round trips), move the data closer or cut the round trips.
 - If RTT climbs under load, fix the queue at the bottleneck before buying capacity.
 - If it's throughput on a long path, look at the windows (scaling, buffers, cwnd), parallel connections, and packet loss.
 - If it's genuinely bandwidth (the bottleneck link really is full), then, and only then, buy more.
 
-Get that diagnosis wrong and you end up where the request at the top of this post did: paying to widen a road that was never the problem.
+Get that diagnosis wrong and you end up where the request at the top of this post did: paying for a wider pipe that was never the problem.
+
+Your first step needs one server and two terminals: run ping during a download, and read the line.
 
 ---
 

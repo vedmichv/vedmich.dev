@@ -3,185 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ping during a download · the one diagnostic</title>
+<title>Ping during a download, the one diagnostic for bufferbloat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/embeds/ltb/ltb-embed.css">
+<noscript><style>.motion-toggle{display:none}</style></noscript>
 <style>
-  :root{
-    --bg:#0F172A; --surface:#1E293B; --elev:#334155; --border:rgba(148,163,184,.16);
-    --teal:#14B8A6; --teal-deep:#0D9488; --amber:#F59E0B; --red:#F87171;
-    --text:#E2E8F0; --dim:#94A3B8;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
-  .wrap{max-width:920px;margin:0 auto;padding:34px 26px 30px}
-  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:14px}
-  .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
-  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(26px,5vw,40px);line-height:1.04;letter-spacing:-.025em;margin-bottom:8px}
-  h1 .em{color:var(--amber)}
-  .lead{color:var(--dim);font-size:clamp(14px,2.4vw,17px);line-height:1.5;max-width:700px;margin-bottom:26px}
 
-  .panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px 28px 22px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 28px 22px}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:10px}
+.axis-title{font-family:var(--mono);font-size:13px;color:var(--dim);letter-spacing:.04em}
+.readout{display:flex;flex-direction:column;align-items:flex-end}
+.liveval{font-family:var(--display);font-weight:700;font-size:clamp(24px,4.5vw,34px);letter-spacing:-.02em;line-height:1.1;color:var(--teal);transition:color .3s}
+.queue{font-family:var(--mono);font-size:12px;color:var(--amber);min-height:1.3em}
 
-  /* the live chart */
-  .chart{position:relative;width:100%;height:230px;background:rgba(148,163,184,.05);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-  .chart svg{display:block;width:100%;height:100%}
-  .axis-lbl{position:absolute;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.04em}
-  .axis-lbl.top{top:10px;left:14px}
-  .axis-lbl.bot{bottom:10px;left:14px}
-  .dl-band{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,rgba(245,158,11,.10),rgba(245,158,11,.04));border-left:2px dashed rgba(245,158,11,.5);border-right:2px dashed rgba(245,158,11,.5);opacity:0;transition:opacity .4s}
-  .dl-band.show{opacity:1}
-  .dl-tag{position:absolute;top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:.05em;transform:translateX(-50%);opacity:0;transition:opacity .4s;white-space:nowrap}
-  .dl-tag.show{opacity:1}
+.chart{position:relative;height:230px;background:rgba(148,163,184,.05);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.chart svg{display:block;width:100%;height:100%}
+.tick{position:absolute;left:8px;transform:translateY(-50%);font-family:var(--mono);font-size:12px;color:var(--dim);pointer-events:none}
+.tick.idle{color:var(--teal)}
+.axis-lbl{position:absolute;bottom:6px;right:12px;font-family:var(--mono);font-size:12px;color:var(--dim)}
 
-  .liveval{position:absolute;top:10px;right:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,4.5vw,32px);letter-spacing:-.02em;transition:color .3s}
+.key{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.key span{display:inline-flex;align-items:center;gap:8px}
+.key i{flex:none;width:14px;height:14px;border-radius:4px}
+.key .k-q i{background:rgba(248,113,113,.4)}
+.key .k-d i{background:rgba(245,158,11,.22);border:1px dashed rgba(245,158,11,.8)}
 
-  .ctrls{display:flex;gap:12px;align-items:center;margin-top:20px;flex-wrap:wrap}
-  .btn{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#04211D;background:var(--teal);border:0;border-radius:10px;padding:11px 20px;cursor:pointer;transition:transform .1s,background .15s}
-  .btn:hover{background:var(--teal-deep)}
-  .btn:active{transform:scale(.97)}
-  .btn.sec{color:var(--text);background:var(--elev)}
-  .hint{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+.ctrls{display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:13px;font-weight:600;color:#04211D;background:var(--teal);border:0;border-radius:10px;padding:12px 20px;min-height:44px;cursor:pointer;transition:background .15s}
+.btn:hover{background:#2DD4BF}
+.btn:active{filter:brightness(.92)}
+.btn.sec{color:var(--text);background:var(--elev)}
+.btn.sec:hover{background:#475569}
+.btn.sec.on{color:#04211D;background:var(--teal)}
+.btn.sec.on:hover{background:#2DD4BF}
+.hint{font-family:var(--mono);font-size:12px;color:var(--dim)}
 
-  .verdict{margin-top:20px;padding:16px 18px;border-radius:13px;border-left:5px solid var(--teal);background:linear-gradient(135deg,var(--surface),rgba(20,184,166,.07));font-size:clamp(13px,2.4vw,16px);line-height:1.5;color:var(--text);transition:all .3s}
-  .verdict b{color:var(--text)}
-  .verdict.bad{border-left-color:var(--red);background:linear-gradient(135deg,var(--surface),rgba(248,113,113,.08))}
+.verdict{margin-top:18px;padding:16px 18px;border-radius:13px;border-left:5px solid var(--teal);background:linear-gradient(135deg,var(--surface),rgba(20,184,166,.07));font-size:clamp(14px,2.4vw,16px);line-height:1.5;color:var(--text);transition:border-color .3s}
+.verdict b{color:var(--text)}
+.verdict.bad{border-left-color:var(--red);background:linear-gradient(135deg,var(--surface),rgba(248,113,113,.08))}
 
-  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
-  .foot .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
-  .foot .who b{color:var(--text);font-weight:600}
-  .foot .formula{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)}
-  @media(max-width:560px){.liveval{position:static;display:block;text-align:right;margin-bottom:6px}}
+@media(max-width:560px){
+  .panel{padding:18px 14px 16px}
+  .chart{height:200px}
+  .btn{flex:1 1 100%}
+}
+
 </style>
 </head>
 <body>
+
 <div class="wrap">
   <div class="eyebrow">Interactive · the one diagnostic habit</div>
   <h1>Ping <span class="em">while</span> you download.</h1>
   <p class="lead">This is the single most useful test you can run. Keep a ping going, then start a big download. If the line stays flat, your slowness is elsewhere. If it balloons the moment traffic starts, that is bufferbloat: the cure is a shorter queue, not a bigger plan. Start a download and watch.</p>
 
   <div class="panel">
-    <div class="chart">
-      <span class="axis-lbl top">RTT (ms)</span>
-      <span class="axis-lbl bot">time →</span>
-      <span class="liveval" id="liveval">20 ms</span>
-      <div class="dl-band" id="band"></div>
-      <div class="dl-tag" id="dltag">download running</div>
-      <svg id="svg" viewBox="0 0 600 230" preserveAspectRatio="none">
-        <polyline id="line" fill="none" stroke="#14B8A6" stroke-width="2.5"
-                  stroke-linejoin="round" stroke-linecap="round" points=""></polyline>
+    <div class="chart-head">
+      <span class="axis-title">Round-trip time (ms)</span>
+      <span class="readout"><span class="liveval" id="liveval">20 ms</span><span class="queue" id="queue"></span></span>
+    </div>
+    <div class="chart" role="img" aria-label="Line chart of ping round-trip time over time. It stays near 20 ms while idle and jumps to about 200 ms while a download fills an oversized buffer.">
+      <svg id="svg" viewBox="0 0 600 230" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg" gradientUnits="userSpaceOnUse" x1="0" y1="18" x2="0" y2="200">
+            <stop offset="0" stop-color="#F87171"/><stop offset="0.719" stop-color="#F87171"/>
+            <stop offset="0.719" stop-color="#14B8A6"/><stop offset="1" stop-color="#14B8A6"/>
+          </linearGradient>
+        </defs>
+        <line x1="0" x2="600" y1="143.1" y2="143.1" stroke="rgba(148,163,184,.18)" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="86.2" y2="86.2" stroke="rgba(148,163,184,.18)" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="29.4" y2="29.4" stroke="rgba(148,163,184,.18)" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="188.6" y2="188.6" stroke="rgba(20,184,166,.45)" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+        <g id="bands"></g>
+        <polygon id="area" fill="rgba(248,113,113,.28)" points=""/>
+        <polyline id="line" fill="none" stroke="url(#lg)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" points="0.0,188.6 5.0,188.6 10.1,188.6 15.1,188.6 20.2,188.6 25.2,188.6 30.3,188.6 35.3,188.6 40.3,188.6 45.4,188.6 50.4,188.6 55.5,188.6 60.5,188.6 65.5,188.6 70.6,188.6 75.6,188.6 80.7,188.6 85.7,188.6 90.8,188.6 95.8,188.6 100.8,188.6 105.9,188.6 110.9,188.6 116.0,188.6 121.0,188.6 126.1,188.6 131.1,188.6 136.1,188.6 141.2,188.6 146.2,188.6 151.3,188.6 156.3,188.6 161.3,188.6 166.4,188.6 171.4,188.6 176.5,188.6 181.5,188.6 186.6,188.6 191.6,188.6 196.6,188.6 201.7,188.6 206.7,188.6 211.8,188.6 216.8,188.6 221.8,188.6 226.9,188.6 231.9,188.6 237.0,188.6 242.0,188.6 247.1,188.6 252.1,188.6 257.1,188.6 262.2,188.6 267.2,188.6 272.3,188.6 277.3,188.6 282.4,188.6 287.4,188.6 292.4,188.6 297.5,188.6 302.5,188.6 307.6,188.6 312.6,188.6 317.6,188.6 322.7,188.6 327.7,188.6 332.8,188.6 337.8,188.6 342.9,188.6 347.9,188.6 352.9,188.6 358.0,188.6 363.0,188.6 368.1,188.6 373.1,188.6 378.2,188.6 383.2,188.6 388.2,188.6 393.3,188.6 398.3,188.6 403.4,188.6 408.4,188.6 413.4,188.6 418.5,188.6 423.5,188.6 428.6,188.6 433.6,188.6 438.7,188.6 443.7,188.6 448.7,188.6 453.8,188.6 458.8,188.6 463.9,188.6 468.9,188.6 473.9,188.6 479.0,188.6 484.0,188.6 489.1,188.6 494.1,188.6 499.2,188.6 504.2,188.6 509.2,188.6 514.3,188.6 519.3,188.6 524.4,188.6 529.4,188.6 534.5,188.6 539.5,188.6 544.5,188.6 549.6,188.6 554.6,188.6 559.7,188.6 564.7,188.6 569.7,188.6 574.8,188.6 579.8,188.6 584.9,188.6 589.9,188.6 595.0,188.6 600.0,188.6"/>
       </svg>
+      <span class="tick" style="top:12.77%">300</span><span class="tick" style="top:37.50%">200</span><span class="tick" style="top:62.23%">100</span><span class="tick idle" style="top:77.66%">20</span>
+      <span class="axis-lbl">time →</span>
+    </div>
+    <div class="key" aria-hidden="true">
+      <span class="k-q"><i></i>extra delay added by the queue</span>
+      <span class="k-d"><i></i>download running</span>
     </div>
 
     <div class="ctrls">
-      <button class="btn" id="dlBtn">Start a download</button>
-      <button class="btn sec" id="fixBtn">Apply SQM fix</button>
+      <button class="btn" type="button" id="dlBtn">Start a download</button>
+      <button class="btn sec" type="button" id="fixBtn">Apply SQM fix</button>
       <span class="hint" id="hint">idle line ≈ 20 ms</span>
     </div>
 
-    <div class="verdict" id="verdict"><b>Idle and healthy.</b> Round-trip is flat near 20 ms. Interactive apps (video calls, SSH, gaming) feel instant. Now start a download and watch what an oversized buffer does.</div>
+    <div class="verdict" id="verdict" aria-live="polite"><b>Idle and healthy.</b> Round-trip is flat near 20 ms. Interactive apps (video calls, SSH, gaming) feel instant. Now start a download and watch what an oversized buffer does.</div>
   </div>
 
   <div class="foot">
     <div class="who"><b>Viktor Vedmich</b> · vedmich.dev</div>
-    <div class="formula">flat line = healthy · spike = bufferbloat</div>
+    <div class="legend">flat line = healthy · spike = bufferbloat</div>
+    <button class="motion-toggle" type="button" data-motion-toggle data-pause="Pause animation" data-play="Play animation">Pause animation</button>
   </div>
 </div>
 
+<script src="/embeds/ltb/ltb-embed.js"></script>
+
 <script>
 (function(){
-  var W=600, H=230, N=120;          // viewBox + sample count
-  var BASE=20, FLOOR=H-26, TOP=24;  // 20 ms baseline; chart vertical bounds
-  var MAXMS=320;                    // top of chart = 320 ms
-  var data=[]; for(var i=0;i<N;i++) data.push(BASE);
-  var downloading=false, sqm=false;
-  var line=document.getElementById('line');
-  var liveval=document.getElementById('liveval');
-  var verdict=document.getElementById('verdict');
-  var band=document.getElementById('band');
-  var dltag=document.getElementById('dltag');
-  var dlBtn=document.getElementById('dlBtn');
-  var fixBtn=document.getElementById('fixBtn');
-  var hint=document.getElementById('hint');
-  var reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var T = {"ms": "ms", "queue": "+{n} ms from the queue", "startDl": "Start a download", "stopDl": "Stop download", "applyFix": "Apply SQM fix", "removeFix": "Remove SQM fix", "hintIdle": "idle line ≈ 20 ms", "hintBloat": "buffer fills → RTT spikes", "hintSqm": "with SQM: stays low", "vIdle": "<b>Idle and healthy.</b> Round-trip is flat near 20 ms. Interactive apps (video calls, SSH, gaming) feel instant. Now start a download and watch what an oversized buffer does.", "vSqm": "<b>Same download, smart queue.</b> Queue management (CoDel / FQ-CoDel) keeps the buffer short, so RTT barely moves. The download keeps running, paced a little below the link rate. This is the fix, not a bigger pipe.", "vBloat": "<b>Bufferbloat.</b> The download filled an oversized buffer, so every packet now waits behind it. RTT jumped about 10×. Your video call stutters even though bandwidth is fine. More Mbps may shrink the spike, but only a managed queue removes it."};
+  var W = 600, H = 230, N = 120;
+  var BASE = 20, TOP = 18, FLOOR = 200, MAXMS = 320;
+  var DL_START = 0.36;                       // static view: the download starts at 36% of the width
+  var rtt = [], flags = [];
+  var downloading = false, sqm = false, level = 0, seed = 7, tickNo = 0, timer = null;
+  var line = document.getElementById('line'), area = document.getElementById('area'), bands = document.getElementById('bands');
+  var liveval = document.getElementById('liveval'), queue = document.getElementById('queue');
+  var verdict = document.getElementById('verdict'), hint = document.getElementById('hint');
+  var dlBtn = document.getElementById('dlBtn'), fixBtn = document.getElementById('fixBtn');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function y(ms){ var t=Math.min(ms,MAXMS)/MAXMS; return (FLOOR - t*(FLOOR-TOP)); }
-  function rnd(a,b){ return a+(b-a)*pseudo(); }
-  // deterministic-ish jitter without Math.random dependence on first paint
-  var seed=7; function pseudo(){ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; }
+  function y(ms){ return FLOOR - Math.min(ms, MAXMS) / MAXMS * (FLOOR - TOP); }
+  function X(i){ return i / (N - 1) * W; }
+  function pseudo(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+  function rnd(a, b){ return a + (b - a) * pseudo(); }
 
-  // download starts ~35% across the window; band marks from there to the right edge
-  var DL_START=0.36;
-  band.style.left=(DL_START*100)+'%'; band.style.width=((1-DL_START)*100)+'%';
-  dltag.style.left=((DL_START+(1-DL_START)/2)*100)+'%';
+  // One RTT sample. The queue level ramps toward its goal, so the spike builds and drains over about a second.
+  function nextSample(dl){
+    var goal = dl ? (sqm ? 6 : 190) : 0;
+    level += (goal - level) * 0.3;
+    var jit = (dl && !sqm) ? rnd(-30, 60) * (level / 190) : (dl ? rnd(-2, 4) : rnd(-2, 3));
+    return Math.max(BASE - 2, BASE + level + jit);
+  }
 
-  function targetMs(idx){
-    var inDL = downloading && (idx/N) >= DL_START;
-    if(!inDL) return BASE + rnd(-2,3);
-    if(sqm)  return BASE + rnd(2,10);            // SQM keeps it tame
-    return 210 + rnd(-35,70);                     // bufferbloat: 175–280 ms
+  function reset(){ rtt = []; flags = []; for (var i = 0; i < N; i++) { rtt.push(BASE); flags.push(false); } }
+  function simulate(){                       // still frame for reduced motion
+    seed = 7; level = 0; rtt = []; flags = [];
+    var start = Math.round(DL_START * N);
+    for (var i = 0; i < N; i++) { var dl = downloading && i >= start; rtt.push(nextSample(dl)); flags.push(dl); }
   }
 
   function render(){
-    var pts=[];
-    for(var i=0;i<N;i++){
-      var x=(i/(N-1))*W;
-      pts.push(x.toFixed(1)+','+y(data[i]).toFixed(1));
+    var pts = [], top = [], bot = [], i;
+    for (i = 0; i < N; i++) {
+      var x = X(i).toFixed(1);
+      pts.push(x + ',' + y(rtt[i]).toFixed(1));
+      top.push(x + ',' + y(Math.max(rtt[i], BASE)).toFixed(1));
     }
+    for (i = N - 1; i >= 0; i--) bot.push(X(i).toFixed(1) + ',' + y(BASE).toFixed(1));
     line.setAttribute('points', pts.join(' '));
-    var last=data[N-1];
-    liveval.textContent=Math.round(last)+' ms';
-    var bad = last>90;
-    liveval.style.color = bad? 'var(--red)' : 'var(--teal)';
-    line.setAttribute('stroke', bad? '#F87171' : '#14B8A6');
+    area.setAttribute('points', top.concat(bot).join(' '));
+
+    var s = '';
+    i = 0;
+    while (i < N) {
+      if (flags[i]) {
+        var j = i; while (j + 1 < N && flags[j + 1]) j++;
+        var x0 = X(i), x1 = (j === N - 1) ? W : X(j);
+        s += '<rect x="' + x0.toFixed(1) + '" y="0" width="' + (x1 - x0).toFixed(1) + '" height="' + H + '" fill="rgba(245,158,11,.08)"/>';
+        s += '<line x1="' + x0.toFixed(1) + '" x2="' + x0.toFixed(1) + '" y1="0" y2="' + H + '" stroke="rgba(245,158,11,.7)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>';
+        if (j < N - 1) s += '<line x1="' + x1.toFixed(1) + '" x2="' + x1.toFixed(1) + '" y1="0" y2="' + H + '" stroke="rgba(245,158,11,.7)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>';
+        i = j + 1;
+      } else i++;
+    }
+    bands.innerHTML = s;
+  }
+
+  function readout(){                        // smoothed, so the number does not flicker
+    var c = 4, sum = 0, k;
+    for (k = N - c; k < N; k++) sum += rtt[k];
+    var avg = sum / c;
+    liveval.textContent = Math.round(avg) + ' ' + T.ms;
+    liveval.style.color = avg > 90 ? 'var(--red)' : 'var(--teal)';
+    var extra = avg - BASE;
+    queue.textContent = extra >= 10 ? T.queue.replace('{n}', Math.round(extra)) : '';
+  }
+
+  function syncUI(){
+    dlBtn.textContent = downloading ? T.stopDl : T.startDl;
+    fixBtn.textContent = sqm ? T.removeFix : T.applyFix;
+    fixBtn.classList.toggle('on', sqm);
+    hint.textContent = downloading ? (sqm ? T.hintSqm : T.hintBloat) : T.hintIdle;
+    if (!downloading) { verdict.className = 'verdict'; verdict.innerHTML = T.vIdle; }
+    else if (sqm) { verdict.className = 'verdict'; verdict.innerHTML = T.vSqm; }
+    else { verdict.className = 'verdict bad'; verdict.innerHTML = T.vBloat; }
   }
 
   function tick(){
-    data.shift();
-    data.push(targetMs(N-1));
+    rtt.shift(); flags.shift();
+    rtt.push(nextSample(downloading)); flags.push(downloading);
     render();
+    if (++tickNo % 3 === 0) readout();
   }
 
-  function setVerdict(){
-    if(!downloading){
-      verdict.className='verdict';
-      verdict.innerHTML='<b>Idle and healthy.</b> Round-trip is flat near 20 ms. Interactive apps feel instant. Start a download and watch what an oversized buffer does.';
-    } else if(sqm){
-      verdict.className='verdict';
-      verdict.innerHTML='<b>Same download, smart queue.</b> Queue management (CoDel / FQ-CoDel) keeps the buffer short, so RTT barely moves. The download still runs at full speed. This is the fix, not a bigger pipe.';
-    } else {
-      verdict.className='verdict bad';
-      verdict.innerHTML='<b>Bufferbloat.</b> The download filled an oversized buffer, so every packet now waits behind it. RTT jumped 10×. Your video call stutters even though bandwidth is fine. More Mbps may shrink the spike, but only a managed queue removes it.';
-    }
-  }
+  function refresh(){ if (reduce) { simulate(); render(); readout(); } }
 
-  dlBtn.addEventListener('click', function(){
-    downloading=!downloading;
-    dlBtn.textContent = downloading? 'Stop download' : 'Start a download';
-    band.classList.toggle('show', downloading);
-    dltag.classList.toggle('show', downloading);
-    hint.textContent = downloading? (sqm?'with SQM: stays low':'buffer fills → RTT spikes') : 'idle line ≈ 20 ms';
-    setVerdict();
-  });
-  fixBtn.addEventListener('click', function(){
-    sqm=!sqm;
-    fixBtn.textContent = sqm? 'Remove SQM fix' : 'Apply SQM fix';
-    fixBtn.style.background = sqm? 'var(--teal)' : 'var(--elev)';
-    fixBtn.style.color = sqm? '#04211D' : 'var(--text)';
-    hint.textContent = downloading? (sqm?'with SQM: stays low':'buffer fills → RTT spikes') : 'idle line ≈ 20 ms';
-    setVerdict();
-  });
+  dlBtn.addEventListener('click', function(){ downloading = !downloading; syncUI(); refresh(); });
+  fixBtn.addEventListener('click', function(){ sqm = !sqm; syncUI(); refresh(); });
 
-  render();
-  if(!reduce){
-    setInterval(tick, 130);
+  if (reduce) {
+    downloading = true;                      // show the bufferbloat trace without motion
+    simulate();
   } else {
-    // static: show a representative bufferbloat trace
-    downloading=true; band.classList.add('show'); dltag.classList.add('show');
-    for(var i=0;i<N;i++){ data[i] = (i/N)>=DL_START ? 210 : BASE; }
-    render(); setVerdict();
+    reset();
+    LTB.onRun(function(run){
+      if (run && !timer) timer = setInterval(tick, 130);
+      else if (!run && timer) { clearInterval(timer); timer = null; }
+    });
   }
+  render(); readout(); syncUI();
 })();
 </script>
+
 </body>
 </html>

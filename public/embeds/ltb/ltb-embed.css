@@ -1,0 +1,45 @@
+/* Shared styles for the latency / throughput / bandwidth embeds (EN and RU).
+   Deep Signal tokens. Each embed adds its own layout rules in an inline <style>. */
+:root{
+  --bg:#0F172A; --surface:#1E293B; --elev:#334155; --border:rgba(148,163,184,.16);
+  --teal:#14B8A6; --teal-deep:#0D9488; --amber:#F59E0B; --purple:#C084FC; --red:#F87171;
+  --text:#E2E8F0; --dim:#94A3B8;
+  --display:'Space Grotesk','Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+.wrap{max-width:920px;margin:0 auto;padding:34px 26px 30px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.eyebrow::before{content:'';flex:none;width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,5vw,40px);line-height:1.06;letter-spacing:-.025em;margin-bottom:8px}
+h1 .em{color:var(--amber)}
+.lead{color:var(--dim);font-size:clamp(14px,2.4vw,17px);line-height:1.5;max-width:680px;margin-bottom:28px}
+@media(max-width:560px){
+  .wrap{padding:24px 16px 22px}
+  .eyebrow{letter-spacing:.14em}
+}
+
+/* footer row: credit, legend, optional motion toggle */
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 18px;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+.foot .who{order:1;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.foot .motion-toggle{order:2;margin-left:auto}
+.foot .legend{order:3;flex-basis:100%}
+.foot .who b{color:var(--text);font-weight:600}
+.legend{font-family:var(--mono);font-size:12px;color:var(--dim)}
+
+/* keyboard focus: the same 2px teal ring everywhere */
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+
+/* pause control for looping animation (WCAG 2.2.2) */
+.motion-toggle{font-family:var(--mono);font-size:12px;color:var(--dim);background:transparent;border:1px solid var(--border);border-radius:99px;padding:7px 14px;min-height:32px;cursor:pointer;transition:color .15s,border-color .15s}
+.motion-toggle:hover{color:var(--text);border-color:var(--dim)}
+
+/* paused: off-screen, hidden tab, or the viewer pressed the toggle */
+html.ltb-paused *,html.ltb-paused *::before,html.ltb-paused *::after{animation-play-state:paused!important}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important}
+  .motion-toggle{display:none}
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bits vs bytes, interactive download time calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/embeds/ltb/ltb-embed.css">
+<noscript><style>.motion-toggle{display:none}</style></noscript>
+<style>
+
+.byte{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin:-8px 0 24px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+.byte .bits{display:flex;gap:4px;padding:6px;border:1px solid rgba(245,158,11,.6);border-radius:8px;background:rgba(245,158,11,.08)}
+.byte .bits i{width:14px;height:14px;border-radius:3px;background:var(--amber)}
+.byte b{color:var(--text);font-weight:600}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 30px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:24px}
+.lab{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-family:var(--mono);font-size:13px;color:var(--dim);letter-spacing:.04em;margin-bottom:10px}
+.lab .val{font-family:var(--display);font-weight:700;font-size:20px;white-space:nowrap}
+.lab .link{color:var(--amber)}
+.lab .file{color:var(--teal)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1 1 0;min-height:44px;padding:8px 6px;font-family:var(--mono);font-size:13px;font-weight:600;line-height:1.25;color:#CBD5E1;background:var(--elev);border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:color .15s,background .15s}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed=true]{color:#04211D;background:var(--teal);border-color:var(--teal)}
+
+.calc{display:grid;gap:12px}
+.step{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;padding:14px 18px;background:var(--bg);border:1px solid var(--border);border-radius:13px}
+.step .k{flex-basis:100%;font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.step .eq{font-family:var(--mono);font-size:14px;color:var(--text)}
+.step .v{font-family:var(--display);font-weight:700;font-size:clamp(22px,4.5vw,30px);letter-spacing:-.02em;white-space:nowrap}
+.step .rate{color:var(--teal)}
+.step .time{color:var(--text)}
+
+.bars{margin-top:22px;display:grid;gap:12px}
+.barrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"label time" "bar bar";gap:6px 12px;align-items:baseline}
+.bl{grid-area:label;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.bt{grid-area:time;font-family:var(--display);font-weight:700;font-size:18px;white-space:nowrap}
+.barbox{grid-area:bar;height:18px;border-radius:99px;background:rgba(148,163,184,.08);overflow:hidden}
+.barfill{height:100%;border-radius:99px}
+.barfill.real{width:100%;background:linear-gradient(90deg,var(--teal),var(--teal-deep))}
+.barfill.wrong{width:12.5%;background:repeating-linear-gradient(135deg,rgba(245,158,11,.75) 0 6px,rgba(245,158,11,.35) 6px 12px)}
+.barrow.real .bt{color:var(--teal)}
+.barrow.wrong .bt{color:var(--amber)}
+.fine{margin-top:16px;font-size:14px;line-height:1.5;color:var(--dim)}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+@media(max-width:560px){
+  .panel{padding:20px 16px}
+  .controls{grid-template-columns:1fr}
+  .seg button{font-size:12px}
+}
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="eyebrow">Interactive · pick a link and a file</div>
+  <h1>Links count <span class="em">bits</span>. Files count <span class="em">bytes</span>.</h1>
+  <p class="lead">Link speeds are quoted in bits per second, file sizes in bytes. Divide Mbps by 8 to get MB/s, then divide the file size by that rate.</p>
+  <div class="byte" aria-hidden="true"><span class="bits"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span><b>1 byte</b> = 8 bits</span></div>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="ctrl">
+        <div class="lab"><span id="linkName">Link speed</span><output class="val link" id="linkVal">100 Mbps</output></div>
+        <div class="seg" id="linkSeg" role="group" aria-labelledby="linkName">
+          <button type="button" data-v="10" data-label="10 Mbps" aria-pressed="false">10 Mbps</button>
+          <button type="button" data-v="100" data-label="100 Mbps" aria-pressed="true">100 Mbps</button>
+          <button type="button" data-v="1000" data-label="1 Gbps" aria-pressed="false">1 Gbps</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <div class="lab"><span id="fileName">File size</span><output class="val file" id="fileVal">1 GB</output></div>
+        <div class="seg" id="fileSeg" role="group" aria-labelledby="fileName">
+          <button type="button" data-v="100" data-label="100 MB" aria-pressed="false">100 MB</button>
+          <button type="button" data-v="1000" data-label="1 GB" aria-pressed="true">1 GB</button>
+          <button type="button" data-v="10000" data-label="10 GB" aria-pressed="false">10 GB</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc">
+      <div class="step"><span class="k">Link speed in bytes</span><span class="eq" id="eq1">100 Mbps ÷ 8 =</span><span class="v rate" id="rate">12.5 MB/s</span></div>
+      <div class="step"><span class="k">Best-case transfer time</span><span class="eq" id="eq2">1,000 MB ÷ 12.5 MB/s =</span><span class="v time" id="time">80 s</span></div>
+    </div>
+
+    <div class="bars" aria-hidden="true">
+      <div class="barrow real"><span class="bl">Real minimum</span><span class="bt" id="tReal">80 s</span><div class="barbox"><div class="barfill real"></div></div></div>
+      <div class="barrow wrong"><span class="bl">If you read Mbps as MB/s (wrong)</span><span class="bt" id="tWrong">10 s</span><div class="barbox"><div class="barfill wrong"></div></div></div>
+    </div>
+    <p class="fine">Real downloads are slightly slower, because packet headers take a few percent. Sizes are decimal: 1 GB = 1,000 MB.</p>
+    <div class="sr-only" id="announce" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <div class="foot">
+    <div class="who"><b>Viktor Vedmich</b> · vedmich.dev</div>
+    <div class="legend">MB/s = Mbps ÷ 8 · time = size ÷ rate</div>
+  </div>
+</div>
+
+<script src="/embeds/ltb/ltb-embed.js"></script>
+
+<script>
+(function(){
+  var T = {"dec": ".", "grp": ",", "mbs": "MB/s", "mb": "MB", "s": "s", "min": "min", "h": "h", "say": "{link} link, {file} file: {rate}, at least {time}."};
+  var mbps = 100, fileMB = 1000;
+  var linkSeg = document.getElementById('linkSeg'), fileSeg = document.getElementById('fileSeg');
+  var announce = document.getElementById('announce');
+
+  function dec(s){ return T.dec === '.' ? s : s.replace('.', T.dec); }
+  function trim(s){ return s.indexOf('.') > -1 ? s.replace(/0+$/, '').replace(/\.$/, '') : s; }
+  function group(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, T.grp); }
+  function fmtRate(x){ return dec(trim(x.toFixed(2))) + ' ' + T.mbs; }
+  function fmtTime(s){
+    if (s < 1) return dec(trim(s.toFixed(1))) + ' ' + T.s;
+    if (s < 120) return dec(trim(s.toFixed(s < 10 ? 1 : 0))) + ' ' + T.s;
+    if (s < 7200) {
+      var m = Math.floor(s / 60), r = Math.round(s - m * 60);
+      if (r === 60) { m++; r = 0; }
+      return m + ' ' + T.min + (r ? ' ' + r + ' ' + T.s : '');
+    }
+    return dec(trim((s / 3600).toFixed(1))) + ' ' + T.h;
+  }
+  function set(id, text){ document.getElementById(id).textContent = text; }
+
+  function update(){
+    var rate = mbps / 8;                       // MB/s = Mbps / 8
+    var secs = fileMB / rate;                  // seconds = file size / rate
+    var wrong = fileMB / mbps;                 // what you get if you read Mbps as MB/s
+    var linkLabel = linkSeg.querySelector('[aria-pressed=true]').getAttribute('data-label');
+    var fileLabel = fileSeg.querySelector('[aria-pressed=true]').getAttribute('data-label');
+    set('linkVal', linkLabel);
+    set('fileVal', fileLabel);
+    set('eq1', linkLabel + ' ÷ 8 =');
+    set('rate', fmtRate(rate));
+    set('eq2', group(fileMB) + ' ' + T.mb + ' ÷ ' + fmtRate(rate) + ' =');
+    set('time', fmtTime(secs));
+    set('tReal', fmtTime(secs));
+    set('tWrong', fmtTime(wrong));
+    announce.textContent = T.say.replace('{link}', linkLabel).replace('{file}', fileLabel).replace('{rate}', fmtRate(rate)).replace('{time}', fmtTime(secs));
+  }
+
+  function pick(seg, cb){
+    seg.addEventListener('click', function(e){
+      var b = e.target.closest('button'); if (!b) return;
+      [].forEach.call(seg.children, function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      cb(+b.getAttribute('data-v')); update();
+    });
+  }
+  pick(linkSeg, function(v){ mbps = v; });
+  pick(fileSeg, function(v){ fileMB = v; });
+})();
+</script>
+
+</body>
+</html>
