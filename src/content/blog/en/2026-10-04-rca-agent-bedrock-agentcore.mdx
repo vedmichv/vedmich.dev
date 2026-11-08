@@ -1,11 +1,12 @@
 ---
 title: "Building an RCA agent with Amazon Bedrock AgentCore"
-description: "The companion to my AWS Community Day Central Asia talk: how one question, \"why is this pod restarting?\", grows from a single model call into a bounded investigation agent, what it takes to run one, and where Strands and AgentCore fit."
+description: "How one question, \"why is this pod restarting?\", grows from a model call into a bounded RCA agent, what it takes to run it, and where Strands and AgentCore fit."
 date: 2026-10-04
 tags: ["ai", "agents", "aws", "bedrock", "kubernetes", "mcp"]
 cover_image: "/blog-assets/2026-10-04-rca-agent-bedrock-agentcore/cover.jpg"
 ---
 import SlideEmbed from '../../../components/SlideEmbed.astro';
+import HtmlEmbed from '../../../components/HtmlEmbed.astro';
 
 It is tournament finals night. Matchmaking starts returning errors, the pager goes off, and the first question in the incident channel is the one it always is: *why is this pod restarting?*
 
@@ -13,7 +14,7 @@ You know what happens next, because you have done it. You open the alert. You ru
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={3} clicks={4} title="What you do at 2AM" caption="Alert, workload state, logs, metrics, runbooks: the engineer is the integration layer. The opportunity is to automate the evidence gathering and correlation." />
 
-That gathering and correlating is exactly the part a machine can do first. Not a chat assistant that explains the log you paste into it: that is a copilot, and a copilot answers. What I want at 2AM is an agent. An agent chooses the next check, calls the systems itself and hands me a report with the evidence attached. A copilot answers. An agent investigates.
+That gathering and correlating is exactly the part a machine can do first. I do not mean a chat assistant that explains the log you paste into it. That is a copilot. What I want at 2AM is an agent: it chooses the next check, calls the systems itself and hands me a report with the evidence attached. A copilot answers. An agent investigates.
 
 This post is the written version of [my talk on building a root cause analysis (RCA) agent](/en/speaking/2026-rca-agent-agentcore/) at AWS Community Day Central Asia 2026 in Tashkent. It follows the same route:
 
@@ -22,7 +23,7 @@ This post is the written version of [my talk on building a root cause analysis (
 3. How do Strands and AgentCore help?
 4. How do we build our own RCA agent?
 
-The [full deck](/slides/ai-agents-devops-tashkent/) is online, and its slides are embedded throughout, so you can click through the diagrams yourself. The recorded demo is near the end.
+The [full deck](/slides/ai-agents-devops-tashkent/) is online. The key slides are embedded in the text, so you can click through the diagrams yourself. The recorded demo is near the end.
 
 <figure class="my-8">
   <img
@@ -35,33 +36,33 @@ The [full deck](/slides/ai-agents-devops-tashkent/) is online, and its slides ar
   <figcaption class="text-sm text-text-muted mt-2 text-center">AWS Community Day Central Asia 2026, CAEx, Tashkent.</figcaption>
 </figure>
 
-## One question, five layers
+## One question, five capabilities
 
-The clearest way I know to explain an agent: take one question and keep answering it, adding one capability at a time. At each step, look at what the answer can and cannot do. (The answers and values below are illustrative and synthetic, as they were on the slides.)
+I explain an agent with one question that I keep answering, adding one capability at a time. At each step, look at what the answer can and cannot do. (The answers and values below are illustrative and synthetic, as they were on the slides.)
 
 ### A model alone: plausible and generic
 
 Ask a generative model "why is this pod restarting?" and you get a good answer to a different question. Common causes: the container ran out of memory (OOMKilled), the process crashed on start, a liveness or startup probe is failing, or the config or image is bad. Run `kubectl describe pod` and check the last termination reason.
 
-That is useful general advice, and at 2AM it explains nothing. It could be any pod, anywhere. The reason is mechanical. A model predicts the next token from what is in its prompt. Its knowledge stops at its training cutoff, it has no memory between calls, and it has no access to your cluster. **Context is the only channel into the model.** Everything that follows is a way to put better things into that channel.
+That is useful general advice, and at 2AM it explains nothing. It could be any pod, anywhere. A model predicts the next token from what is in its prompt. Its knowledge stops at its training cutoff, it has no memory between calls, and it has no access to your cluster. **Context is the only channel into the model.** Everything that follows is a way to put better input into that channel.
 
 ### Add our knowledge with RAG
 
-Retrieval-augmented generation (RAG) puts our own documents into the prompt. The question is used to search an index of our runbooks, and the best matching passages, with their source, are added to the context.
+Retrieval-augmented generation (RAG) puts our own documents into the prompt. The question searches an index of our runbooks, and the best matching passages go into the context with their source.
 
 The answer changes: "Your runbook lists match-api memory limits as a known risk. Check the last termination reason and compare memory usage against the configured limit for the incident window."
 
-Now it is grounded in our knowledge. But notice what is still missing: nobody has looked at the pod. Retrieval finds text. It does not observe anything.
+Now the answer is grounded in our knowledge. What is still missing: nobody has looked at the pod. Retrieval finds text. It does not observe anything.
 
 ### Add live tools through MCP
 
-This is where it starts to feel different. With tools, the model can ask for an observation. Through the Model Context Protocol (MCP), the application offers the model a list of tools such as `eks_describe_pod`. The model proposes a call, and the application runs it.
+Tools let the model ask for an observation. Through the Model Context Protocol (MCP), the application offers the model a list of tools such as `eks_describe_pod`.
 
-The context now contains a tool result (synthetic, like every value here): last termination `OOMKilled`, exit code 137, memory limit 512Mi. And the answer is finally about *this* pod: "The previous container was OOMKilled (exit 137) against a 512Mi limit. Next check: the memory working set for the last hour and the deployment history. Not yet established: why memory grew."
+When the model asks for `eks_describe_pod` and the application runs it, the context contains a tool result (synthetic, like every value here): last termination `OOMKilled`, exit code 137, memory limit 512Mi. And the answer is finally about *this* pod: "The previous container was OOMKilled (exit 137) against a 512Mi limit. Next check: the memory working set for the last hour and the deployment history. Not yet established: why memory grew."
 
-<SlideEmbed slug="ai-agents-devops-tashkent" slide={11} clicks={4} title="How tools add live observations" caption="The model proposes eks_describe_pod(pod). The application checks policy and calls the EKS tool server through MCP. The observation (OOMKilled, exit 137) goes back into the prompt." />
+<SlideEmbed slug="ai-agents-devops-tashkent" slide={11} clicks={4} title="How tools add live observations" caption="The model proposes eks_describe_pod(pod). The application checks policy and calls the tool server for EKS through MCP. The observation (OOMKilled, exit 137) goes back into the prompt." />
 
-One detail on this slide matters more than anything else in the first half: **the model proposes the call, the application makes it.** The model never touches your cluster. Your application checks the policy, calls the MCP server and returns the observation. Permissions live in code and configuration, not in the model's good intentions. (If MCP is new to you, start with [MCP servers, plainly explained](/en/blog/2026-03-02-mcp-servers-plainly-explained).)
+**The model proposes the call, the application makes it.** The model never touches your cluster. Your application checks the policy, calls the MCP server and returns the observation. Permissions live in code and configuration, not in the model's good intentions. (If MCP is new to you, start with [MCP servers, plainly explained](/en/blog/2026-03-02-mcp-servers-plainly-explained).)
 
 ### Let the loop choose the next check
 
@@ -69,19 +70,19 @@ A tool call gives the model one observation. The agent part is the loop that use
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={12} clicks={4} title="The agent loop chooses the next check" caption="A bounded investigation loop: evidence, choose the next check, scoped tool, observed result. It ends with a supported report when the evidence is sufficient or the budget is reached." />
 
-Two properties keep this loop under control. It is **bounded**: the application, not the model, enforces limits on tool calls, time and tokens, and when a limit is reached the agent stops and says what it could not establish. And **only an observed result can trigger another check**, an error included. The loop moves forward on evidence, not on the model talking itself into something. Permissions and untrusted content need their own controls, and they come up below.
+Two properties keep this loop under control. It is **bounded**: the application, not the model, enforces limits on tool calls, time and tokens, and when a limit is reached the agent stops and says what it could not establish. And **only an observed result can trigger another check**, an error included. The loop moves forward on evidence, not on the model talking itself into something. Permissions and untrusted content need their own controls, covered below.
 
 ### Not everything needs to be an agent
 
-The advice from the talk that I would give any team: let the task decide. A workflow is fixed steps in code. It is predictable, cheap and testable. An agent lets the model choose the next step, and you pay for that in latency, cost and a much wider range of ways to fail.
+My advice for any team, from the talk: let the task decide. A workflow is fixed steps in code. It is predictable, cheap and testable. An agent lets the model choose the next step, and you pay for that in latency, cost and a much wider range of ways to fail.
 
-<SlideEmbed slug="ai-agents-devops-tashkent" slide={13} clicks={3} title="Workflow or agent? Let the task decide." caption="Workflow: alert, fetch pod status, summarize, post. Agent: the model chooses a useful next check, repeated within a budget. In the RCA design only the open-ended investigation is agentic." />
+<SlideEmbed slug="ai-agents-devops-tashkent" slide={13} clicks={3} title="Workflow or agent? Let the task decide." caption="Workflow: alert, fetch pod status, summarize, post. Agent: the model chooses a useful next check, repeated within a budget." />
 
-In the RCA design, only the investigation itself is agentic. Alert intake is a fixed workflow with a fixed webhook schema. The tool contracts are read-only. Remediation is gated by a person. Keep the agent for the open-ended part and keep everything around it deterministic.
+In the RCA design, only the investigation itself is agentic. Alert intake is a fixed workflow with a fixed webhook schema. The tool contracts are read-only. Remediation is a person's decision. Keep the agent for the open-ended part and keep everything around it deterministic.
 
 ### Skills and subagents, when you need them
 
-Two more capabilities complete the picture.
+Two more capabilities come in when the task needs them.
 
 A **skill** is a reusable procedure for a recurring job. "Restart investigation" says when to use it (a container restart, not every Kubernetes question) and how to proceed: inspect the previous termination state, align metrics with the restart time, compare plausible causes, report the evidence and the missing checks. The skill is loaded into the prompt when the job matches. Skills provide instructions. Tools provide capabilities.
 
@@ -89,19 +90,21 @@ A **subagent** gets a bounded task in a fresh context. The investigator's contex
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={16} clicks={5} title="Capabilities build on one another" caption="Model, knowledge (RAG), tools (MCP), skills, subagents. A capability map, not a mandatory stack: add a capability when the task needs it." />
 
-This is a capability map, not a mandatory stack. Add a capability when the task needs it. The prototype I showed uses the model, RAG and MCP tools in a loop. Skills and subagents are where it can grow, not where it starts.
+The prototype I showed uses the model, RAG and MCP tools in a loop. Skills and subagents are where it can grow, not where it starts.
 
 ## Running it is the hard part
 
 Everything so far fits on a whiteboard. Then you try to run it for a real on-call rotation and find out that the loop is only part of the application. A working agent needs an operating environment: where it runs, who may call which tool, what must be blocked, what survives between runs, which prompt version is live, and what happened and why.
 
-Four of these deserve a closer look.
+Four of these deserve a closer look: access, memory, prompt changes and records.
 
 ### Three access decisions, not one
 
+An agent needs three separate access decisions, and a login covers only the first.
+
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={19} clicks={4} title="Access and protection need explicit boundaries" caption="Caller: who may invoke the agent. Tools: which actions on which resources. Content: logs are evidence, not authority. Private data, untrusted content and a way out are all present here." />
 
-A login answers only the first question: who may invoke the agent? The second is what the agent may do with its tools. Inspect one workload: yes. Change an alarm: no. The third is the one people skip: content. Logs are untrusted input. Anyone who can write a log line can write text that ends up in your model's context. Treat content as evidence, never as authority.
+The first is who may invoke the agent. The second is what the agent may do with its tools. Inspect one workload: yes. Change an alarm: no. The third is the one people skip: content. Logs are untrusted input. Anyone who can write a log line can write text that ends up in your model's context. Treat content as evidence, never as authority.
 
 This RCA agent has all three ingredients that make an agent risky: private data (the cluster), untrusted content (logs) and a way out (the report). So each boundary has to be explicit, in configuration you can test. Writing "be careful" in a prompt replaces none of these decisions.
 
@@ -111,19 +114,21 @@ This RCA agent has all three ingredients that make an agent risky: private data 
 
 ### A prompt edit is a release
 
-Change one instruction and you have changed the system. The example from the slide: a new instruction makes the agent recommend more memory *before* it reads the container state. Every response is still valid. The investigation got worse.
+Change one instruction and you have changed the system. The example from the deck: a new instruction makes the agent recommend more memory *before* it reads the container state. Every response is still valid. The investigation got worse.
 
 So prompts get the same treatment as code. Version the prompt, the tools and the model together. Evaluate by replaying past incidents. Promote with a rollback path. Every report carries the version that produced it, so when two reports disagree you know what changed. A platform can help you evaluate behavior. The release decision stays yours.
 
 ### Three records answer three questions
 
+When something goes wrong you will ask three different questions, and each needs its own record.
+
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={22} clicks={4} title="Three records answer different questions" caption="Alert, tool call, model call, report. API audit trail: who called what. Execution traces: which steps ran. Captured content: what the model received and returned." />
 
-When something goes wrong you will ask three different questions, and each needs its own record. Who called which API, and when? That is the audit trail. Which steps ran, failed or took time, and did the diagnostic step run at all? That is execution tracing. What did the model actually receive and return? That is captured content. None of them alone answers every question, and access, redaction and retention are decisions you make for each one up front.
+Who called which API, and when? That is the audit trail. Which steps ran, failed or took time, and did the diagnostic step run at all? That is execution tracing. What did the model receive and return? That is captured content. None of them alone answers every question, and access, redaction and retention are decisions you make for each one up front.
 
 ## Where Strands and AgentCore fit
 
-I work at AWS; this is my own view. Now map those requirements to AWS. Two pieces do the work: **Strands Agents**, an open-source SDK from AWS (Python and TypeScript) that runs the agent loop in your application code, and **Amazon Bedrock AgentCore**, a set of services for running agents in production.
+I work at AWS; this is my own view. Two AWS pieces do the work: **Strands Agents**, an open-source SDK from AWS (Python and TypeScript) that runs the agent loop in your application code, and **Amazon Bedrock AgentCore**, a set of services for running agents in production.
 
 Strands is pleasantly boring. An agent is a model, a list of tools and a system prompt:
 
@@ -137,7 +142,7 @@ return Agent(
 
 AgentCore covers the operating environment:
 
-<SlideEmbed slug="ai-agents-devops-tashkent" slide={25} clicks={5} title="Map the requirements to AgentCore" caption="On-call app, then Runtime running the RCA agent with a Bedrock model and Memory, then Gateway (with Identity and Policy) to the EKS, CloudWatch, Prometheus and Knowledge Base tool servers. Observability and Evaluations alongside." />
+<SlideEmbed slug="ai-agents-devops-tashkent" slide={25} clicks={5} title="Map the requirements to AgentCore" caption="On-call app, then Runtime running the RCA agent with a Bedrock model and Memory, then Gateway (with Identity and Policy) to the tool servers for EKS, CloudWatch, Prometheus and Knowledge Base. Observability and Evaluations alongside." />
 
 - **Runtime** hosts the agent: the execution environment and the session lifecycle. Your entrypoint accepts a request, runs the Strands loop and returns the report.
 - **Gateway** exposes the tool servers to the agent as MCP tools: one place for tool discovery and calls.
@@ -154,18 +159,23 @@ Three notes from building on it.
 
 **Memory stores leads, not truth.** Today the prototype retrieves runbooks. Recalling past incidents is a planned extension, not built yet. In that design, a reviewed incident outcome would go into long-term memory through `IngestData`, the direct ingestion API that AgentCore Memory gained in September 2026. The configured extraction strategies would process it asynchronously, and a later investigation would retrieve the resulting records within its own scope. If ingestion fails, inspect the failure before you redrive it.
 
-**Observability is three switches, and you have to flip them.** The three records map to three AWS features. AWS CloudTrail records API audit events, but not all of them by default. Bedrock model calls such as `InvokeModel` and `Converse` arrive as management events. CloudTrail lists AgentCore Runtime, Gateway and Memory among its data event resource types, and Knowledge Base retrievals are data events too. Data events are not logged by default, so you have to enable them explicitly.
+**Observability is three switches, and you have to flip them.** The three records map to three AWS features.
+
+<HtmlEmbed src="/embeds/rca/01-three-records-three-switches.html" minHeight={760}
+  title="Three records, three switches: CloudTrail, OpenTelemetry traces and model invocation logging" />
+
+The first switch is AWS CloudTrail, the API audit trail, and it does not record everything by default. Bedrock model calls such as `InvokeModel` and `Converse` arrive as management events. CloudTrail lists AgentCore Runtime, Gateway and Memory among its data event resource types, and Knowledge Base retrievals are data events too. Data events are not logged by default, so you have to enable them explicitly.
 
 The second switch is in your code: instrument the application to emit OpenTelemetry traces, and AgentCore Observability stores the traces, spans and metrics in Amazon CloudWatch.
 
-The third is Amazon Bedrock model invocation logging, which captures model inputs and outputs to CloudWatch Logs, Amazon S3 or both. It is disabled by default. Three records, three switches. And you still compare the diagnosis with the actual observation.
+The third is Amazon Bedrock model invocation logging, which captures model inputs and outputs to CloudWatch Logs, Amazon S3 or both. It is disabled by default. Even with all three switches on, you still compare the diagnosis with the actual observation.
 
 ## Building the RCA agent
 
-Time for the worked example. The first job is deliberately small: the 2AM pod.
+The worked example starts with a deliberately small job: the 2AM pod.
 
 - **Gather:** pod state, logs, metrics and the applicable runbook.
-- **Explain:** a diagnosis tied to those observations, and what is missing.
+- **Explain:** a diagnosis based on those observations, and what is missing.
 - **Hand over:** the engineer reviews and decides the remedy.
 
 The hypothesis is that the agent reduces repeated evidence gathering without replacing the engineer.
@@ -213,9 +223,17 @@ def eks_describe_pod(
     ...
 ```
 
-It returns the resources and the current and previous container state. The runbook side is one retrieval tool, `bedrock_kb_retrieve(query, top_k=3)`, a thin wrapper around the Amazon Bedrock Knowledge Bases `Retrieve` API, which returns each passage with its source location and score. Query with the failure mode, get passages from the applicable runbook, then compare that guidance with the current evidence.
+It returns the resources and the current and previous container state. The runbook side is one retrieval tool, `bedrock_kb_retrieve(query, top_k=3)`. It is a thin wrapper around the Amazon Bedrock Knowledge Bases `Retrieve` API, which returns each passage with its source location and score. Query with the failure mode, get passages from the applicable runbook, then compare that guidance with the current evidence.
 
 ### What a useful report must show
+
+A useful RCA report has three parts:
+
+- **Diagnosis:** the explanation supported by the observations.
+- **Evidence:** what the tools returned, and what is missing.
+- **Remediation:** recommended actions and a verification step.
+
+And one rule: verify the captured observations before you trust a generated report. The evidence is the product. The prose around it is packaging.
 
 <figure class="my-8">
   <img
@@ -228,15 +246,9 @@ It returns the resources and the current and previous container state. The runbo
   <figcaption class="text-sm text-text-muted mt-2 text-center">The slide I would keep if I could keep only one.</figcaption>
 </figure>
 
-A useful RCA report has three parts:
+## The demo: a rehearsed EKS failure
 
-- **Diagnosis:** the explanation supported by the observations.
-- **Evidence:** what the tools returned, and what is missing.
-- **Remediation:** recommended actions and a verification step.
-
-And one rule: verify the captured observations before you trust a generated report. The evidence is the product. The prose around it is packaging.
-
-## The demo
+The demo had three steps. A rehearsed EKS failure triggers an investigation. We inspect the actual tool results and the runbook retrieval. Then we compare the diagnosis and the proposed remedy with the evidence.
 
 <figure class="my-8">
   <img
@@ -249,7 +261,7 @@ And one rule: verify the captured observations before you trust a generated repo
   <figcaption class="text-sm text-text-muted mt-2 text-center">Demo flow: trigger, observe, review.</figcaption>
 </figure>
 
-The demo had three steps. A rehearsed EKS failure triggers an investigation. We inspect the actual tool results and the runbook retrieval. Then we compare the diagnosis and the proposed remedy with the evidence. Here is the recording I played in the room (2:49):
+Here is the recording I played in the room (2:49):
 
 <figure class="my-8">
   <video controls aria-label="Recorded demo, 2:49, without sound: the RCA agent investigates a rehearsed EKS failure" preload="metadata" playsinline poster="/slides/ai-agents-devops-tashkent/video/demo-tashkent-rca-agent-poster.jpg" width="1920" height="1080" style="max-width: 100%; height: auto;">
