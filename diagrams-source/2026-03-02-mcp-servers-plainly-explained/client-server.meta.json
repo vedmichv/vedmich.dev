@@ -1,5 +1,5 @@
 {
-  "title": "MCP client-server architecture",
-  "descEn": "Claude Code (client) connects via JSON-RPC to an MCP server, which fans out to external resources: docs, databases, APIs.",
-  "descRu": "Claude Code (клиент) подключается по JSON-RPC к MCP-серверу, который обращается к внешним ресурсам: docs, DB, API."
+  "title": "MCP roles and the path of a tool call",
+  "descEn": "Four numbered steps of a tool call. The host, Claude Code, sits between the model and the MCP server. Its MCP client sends tools/list and tools/call to the server, the host passes the tool definitions, the prompt and the result to the model, and the server runs the tool against docs or an API. The model has no direct line to the server.",
+  "descRu": "Четыре шага вызова инструмента. Хост Claude Code стоит между моделью и MCP-сервером. Его MCP-клиент отправляет серверу tools/list и tools/call, хост передаёт модели описания инструментов, промпт и результат, а сервер запускает инструмент над документацией или API. Прямой связи между моделью и сервером нет."
 }
