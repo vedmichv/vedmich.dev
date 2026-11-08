@@ -45,16 +45,16 @@
 <div class="wrap">
   <div class="eyebrow">Step 1: read the events</div>
   <h1>describe, <span class="em">not logs</span></h1>
-  <p class="lead">A Pending Pod has no container, so logs are empty. The scheduler writes its reasoning into the Pod's Events. Scroll to the bottom and read it, node by node.</p>
+  <p class="lead">A Pending Pod has no container, so logs are empty. The scheduler writes its reasoning into the Pod's Events. Scroll to the bottom and read it, reason by reason.</p>
 
   <div class="term">
     <div class="term-bar">
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="term-title">kubectl describe pod &middot; Events</span>
     </div>
-<pre id="term"><span class="ln" data-l="1"><span class="cmd">$ kubectl describe pod</span> api-7d9f</span><span class="ln" data-l="2"> </span><span class="ln cmt" data-l="3"># scroll to the bottom: the scheduler talks here</span><span class="ln" data-l="4">Events:</span><span class="ln" data-l="5">  <span class="warn">Warning</span>  FailedScheduling</span><span class="ln amber" data-l="6">  0/12 nodes are available:</span><span class="ln" data-l="7">   3 Insufficient cpu,</span><span class="ln" data-l="8">   4 node(s) had untolerated taint,</span><span class="ln" data-l="9">   5 didn't match node affinity/selector.</span><span class="cursor" id="cur"></span></pre>
+<pre id="term"><span class="ln" data-l="1"><span class="cmd">$ kubectl describe pod</span> api-7d9f</span><span class="ln" data-l="2"> </span><span class="ln cmt" data-l="3"># scroll to the bottom: the scheduler talks here</span><span class="ln" data-l="4">Events:</span><span class="ln" data-l="5">  <span class="warn">Warning</span>  FailedScheduling</span><span class="ln amber" data-l="6">  0/12 nodes are available:</span><span class="ln" data-l="7">   3 Insufficient cpu,</span><span class="ln" data-l="8">   4 node(s) had untolerated taint(s),</span><span class="ln" data-l="9">   5 node(s) didn't match Pod's node affinity/selector.</span><span class="cursor" id="cur"></span></pre>
   </div>
-  <p class="caption">One FailedScheduling line, broken down per node. The scheduler already did the diagnosis. You just read it.</p>
+  <p class="caption">One FailedScheduling line, broken down by reason. The scheduler already did the diagnosis. You just read it.</p>
   <button class="replay" onclick="playTerm()">&#8635; replay</button>
 </div>
 

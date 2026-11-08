@@ -51,7 +51,7 @@
 <div class="wrap">
   <div class="eyebrow">Scheduling cycle</div>
   <h1>Pass every gate, or go <span class="em">Pending</span></h1>
-  <p class="lead">The scheduler runs each Pending Pod down a chain of filters. Stay on the green path and it lands on a node. Fail any one gate and that branch splits off to Pending.</p>
+  <p class="lead">The scheduler runs each Pending Pod down a chain of filters. Stay on the green path and it lands on a node. A node that fails any one gate drops out. If no node is left, the Pod stays Pending.</p>
 
   <div class="flowwrap">
     <svg id="flow" viewBox="0 0 720 760" xmlns="http://www.w3.org/2000/svg">

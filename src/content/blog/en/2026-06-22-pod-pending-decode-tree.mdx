@@ -17,11 +17,11 @@ Here's how it usually goes. I describe the symptom, the candidate types `kubectl
 
 ## Why logs are empty
 
-A `Pending` Pod has been accepted by the API server, but the scheduler hasn't placed it on a node yet. No node means no kubelet picked it up. No kubelet means no container runtime started anything. No container means there are no logs to read.
+Here, `Pending` means the API server has accepted the Pod, but the scheduler hasn't placed it on a node yet. No node means no kubelet picked it up. No kubelet means no container runtime started anything. No container means there are no logs to read.
 
 So `kubectl logs` is the wrong tool. It's not that the command fails, it's that there's nothing for it to show. The Pod object exists in etcd, but nothing has run.
 
-The answer isn't in the Pod. It's in the Events.
+The answer isn't in the logs. It's in the Events.
 
 ## Step one: describe, not logs
 
@@ -29,13 +29,13 @@ Run `kubectl describe pod` and scroll to the bottom. The scheduler writes its re
 
 <HtmlEmbed src="/embeds/pod-pending/02-describe-events.html" title="kubectl describe pod: the scheduler talks in the Events" minHeight={620} />
 
-That single `FailedScheduling` line is the whole answer, broken down node by node. Twelve nodes, and none of them work, for three different reasons. No guessing. The scheduler already did the diagnosis for you. You just have to read it.
+That single `FailedScheduling` line is the whole answer, broken down by reason, with a node count for each. Twelve nodes, and none of them work, for three different reasons. No guessing. The scheduler already did the diagnosis for you. You just have to read it.
 
 The candidates who get this right say "describe" before I finish the question. The ones who don't reach for `logs`, `get pods -o yaml`, or start SSHing into nodes. The difference is whether they've actually watched a Pod fail to schedule in production.
 
 ## Step two: the four checks
 
-Once you know to read the events, you need a mental model for what the scheduler does. It runs every Pending Pod through a sequence of filters. Fail any one of them and the Pod stays Pending.
+Once you know to read the events, you need a mental model for what the scheduler does. It runs every Pending Pod through a sequence of filters. A node that fails any one of them is out. If no node is left, the Pod stays Pending.
 
 <HtmlEmbed src="/embeds/pod-pending/01-scheduling-flow.html" title="The scheduling flow: pass every gate or go Pending" minHeight={900} />
 
