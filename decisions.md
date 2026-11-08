@@ -18,3 +18,11 @@
   and formatting only. No rewrites, no fact changes; factual doubts go to Viktor.
 - Talk and deck titles are official titles and stay as published; tags stay unchanged.
 - The `__fixture-syntax-highlighting` post is test data and is excluded.
+- Viktor, 2026-11-08: English prose dates use day-month-year ("5 October 2026")
+  everywhere; month-year mentions ("October 2026") stay as they are.
+- Viktor, 2026-11-08: English UI headings and buttons in `en.json` use sentence case.
+- Viktor, 2026-11-08: city names are Cyrillic on RU pages and keep their diacritics
+  on EN pages (Kraków, Košice). Official venue and event names stay as written.
+- Viktor, 2026-11-08: RU prose keeps Latin `taint`/`toleration` in the Karpenter post.
+- Viktor, 2026-11-08: factual problems are fixed against primary sources, and EN/RU
+  divergences are resolved so both locales carry the same facts.

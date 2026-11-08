@@ -67,3 +67,8 @@
   were inspected (text reflow only) and refreshed.
 - Ten content commits (bc63f0e..082e9bd); report in
   `docs/reviews/2026-11-08-content-proofreading.md`. No push.
+- Round 2 (Viktor's decisions): seven units fact-checked against primary sources and
+  aligned EN/RU; conventions applied for dates, UI casing and cities; Hero pills
+  localized. Gateway API v1.7.0 and the Kubernetes log behavior were verified by hand.
+- Build, smoke (20) and visual (9, baselines refreshed after inspection) pass.
+  A 320px sweep found eight pre-existing overflows, recorded in the report.
