@@ -123,7 +123,7 @@ When something goes wrong you will ask three different questions, and each needs
 
 ## Where Strands and AgentCore fit
 
-Now map those requirements to AWS. Two pieces do the work: **Strands Agents**, an open-source SDK from AWS (Python and TypeScript) that runs the agent loop in your application code, and **Amazon Bedrock AgentCore**, a set of services for running agents in production.
+I work at AWS; this is my own view. Now map those requirements to AWS. Two pieces do the work: **Strands Agents**, an open-source SDK from AWS (Python and TypeScript) that runs the agent loop in your application code, and **Amazon Bedrock AgentCore**, a set of services for running agents in production.
 
 Strands is pleasantly boring. An agent is a model, a list of tools and a system prompt:
 
@@ -154,7 +154,7 @@ Three notes from building on it.
 
 **Memory stores leads, not truth.** Today the prototype retrieves runbooks. Recalling past incidents is a planned extension, not built yet. In that design, a reviewed incident outcome would go into long-term memory through `IngestData`, the direct ingestion API that AgentCore Memory gained in September 2026. The configured extraction strategies would process it asynchronously, and a later investigation would retrieve the resulting records within its own scope. If ingestion fails, inspect the failure before you redrive it.
 
-**Observability is three switches, and you have to flip them.** The three records map to three AWS features. AWS CloudTrail records API audit events, but not all of them by default. Bedrock model calls such as `InvokeModel` and `Converse` arrive as management events. Calls to AgentCore Runtime, Gateway and Memory, and Knowledge Base retrievals, are data events, and those you have to enable explicitly.
+**Observability is three switches, and you have to flip them.** The three records map to three AWS features. AWS CloudTrail records API audit events, but not all of them by default. Bedrock model calls such as `InvokeModel` and `Converse` arrive as management events. CloudTrail lists AgentCore Runtime, Gateway and Memory among its data event resource types, and Knowledge Base retrievals are data events too. Data events are not logged by default, so you have to enable them explicitly.
 
 The second switch is in your code: instrument the application to emit OpenTelemetry traces, and AgentCore Observability stores the traces, spans and metrics in Amazon CloudWatch.
 
@@ -252,7 +252,7 @@ And one rule: verify the captured observations before you trust a generated repo
 The demo had three steps. A rehearsed EKS failure triggers an investigation. We inspect the actual tool results and the runbook retrieval. Then we compare the diagnosis and the proposed remedy with the evidence. Here is the recording I played in the room (2:49):
 
 <figure class="my-8">
-  <video controls preload="metadata" playsinline poster="/slides/ai-agents-devops-tashkent/video/demo-tashkent-rca-agent-poster.jpg" width="1920" height="1080" style="max-width: 100%; height: auto;">
+  <video controls aria-label="Recorded demo, 2:49, without sound: the RCA agent investigates a rehearsed EKS failure" preload="metadata" playsinline poster="/slides/ai-agents-devops-tashkent/video/demo-tashkent-rca-agent-poster.jpg" width="1920" height="1080" style="max-width: 100%; height: auto;">
     <source src="/slides/ai-agents-devops-tashkent/video/demo-tashkent-rca-agent.mp4" type="video/mp4" />
   </video>
   <figcaption class="text-sm text-text-muted mt-2 text-center">Recorded demo (2:49): the RCA agent investigates a rehearsed EKS failure.</figcaption>

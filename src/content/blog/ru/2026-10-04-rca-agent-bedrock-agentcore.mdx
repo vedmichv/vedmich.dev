@@ -123,7 +123,7 @@ Retrieval-augmented generation (RAG) добавляет в промпт наши
 
 ## Где тут Strands и AgentCore
 
-Теперь сопоставим эти требования с AWS. Работу делают две части: **Strands Agents**, open-source SDK от AWS (Python и TypeScript), который крутит цикл агента в коде вашего приложения, и **Amazon Bedrock AgentCore**, набор сервисов для эксплуатации агентов в проде.
+Я работаю в AWS, но это моя личная оценка. Теперь сопоставим эти требования с AWS. Работу делают две части: **Strands Agents**, open-source SDK от AWS (Python и TypeScript), который крутит цикл агента в коде вашего приложения, и **Amazon Bedrock AgentCore**, набор сервисов для эксплуатации агентов в проде.
 
 Strands приятно скучный. Агент в нём состоит из модели, списка инструментов и системного промпта:
 
@@ -154,7 +154,7 @@ return Agent(
 
 **Memory хранит зацепки, а не истину.** Сейчас прототип ищет по ранбукам. Поиск по прошлым инцидентам пока только запланирован. В этой схеме проверенный итог инцидента будет попадать в долговременную память через `IngestData`, API прямой загрузки, который появился у AgentCore Memory в сентябре 2026. Настроенные стратегии извлечения будут обрабатывать его асинхронно, а следующее расследование сможет искать получившиеся записи в пределах своей области. Если загрузка упала, сначала разберитесь с причиной, а потом запускайте повторно.
 
-**Observability: три переключателя, и включать их придётся вам.** Три вида записей соответствуют трём возможностям AWS. AWS CloudTrail пишет аудит вызовов API, но по умолчанию не всё. Вызовы моделей Bedrock вроде `InvokeModel` и `Converse` приходят как management events. А вызовы AgentCore Runtime, Gateway и Memory, как и поиск по Knowledge Base, относятся к data events, и их нужно включать явно.
+**Observability: три переключателя, и включать их придётся вам.** Три вида записей соответствуют трём возможностям AWS. AWS CloudTrail пишет аудит вызовов API, но по умолчанию не всё. Вызовы моделей Bedrock вроде `InvokeModel` и `Converse` приходят как management events. В списке типов ресурсов для data events в CloudTrail есть AgentCore Runtime, Gateway и Memory, а поиск по Knowledge Base тоже относится к data events. По умолчанию CloudTrail их не пишет, поэтому включать их нужно явно.
 
 Второй переключатель в вашем коде: инструментируйте приложение, чтобы оно отправляло трейсы OpenTelemetry, и AgentCore Observability сохранит трейсы, спаны и метрики в Amazon CloudWatch.
 
@@ -252,7 +252,7 @@ def eks_describe_pod(
 В демо было три шага. Заранее подготовленный сбой в EKS запускает расследование. Смотрим на реальные результаты инструментов и на найденный ранбук. Потом сверяем диагноз и предложенное исправление с уликами. Вот запись, которую я показывал в зале (2:49):
 
 <figure class="my-8">
-  <video controls preload="metadata" playsinline poster="/slides/ai-agents-devops-tashkent/video/demo-tashkent-rca-agent-poster.jpg" width="1920" height="1080" style="max-width: 100%; height: auto;">
+  <video controls aria-label="Записанное демо, 2:49, без звука: RCA-агент расследует отрепетированный сбой в EKS" preload="metadata" playsinline poster="/slides/ai-agents-devops-tashkent/video/demo-tashkent-rca-agent-poster.jpg" width="1920" height="1080" style="max-width: 100%; height: auto;">
     <source src="/slides/ai-agents-devops-tashkent/video/demo-tashkent-rca-agent.mp4" type="video/mp4" />
   </video>
   <figcaption class="text-sm text-text-muted mt-2 text-center">Записанное демо (2:49): RCA-агент расследует отрепетированный сбой в EKS.</figcaption>
