@@ -8,7 +8,7 @@ import SlideEmbed from '../../../components/SlideEmbed.astro';
 
 In March 2026, ingress-nginx was retired. Datadog's internal research, quoted by the Kubernetes project, found that it ran in about half of all cloud native environments. There will be no more releases, no bug fixes, and no patches for security vulnerabilities. That is what turns "I should look at Gateway API eventually" into "I need to understand this now."
 
-This post accompanies a talk I give as a from-zero-to-hero walkthrough. We take one online shop, start with a single route, and grow the design one concept at a time until it has TLS, a canary, several teams, and a cross-namespace dependency. The examples are vendor-neutral and current as of Gateway API v1.5 (February 2026). The slides are embedded throughout, so you can click through the animated ones yourself. A follow-up post will make all of this concrete on AWS.
+This post accompanies a talk I give as a from-zero-to-hero walkthrough. We take one online shop, start with a single route, and grow the design one concept at a time until it has TLS, a canary, several teams, and a cross-namespace dependency. The examples are vendor-neutral and current as of Gateway API v1.5 (February 2026). The slides are embedded throughout, so you can click through the animated ones yourself. This post does not cover AWS-specific implementations.
 
 One terminology note first, because the names are easy to mix up. This is **Gateway API**, the Kubernetes networking standard. It is not an "API gateway", which is a generic architectural component, and it is not Amazon API Gateway, the AWS service. Different things.
 
@@ -133,7 +133,7 @@ Now the payoff. GatewayClass, Gateway, and HTTPRoute are configuration: together
 
 ## Hands-on: route the shop
 
-Time to deploy. The Gateway API CRDs are not built into Kubernetes; you install them separately, and v1.5 works on any Kubernetes 1.30 or newer. You can upgrade Gateway API on its own, as long as your Kubernetes version meets the new release's minimum. You do need a controller that supports the version and features you use, so follow its compatibility guide when you upgrade the CRDs.
+Time to deploy. The Gateway API CRDs are not built into Kubernetes; you install them separately. v1.5 works on Kubernetes 1.30 or newer, except that TLSRoute's CEL validation needs Kubernetes 1.31 or newer. You can upgrade Gateway API on its own, as long as your Kubernetes version meets the new release's minimum. You do need a controller that supports the version and features you use, so follow its compatibility guide when you upgrade the CRDs.
 
 Before applying the examples, install a controller, create the `infra` and `shop` namespaces, and deploy the `web` Service on port `8080`. The `prod` class and the `example.net/gateway-controller` name are placeholders; use the GatewayClass your controller provides.
 
@@ -317,9 +317,8 @@ Third, the **gotchas** that catch people in real migrations:
 
 We started with one `web` service and ended with a shared HTTPS front door, self-service routes for several teams, a weighted canary, and an explicitly authorized reference to `payments`, all on the same handful of building blocks.
 
-To start concretely: pick compatible versions of Kubernetes (1.30 or newer), Gateway API, and a conformant controller. Expose your first service exactly like we did with `web`, check the status conditions, and send a real request. Once that request reaches the app, add the rest of the routes.
+To start concretely: pick compatible versions of Kubernetes (1.30 or newer, and 1.31 or newer for TLSRoute validation), Gateway API, and a conformant controller. Expose your first service exactly like we did with `web`, check the status conditions, and send a real request. Once that request reaches the app, add the rest of the routes.
 
 ## Related
 
 - **Slides:** [Kubernetes Gateway API: from zero to hero](/slides/k8s-gateway-api/). The full deck this post is built on. Click through the animated diagrams in presenter mode.
-- **Next up:** the AWS implementation deck, making this vendor-neutral foundation concrete with load balancer controllers, ACM for certificates, and VPC Lattice for the mesh.
