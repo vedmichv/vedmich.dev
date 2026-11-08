@@ -63,12 +63,6 @@ const imageURL = new URL(Astro.props.image || '/og-default.png', Astro.site);
     <link rel="preload" href="/fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
 
-    <noscript>
-      <style>
-        .animate-on-scroll { opacity: 1 !important; }
-      </style>
-    </noscript>
-
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -88,6 +82,14 @@ const imageURL = new URL(Astro.props.image || '/og-default.png', Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageURL} />
     <meta name="twitter:image:alt" content={Astro.props.image ? title : 'Viktor Vedmich: Architect, Author, Speaker'} />
+
+    <!-- Keep <noscript> last in <head>: the Astro compiler ends the head early when
+         expressions follow it, which moved the meta tags below into <body>. -->
+    <noscript>
+      <style>
+        .animate-on-scroll { opacity: 1 !important; }
+      </style>
+    </noscript>
   </head>
   <body class="min-h-screen flex flex-col">
     <a href="#main-content" class="skip-link">{i.nav.skip_to_content}</a>
