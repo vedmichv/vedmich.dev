@@ -7,4 +7,4 @@ tags: ["Kubernetes", "AWS", "Karpenter", "Cost Optimization"]
 draft: false
 ---
 
-Реальные уроки эксплуатации Karpenter в production окружениях с фокусом на оптимизацию затрат и операционные best practices.
+Реальные уроки эксплуатации Karpenter в продакшен-окружениях с фокусом на оптимизацию затрат и операционные best practices.

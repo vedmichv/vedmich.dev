@@ -8,4 +8,4 @@ highlight: "Speaker rating: 4.7/5.0"
 draft: false
 ---
 
-AWS re:Invent session on leveraging CDK8S for scalable Kubernetes infrastructure. Session code: BOA310.
+AWS re:Invent session on using CDK8S for scalable Kubernetes infrastructure. Session code: BOA310.
