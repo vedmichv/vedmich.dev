@@ -1,5 +1,5 @@
 ---
-title: "New Era of IaC: Effective Kubernetes Management with CDK8S (BOA310)"
+title: "New Era of IaC: Effective Kubernetes Management with cdk8s (BOA310)"
 event: "AWS re:Invent"
 city: "Las Vegas"
 date: 2023-11-29
@@ -8,4 +8,4 @@ highlight: "Speaker rating: 4.7/5.0"
 draft: false
 ---
 
-AWS re:Invent session on using CDK8S for scalable Kubernetes infrastructure. Session code: BOA310.
+AWS re:Invent session on using cdk8s for scalable Kubernetes infrastructure. Session code: BOA310.

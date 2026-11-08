@@ -1,7 +1,7 @@
 ---
 title: "Scaling machine learning with containers on AWS: Lessons learned"
 event: "AWS re:Invent"
-city: "Las Vegas"
+city: "Лас-Вегас"
 date: 2024-12-04
 tags: ["Machine Learning", "Containers", "Serverless", "SageMaker", "AWS"]
 draft: false

@@ -1,7 +1,7 @@
 ---
 title: "Move beyond reactive: AWS DevOps Agent"
 event: "AWS Summit Hamburg"
-city: "Hamburg"
+city: "Гамбург"
 date: 2026-05-20
 tags: ["AI Agents", "AWS", "DevOps", "SRE", "Observability"]
 draft: false

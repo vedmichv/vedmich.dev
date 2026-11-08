@@ -1,7 +1,7 @@
 ---
 title: "Mastering Kubernetes Scalability with Karpenter"
 event: "Code Europe"
-city: "Krakow"
+city: "Kraków"
 date: 2025-07-01
 tags: ["Kubernetes", "AWS", "Karpenter", "Scaling"]
 draft: false

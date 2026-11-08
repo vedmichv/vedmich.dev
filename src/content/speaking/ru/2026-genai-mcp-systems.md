@@ -1,7 +1,7 @@
 ---
 title: "Построение Production GenAI: MCP и мульти-агентные системы"
 event: "Code Europe"
-city: "Krakow"
+city: "Краков"
 date: 2025-07-01
 tags: ["AI", "GenAI", "MCP", "Architecture"]
 video: "https://www.youtube.com/watch?v=PxZiNWUCl3Q"

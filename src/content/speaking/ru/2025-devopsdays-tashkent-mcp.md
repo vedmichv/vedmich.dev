@@ -1,7 +1,7 @@
 ---
 title: "Model Context Protocol (MCP): практическое руководство для DevOps-инженеров"
-event: "DevOpsDays Tashkent"
-city: "Tashkent"
+event: "devopsdays Tashkent"
+city: "Ташкент"
 date: 2025-05-24
 tags: ["MCP", "GenAI", "DevOps", "Kubernetes", "AWS"]
 draft: false

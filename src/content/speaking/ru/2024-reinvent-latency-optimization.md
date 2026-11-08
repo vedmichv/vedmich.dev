@@ -1,7 +1,7 @@
 ---
 title: "Latency optimization: From theory to practice"
 event: "AWS re:Invent"
-city: "Las Vegas"
+city: "Лас-Вегас"
 date: 2024-12-05
 tags: ["Latency", "Networking", "Observability", "Architecture", "AWS"]
 draft: false
