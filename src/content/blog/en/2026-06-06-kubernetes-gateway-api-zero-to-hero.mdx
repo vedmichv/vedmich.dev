@@ -6,7 +6,7 @@ tags: ["kubernetes", "gateway-api", "networking"]
 ---
 import SlideEmbed from '../../../components/SlideEmbed.astro';
 
-In March 2026, ingress-nginx was retired. By the Kubernetes project's own estimate, it ran in about half of all cloud native environments. There will be no more releases, no bug fixes, and no patches for security vulnerabilities. That is what turns "I should look at Gateway API eventually" into "I need to understand this now."
+In March 2026, ingress-nginx was retired. Datadog's internal research, quoted by the Kubernetes project, found that it ran in about half of all cloud native environments. There will be no more releases, no bug fixes, and no patches for security vulnerabilities. That is what turns "I should look at Gateway API eventually" into "I need to understand this now."
 
 This post accompanies a talk I give as a from-zero-to-hero walkthrough. We take one online shop, start with a single route, and grow the design one concept at a time until it has TLS, a canary, several teams, and a cross-namespace dependency. The examples are vendor-neutral and current as of Gateway API v1.5 (February 2026). The slides are embedded throughout, so you can click through the animated ones yourself. A follow-up post will make all of this concrete on AWS.
 
@@ -18,7 +18,7 @@ I spend exactly one slide on the "why now", and so will this section. Four facts
 
 - **ingress-nginx is retired** (March 2026). The repositories are read-only, and there will be no fix for any future CVE. Existing deployments keep running, which is exactly why they are easy to forget. To check whether you run it: `kubectl get pods --all-namespaces --selector app.kubernetes.io/name=ingress-nginx`.
 - **Gateway API is the standard.** Its core resources reached `v1` in October 2023, and v1.5 shipped in February 2026. It is SIG Network's official successor to Ingress.
-- **Implementations are everywhere.** GKE, AKS, Istio, Cilium, Envoy Gateway, NGINX Gateway Fabric, and more. As of April 21, 2026, seven implementations were fully conformant with v1.5.
+- **Implementations are everywhere.** GKE, AKS, Istio, Cilium, Envoy Gateway, NGINX Gateway Fabric, and more. As of 21 April 2026, seven implementations were fully conformant with v1.5.
 - **The `Ingress` API is frozen.** It is GA, Kubernetes has no plans to remove it, and it will get no further changes. All new capability lands in Gateway API. If you are starting today, start here.
 
 That is the entire history portion. The rest is the "what" and the "how".
@@ -29,7 +29,7 @@ Before any YAML, here is the fundamental problem. A browser has a URL, `shop.exa
 
 <SlideEmbed slide={6} clicks={4} title="How a request reaches a Pod" caption="Browser to Pod: the Service solves the inside half, but something still has to take external traffic to the right Service. That missing piece is what Gateway API models." />
 
-Kubernetes already solves half of this with a **Service**: a stable virtual IP and DNS name in front of a set of Pods. Our shop uses ClusterIP Services, which are reachable only inside the cluster. NodePort and LoadBalancer Services can expose a single Service externally, but they give you no shared front door with hostnames, paths, and routing rules. That missing piece is what Gateway API models: a typed way to define the entry point and the routing, split by who owns what. Ingress filled this slot before. Gateway API is the better-structured answer.
+Kubernetes already solves half of this with a **Service**: a stable virtual IP and DNS name in front of a set of Pods. Our shop uses `ClusterIP` Services, which are reachable only inside the cluster. `NodePort` and `LoadBalancer` Services can expose a single Service externally, but they give you no shared front door with hostnames, paths, and routing rules. That missing piece is what Gateway API models: a typed way to define the entry point and the routing, split by who owns what. Ingress filled this slot before. Gateway API is the better-structured answer.
 
 ## Why Ingress was not enough
 
@@ -288,7 +288,7 @@ Then there is a whole second direction of traffic. GAMMA (Gateway API for Mesh M
 
 <SlideEmbed slide={33} title="GAMMA: the same API inside the mesh" caption="North-south (teal) enters through a Gateway. East-west (amber) is the GAMMA extension: the HTTPRoute's parentRefs entry points at a Service, not a Gateway. That one change repurposes the same routing API for the mesh." />
 
-The key twist is that one change: the HTTPRoute's `parentRefs` entry points at a **Service** instead of a Gateway. For the Mesh profile that is a ClusterIP Service, referenced with `kind: Service` and `group: ""`. With a mesh that implements GAMMA, you get header routing and weighted canaries for internal calls too, using the same HTTPRoute shape you already learned. Istio, Linkerd, and Cilium's mesh implement GAMMA; check which features your version supports. One API, both directions.
+The key twist is that one change: the HTTPRoute's `parentRefs` entry points at a **Service** instead of a Gateway. For the Mesh profile that is a `ClusterIP` Service, referenced with `kind: Service` and `group: ""`. With a mesh that implements GAMMA, you get header routing and weighted canaries for internal calls too, using the same HTTPRoute shape you already learned. Istio, Linkerd, and Cilium's mesh implement GAMMA; check which features your version supports. One API, both directions.
 
 ## The whole shop, every concept
 
@@ -300,9 +300,9 @@ The thing I want you to notice: the core never changed. GatewayClass, Gateway, H
 
 ## Operating it in 2026
 
-Three things to know to run it well. First, **what's current**. v1.5 was released on February 27, 2026, the biggest release yet, themed around promoting Experimental features to Standard. The headline is **ListenerSet**: listeners can be defined independently and merged onto a Gateway, which lets platform teams delegate listeners to app teams and lets a shared Gateway take more than 64 listeners. The Gateway has to opt in through `allowedListeners`; by default it accepts no ListenerSets. TLSRoute and ReferenceGrant reached `v1`, and the HTTPRoute CORS filter entered the Standard channel, so CORS no longer needs annotations on controllers that support it.
+Three things to know to run it well. First, **what's current**. v1.5 was released on 27 February 2026, the biggest release yet, themed around promoting Experimental features to Standard. The headline is **ListenerSet**: listeners can be defined independently and merged onto a Gateway, which lets platform teams delegate listeners to app teams and lets a shared Gateway take more than 64 listeners. The Gateway has to opt in through `allowedListeners`; by default it accepts no ListenerSets. TLSRoute and ReferenceGrant reached `v1`, and the HTTPRoute CORS filter entered the Standard channel, so CORS no longer needs annotations on controllers that support it.
 
-> **Update, October 2026:** Gateway API v1.6 shipped on June 30, 2026. TCPRoute and UDPRoute graduated to the Standard channel, and Experimental resources moved to a separate API group, `gateway.networking.x-k8s.io`. Everything in this post still applies.
+> **Update, November 2026:** Gateway API v1.7 shipped on 29 October 2026. HTTPRoute retries (`codes`, `attempts`, and `backoff`) graduated to the Standard channel, and `backoff` stays implementation-specific. Earlier, v1.6 shipped on 30 June 2026. TCPRoute and UDPRoute graduated to the Standard channel, and new Experimental resources moved to a separate API group, `gateway.networking.x-k8s.io`. Everything in this post still applies.
 
 Second, and this is the single most useful mental model: **the spec is not the implementation.** The API is vendor-neutral and versioned. A controller does the actual work. Core features are mandatory within the conformance profiles a controller declares. Extended features are optional, and `RegularExpression` path matching is implementation-specific by design. Here is the dirty secret: a field can sit in the Standard channel, fully GA, and your controller still may not support it, because it is an Extended feature. An unsupported filter, for example, can get the whole route rejected with `Accepted=False`. Do not assume. Check the conformance report for your controller version, and for implementation-specific behavior, read its docs and test the rules you depend on. This one habit heads off most "why doesn't my route work" surprises.
 
