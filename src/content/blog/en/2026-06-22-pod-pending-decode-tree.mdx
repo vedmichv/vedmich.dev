@@ -1,6 +1,6 @@
 ---
 title: "Your Pod is stuck in Pending: the decode tree"
-description: "A senior K8s interview favorite. Most candidates check the logs and find nothing. Here is the four-check decode tree that actually finds the cause, plus the schedulerName trap that produces no events at all."
+description: "A Pod stuck in Pending has no logs. Read the FailedScheduling event, match its reasons to four checks, and look at schedulerName when there are no events."
 date: 2026-06-22
 tags: ["kubernetes", "interview", "troubleshooting"]
 draft: true
@@ -9,86 +9,104 @@ draft: true
 import HtmlEmbed from '../../../components/HtmlEmbed.astro';
 import BookLink from '../../../components/BookLink.astro';
 
-A Pod sits in `Pending`. It's one of my favorite questions to ask in mock interviews on our DevOps podcast, because it sounds trivial and almost nobody gets it cleanly. Senior candidates included.
+A Pod sits in `Pending`. It's one of my favorite questions to ask in mock interviews on our DevOps podcast, because it sounds trivial and almost nobody answers it cleanly. Senior candidates included.
 
-![Your Pod is stuck in Pending](/blog-assets/2026-06-22-pod-pending-decode-tree/cover.png)
+<img src="/blog-assets/2026-06-22-pod-pending-decode-tree/cover.webp" alt="Cover slide: Your Pod is stuck in Pending. kubectl get pod shows api-7d9f at READY 0/1." width="1080" height="1350" />
 
-Here's how it usually goes. I describe the symptom, the candidate types `kubectl logs` in their head, and then they stall. Because logs return nothing. And a surprising number of people have no second move.
+In the interview, I describe the symptom. The candidate types `kubectl logs` in their head, and then they stall, because the logs return nothing. A surprising number of people have no second move.
+
+The second move is to read the Pod's events. The decode tree fits in four lines:
+
+1. A Pending Pod has no container, so logs are empty. Read the events instead.
+2. Run `kubectl describe pod` and find the scheduler's `FailedScheduling` line at the bottom.
+3. Match the reasons in that line to the four checks: resources, taints, affinity, unbound PVC.
+4. No events at all? Check `spec.schedulerName` for a scheduler that isn't running.
 
 ## Why logs are empty
 
 Here, `Pending` means the API server has accepted the Pod, but the scheduler hasn't placed it on a node yet. No node means no kubelet picked it up. No kubelet means no container runtime started anything. No container means there are no logs to read.
 
-So `kubectl logs` is the wrong tool. It's not that the command fails, it's that there's nothing for it to show. The Pod object exists in etcd, but nothing has run.
+So `kubectl logs` is the wrong tool. The command doesn't fail, but it has nothing to show: the Pod object exists in etcd, and nothing has run. The cause is in the Events.
 
-The answer isn't in the logs. It's in the Events.
+## Step 1: read the events with describe
 
-## Step one: describe, not logs
+When a Pod stays in `Pending`, run `kubectl describe pod api-7d9f` and scroll to the Events at the bottom. The scheduler writes its reasoning there, and it is specific:
 
-Run `kubectl describe pod` and scroll to the bottom. The scheduler writes its reasoning into the Pod's events, and it's specific:
+<HtmlEmbed src="/embeds/pod-pending/02-describe-events.html" title="kubectl describe pod output: a FailedScheduling event with a node count for each reason" minHeight={760} />
 
-<HtmlEmbed src="/embeds/pod-pending/02-describe-events.html" title="kubectl describe pod: the scheduler talks in the Events" minHeight={620} />
+That single `FailedScheduling` line is the whole answer, broken down by reason, with a node count for each. Twelve nodes, and none of them can take the Pod, for three different reasons. No guessing. The scheduler already did the diagnosis for you. You just have to read it.
 
-That single `FailedScheduling` line is the whole answer, broken down by reason, with a node count for each. Twelve nodes, and none of them work, for three different reasons. No guessing. The scheduler already did the diagnosis for you. You just have to read it.
+The candidates who get this right say "describe" before I finish the question. The ones who don't reach for `logs`, `get pods -o yaml`, or start SSHing into nodes. The difference is whether they have watched a Pod fail to schedule in production.
 
-The candidates who get this right say "describe" before I finish the question. The ones who don't reach for `logs`, `get pods -o yaml`, or start SSHing into nodes. The difference is whether they've actually watched a Pod fail to schedule in production.
+## Step 2: match the reasons to the four checks
 
-## Step two: the four checks
+To read those reasons, you need a model of the scheduler. It runs every Pending Pod through a sequence of filters. A node that fails any one of them is out. If no node is left, the Pod stays `Pending`. The order in the diagram is for reading, not the scheduler's own filter order.
 
-Once you know to read the events, you need a mental model for what the scheduler does. It runs every Pending Pod through a sequence of filters. A node that fails any one of them is out. If no node is left, the Pod stays Pending.
+<HtmlEmbed src="/embeds/pod-pending/01-scheduling-flow.html" title="Scheduling flow: three gates, then Assigned or Pending" minHeight={840} />
 
-<HtmlEmbed src="/embeds/pod-pending/01-scheduling-flow.html" title="The scheduling flow: pass every gate or go Pending" minHeight={900} />
+Four checks cover almost everything. Each one leaves a typical phrase in the event.
 
-There are four causes that cover almost everything:
+### Insufficient resources
 
-**1. Insufficient resources.** No node has enough free `cpu` or `memory` to satisfy the Pod's `requests`. Note that this is about requests, not actual usage. A node running at 10% CPU can still reject a Pod if its requests are already fully reserved. The fix: lower the requests, scale the nodes, or add capacity.
+Look for `Insufficient cpu` or `Insufficient memory`. No node has enough free `cpu` or `memory` for the Pod's `requests`. This is about requests, not actual usage. A node running at 10% CPU can still reject a Pod when the Pods already on it have requested all of its CPU. To fix it, lower the requests, scale the nodes, or add capacity.
 
-**2. Untolerated taint.** The available nodes carry a taint the Pod doesn't tolerate. This is common on control-plane nodes, GPU pools, and Spot capacity, where taints exist precisely to keep general workloads off. The fix: add a matching `toleration` to the Pod spec.
+<HtmlEmbed src="/embeds/pod-pending/04-requests-not-usage.html" title="Requests, not usage: a node at 10% CPU usage rejects a Pod" minHeight={580} />
 
-**3. Affinity not satisfied.** No node matches the Pod's `nodeAffinity` or topology spread constraints. Often this is a typo in a node label, or a rule that was written for a cluster that has since changed. The fix: relax the rule, or label more nodes to match.
+### Untolerated taint
 
-**4. Unbound PVC.** The Pod references a PersistentVolumeClaim that has no matching PersistentVolume or StorageClass. The Pod can't schedule until the volume binds, and if the storage class can't provision, it waits forever. This one catches people because the Pod spec looks fine. The problem is one level down in the volume.
+Look for `untolerated taint`. The nodes carry a taint the Pod doesn't tolerate. This is common on control-plane nodes, GPU pools, and Spot capacity, where taints exist precisely to keep general workloads off. To fix it, add a matching `toleration` to the Pod spec.
 
-Run those four in order and you'll resolve the overwhelming majority of Pending Pods. But there's one case that breaks the whole approach.
+### Affinity not satisfied
+
+Look for `didn't match Pod's node affinity/selector`. No node matches the Pod's `nodeAffinity` or topology spread constraints. Often this is a typo in a node label, or a rule that was written for a cluster that has since changed. To fix it, relax the rule, or label more nodes to match.
+
+### Unbound PVC
+
+Look for `unbound immediate PersistentVolumeClaims` or `didn't find available persistent volumes to bind`. The Pod references a PersistentVolumeClaim that has no matching PersistentVolume or StorageClass. The Pod can't schedule until the volume binds, and if the storage class can't provision, it waits forever. This one catches people because the Pod spec looks fine. The problem is one level down, in the volume.
+
+Match each reason to one of these four and you will resolve the overwhelming majority of Pending Pods. But there's one case that breaks the whole approach: nothing to match.
 
 ## The senior follow-up: no events at all
 
-Here's where I separate the people who've operated clusters from the people who've read about them.
+This is where I separate the people who have operated clusters from the people who have only read about them.
 
 What if you run `describe` and there are no scheduling events at all? No `FailedScheduling`, no warnings, nothing. The Pod just sits there in silence.
 
-Check `spec.schedulerName`.
+Then check `spec.schedulerName`:
 
-<HtmlEmbed src="/embeds/pod-pending/03-schedulername-trap.html" title="The schedulerName trap: a Pod nobody schedules" minHeight={640} />
+```bash
+kubectl get pod api-7d9f -o jsonpath='{.spec.schedulerName}'
+```
 
-By default, Pods are handled by the `default-scheduler`. But you can assign a Pod to a custom scheduler by name. If that name points to a scheduler that isn't actually running in the cluster, nothing happens. The default scheduler ignores the Pod because it's not its responsibility. The named scheduler doesn't exist to claim it. So the Pod waits, and because no scheduler ever looked at it, there are no `FailedScheduling` events to read.
+It prints `default-scheduler` unless the Pod names another scheduler. Here it prints `gpu-scheduler`.
 
-I've seen this in the wild when a team copied a manifest from a GPU-scheduling setup that used a custom scheduler, pasted it into a normal namespace, and couldn't figure out why the Pod never moved. The events were empty because the scheduler they named was never installed.
+<HtmlEmbed src="/embeds/pod-pending/03-schedulername-trap.html" title="The schedulerName trap: Pending with no events" minHeight={700} />
 
-That's the answer that gets you hired. Not the four checks, which a good junior can recite. The recognition that an empty event log is itself a clue, and knowing exactly where to look next.
+By default, Pods are handled by the `default-scheduler`. But you can assign a Pod to a custom scheduler by name. If that name points to a scheduler that isn't running in the cluster, nothing happens. The default scheduler ignores the Pod because it's not its responsibility. The named scheduler doesn't exist to claim it. So the Pod waits, and because no scheduler ever looked at it, there are no `FailedScheduling` events to read.
 
-## The decode tree, end to end
+To fix it, install that scheduler or remove `schedulerName` from the manifest.
 
-Put it together and the response is short:
+I've seen this happen. A team copied a manifest from a GPU-scheduling setup that used a custom scheduler, pasted it into a normal namespace, and couldn't see why the Pod never moved. The events were empty because the scheduler they named was never installed.
 
-1. A Pending Pod has no container, so logs are empty. Read events instead.
-2. `kubectl describe pod`, scroll to the scheduler's `FailedScheduling` line.
-3. Walk the four checks: resources, taints, affinity, unbound PVC.
-4. No events at all? Check `spec.schedulerName` for a scheduler that isn't running.
+That's the answer that gets you hired. Not the four checks, which a good junior can recite. The recognition that an empty event list is itself a clue, and knowing exactly where to look next.
 
-Here is the full picture, the scheduling diagram from my book. The scheduling cycle runs left to right through the gates, and the scheduler selection branch on top is the `schedulerName` check that produces the silent case:
+## The whole flow in one diagram
 
-![The Pod scheduling flow: scheduler selection plus the resource, taint, and affinity gates](/blog-assets/2026-06-22-pod-pending-decode-tree/scheduling-flow-diagram.png)
+Here is the full picture from my book. The scheduling cycle runs top to bottom through the gates, and the scheduler selection branch on top is the `schedulerName` check that produces the silent case. The red Pending box names only the affinity event. In a real cluster, `FailedScheduling` lists every reason, with node counts.
 
-It takes about thirty seconds to say out loud, and it demonstrates that you understand what the scheduler actually does rather than memorizing kubectl commands. That's the whole point of the question.
+<img src="/blog-assets/2026-06-22-pod-pending-decode-tree/scheduling-flow-diagram.webp" alt="Book flowchart. Scheduler selection: an empty schedulerName goes to the default-scheduler, a named one to its custom scheduler. Scheduling cycle: resources, taints, affinity. Any failed gate leads to Pending; all passed leads to Assign Pod to Node." width="1600" height="1797" loading="lazy" />
+
+The four lines at the top take about thirty seconds to say out loud. They show that you understand what the scheduler does, rather than memorizing kubectl commands. That's the whole point of the question.
+
+Watch the events, not the logs. When the events are empty, find out which scheduler was supposed to write them.
+
+## The book behind this series
+
+<BookLink cover="/blog-assets/2026-06-22-pod-pending-decode-tree/book-cover.webp" locale="en" />
 
 This is post one in a series I'm building from my book on Kubernetes: one senior interview question every week, broken down the way I'd want to hear it answered.
 
-## Get the full playbook
-
-<BookLink cover="/blog-assets/2026-06-22-pod-pending-decode-tree/book-cover.png" locale="en" />
-
-The Pending decode tree is one question. Want more like it? They're all in my book, *Cracking the Kubernetes Interview* (with Alexander Dovnar): control plane internals, scheduling, networking, storage, security, and the tricky follow-ups interviewers actually use to tell operators from doc-readers. If this breakdown was useful, that's the whole book.
+The Pending decode tree is one question. Want more like it? They're all in my book, *Cracking the Kubernetes Interview* (with Alexander Dovnar): control plane internals, scheduling, networking, storage, security, and the tricky follow-ups interviewers use to tell operators from doc-readers. If this breakdown was useful, the whole book works the same way.
 
 ## Related
 

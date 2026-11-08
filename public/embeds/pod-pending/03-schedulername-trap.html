@@ -4,98 +4,130 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The schedulerName trap: a Pod nobody schedules</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<script>document.documentElement.className += ' js';</script>
 <style>
+  /* Self-hosted Deep Signal fonts, same files as the site (no third-party request). */
+  @font-face{font-family:'Inter';font-weight:400;font-display:swap;src:url('/fonts/inter-latin-400-normal.woff2') format('woff2')}
+  @font-face{font-family:'Space Grotesk';font-weight:700;font-display:swap;src:url('/fonts/space-grotesk-latin-700-normal.woff2') format('woff2')}
+  @font-face{font-family:'JetBrains Mono';font-weight:400;font-display:swap;src:url('/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2')}
+  @font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url('/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2')}
   :root{
-    --bg:#0F172A; --code-bg:#0B1220; --surface:#1E293B; --border:rgba(148,163,184,.16);
-    --teal:#14B8A6; --amber:#F59E0B; --amber2:#FBBF24;
+    --bg:#0F172A; --code-bg:#0D1117; --surface:#1E293B; --border:rgba(148,163,184,.16);
+    --teal:#14B8A6; --amber:#F59E0B;
     --text:#E2E8F0; --dim:#94A3B8;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+  code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.92em;color:var(--amber)}
   .wrap{max-width:760px;margin:0 auto;padding:30px 24px 28px}
   .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:10px;margin-bottom:12px}
   .eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
-  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,4.4vw,32px);line-height:1.06;letter-spacing:-.025em;margin-bottom:8px}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(24px,4.4vw,32px);line-height:1.1;letter-spacing:-.025em;margin-bottom:8px}
   h1 .em{color:var(--amber)}
   .lead{color:var(--dim);font-size:clamp(14px,2.3vw,16px);line-height:1.5;max-width:620px;margin-bottom:22px}
   .trap{display:flex;flex-direction:column;align-items:center;gap:22px;padding:8px 0 4px}
-  .trap-pod{background:var(--surface);border:2px solid var(--amber);border-radius:14px;padding:18px 30px;text-align:center;opacity:0;transform:scale(.9);transition:opacity .5s ease,transform .5s ease;box-shadow:0 0 40px rgba(245,158,11,.18)}
-  .trap-pod.show{opacity:1;transform:scale(1)}
-  .trap-pod-name{font-family:'JetBrains Mono',monospace;font-size:clamp(16px,3vw,20px);color:var(--text);font-weight:600}
+  .trap-pod{background:var(--surface);border:2px solid var(--amber);border-radius:14px;padding:18px 30px;text-align:center;box-shadow:0 0 40px rgba(245,158,11,.18)}
+  .trap-pod-name{font-family:'JetBrains Mono',monospace;font-size:clamp(16px,3vw,20px);color:var(--text);font-weight:500}
   .trap-pod-status{font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,4vw,24px);color:var(--amber);font-weight:700;margin:4px 0}
-  .trap-pod-meta{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,2.4vw,14px);color:var(--dim)}
+  .trap-pod-meta{font-family:'JetBrains Mono',monospace;font-size:clamp(13px,2.4vw,14px);color:var(--dim)}
   .trap-schedulers{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
-  .trap-sched{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 22px;text-align:center;min-width:190px;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
-  .trap-sched.show{opacity:1;transform:translateY(0)}
-  .trap-sched.ghost{border-style:dashed;opacity:0}
-  .trap-sched.ghost.show{opacity:.45}
-  .trap-sched-name{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--text);font-weight:600}
-  .trap-sched-say{font-family:'Inter',sans-serif;font-size:14px;color:var(--dim);margin-top:6px;font-style:italic;opacity:0;transition:opacity .4s ease}
-  .trap-sched-say.show{opacity:1}
-  .trap-events{font-family:'JetBrains Mono',monospace;font-size:clamp(15px,3vw,18px);color:var(--dim);background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:14px 24px;opacity:0;transition:opacity .5s ease}
-  .trap-events.show{opacity:1}
-  .cursor{display:inline-block;width:9px;height:18px;background:var(--teal);vertical-align:middle;animation:blink 1s step-end infinite;margin-left:2px}
+  .trap-sched{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 22px;text-align:center;min-width:190px}
+  .trap-sched.ghost{background:transparent;border:1.5px dashed var(--dim)}
+  .trap-sched-name{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--text);font-weight:500}
+  .trap-sched.ghost .trap-sched-name{color:var(--dim)}
+  .trap-sched-say{font-family:'Inter',sans-serif;font-size:14px;color:var(--dim);margin-top:6px;font-style:italic}
+  .trap-sched.ghost .trap-sched-say{color:var(--amber)}
+  .trap-events{font-family:'JetBrains Mono',monospace;font-size:clamp(15px,3vw,18px);color:var(--dim);background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:14px 24px;white-space:pre}
+  .cursor{display:inline-block;width:9px;height:18px;background:var(--teal);vertical-align:middle;animation:blink 1s step-end 8;margin-left:2px}
   @keyframes blink{50%{opacity:0}}
-  .caption{margin:18px auto 0;max-width:560px;color:var(--dim);font-size:13px;text-align:center;font-style:italic}
-  .replay{display:block;margin:16px auto 0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--amber);background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px}
+  .caption{margin:18px auto 0;max-width:560px;color:var(--dim);font-size:14px;line-height:1.5;text-align:center}
+  .replay{display:block;margin:16px auto 0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--amber);background:none;border:1px solid var(--border);border-radius:8px;padding:8px 16px}
   .replay:hover{border-color:var(--amber)}
-  @media (prefers-reduced-motion: reduce){ .trap-pod,.trap-sched,.trap-sched-say,.trap-events{transition:none !important} }
+  .replay:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  @media (max-width:420px){
+    .wrap{padding:24px 16px 24px}
+    .trap-pod{padding:16px 20px}
+  }
+
+  /* entrance animation: only when motion is allowed and JS runs; played once, replay by button */
+  @media (prefers-reduced-motion: no-preference){
+    .js .step{opacity:0;transition:opacity .5s ease}
+    .js .trap-pod.step{transform:scale(.92);transition:opacity .5s ease,transform .5s ease}
+    .js .trap-sched.step{transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
+    .js .step.show{opacity:1}
+    .js .trap-pod.step.show,.js .trap-sched.step.show{transform:none}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cursor{animation:none}
+    .replay{display:none}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">The senior follow-up</div>
   <h1>No events <span class="em">at all?</span></h1>
-  <p class="lead">Sometimes describe shows nothing: no FailedScheduling, no warnings. Check spec.schedulerName. If it names a scheduler that isn't running, nobody ever claims the Pod.</p>
+  <p class="lead">Sometimes <code>describe</code> shows nothing: no <code>FailedScheduling</code>, no warnings. Check <code>spec.schedulerName</code>. If it names a scheduler that isn't running, nobody ever claims the Pod.</p>
 
   <div class="trap" id="trap">
-    <div class="trap-pod" id="trapPod">
+    <div class="trap-pod step" data-s="0">
       <div class="trap-pod-name">api-7d9f</div>
       <div class="trap-pod-status">Pending</div>
       <div class="trap-pod-meta">schedulerName: gpu-scheduler</div>
     </div>
     <div class="trap-schedulers">
-      <div class="trap-sched" id="schedDefault">
+      <div class="trap-sched step" data-s="1">
         <div class="trap-sched-name">default-scheduler</div>
-        <div class="trap-sched-say" id="sayDefault">not mine, ignoring</div>
+        <div class="trap-sched-say step" data-s="2">not mine, ignoring</div>
       </div>
-      <div class="trap-sched ghost" id="schedGhost">
+      <div class="trap-sched ghost step" data-s="3">
         <div class="trap-sched-name">gpu-scheduler</div>
-        <div class="trap-sched-say" id="sayGhost">not installed</div>
+        <div class="trap-sched-say step" data-s="4">not installed</div>
       </div>
     </div>
-    <div class="trap-events" id="trapEvents">Events:  &lt;none&gt;<span class="cursor"></span></div>
+    <div class="trap-events step" data-s="5">Events:  &lt;none&gt;<span class="cursor" aria-hidden="true"></span></div>
   </div>
-  <p class="caption">The default scheduler ignores it, the named one does not exist. No scheduler looks, so no event is ever written. Silence.</p>
-  <button class="replay" onclick="playTrap()">&#8635; replay</button>
+  <p class="caption">The default scheduler ignores the Pod, and the named one does not exist. No scheduler looks, so no event is ever written. Silence.</p>
+  <button class="replay" id="replay" type="button" aria-label="Replay the animation">&#8635; replay</button>
 </div>
 
 <script>
-  function playTrap(){
-    var ids = ['trapPod','schedDefault','sayDefault','schedGhost','sayGhost','trapEvents'];
-    ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('show'); });
+  (function () {
+    var trap = document.getElementById('trap');
+    var steps = Array.prototype.slice.call(trap.querySelectorAll('.step'));
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(reduce){ ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.add('show'); }); return; }
-    var seq = [['trapPod',200],['schedDefault',900],['sayDefault',1500],['schedGhost',2200],['sayGhost',2800],['trapEvents',3600]];
-    seq.forEach(function(pair){
-      setTimeout(function(){ var el=document.getElementById(pair[0]); if(el) el.classList.add('show'); }, pair[1]);
-    });
-  }
+    var timers = [];
+    var DELAYS = [200, 900, 1500, 2200, 2800, 3600]; // ms per data-s value
 
-  var played = false, loopTimer = null;
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){
-        if(!played){ played = true; playTrap(); }
-        if(!loopTimer){ loopTimer = setInterval(playTrap, 7500); }
-      } else {
-        if(loopTimer){ clearInterval(loopTimer); loopTimer = null; }
-      }
-    });
-  }, {threshold: .35});
-  io.observe(document.getElementById('trap'));
+    function showAll() { steps.forEach(function (el) { el.classList.add('show'); }); }
+
+    function play() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      if (reduce) { showAll(); return; }
+      steps.forEach(function (el) { el.classList.remove('show'); });
+      void trap.offsetWidth; // let the hidden state register before the first step
+      steps.forEach(function (el) {
+        var s = +el.getAttribute('data-s');
+        timers.push(setTimeout(function () { el.classList.add('show'); }, DELAYS[s]));
+      });
+    }
+
+    document.getElementById('replay').addEventListener('click', play);
+
+    // Play once when the trap scrolls into view. No loop: use the replay button.
+    if ('IntersectionObserver' in window && !reduce) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { io.disconnect(); play(); }
+        });
+      }, { threshold: 0.35 });
+      io.observe(trap);
+    } else {
+      showAll();
+    }
+  })();
 </script>
 </body>
 </html>
