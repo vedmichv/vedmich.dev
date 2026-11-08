@@ -1,5 +1,5 @@
 ---
-title: "Kubernetes Gateway API: от нуля до героя"
+title: "Kubernetes Gateway API: с нуля до продакшна"
 event: "Концепт-разбор · Технический deep-dive"
 city: null
 date: 2026-06-06
