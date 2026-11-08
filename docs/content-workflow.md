@@ -40,6 +40,19 @@ Use reusable components for code copying, book links, diagrams, `HtmlEmbed`,
 and `SlideEmbed`. Keep images responsive; provide alt text and iframe titles;
 respect reduced motion. `HtmlEmbed` assumes trusted same-origin HTML.
 
+## Review copies in the vault
+
+Viktor reads and comments on posts in Obsidian. `scripts/export-blog-to-vault.py`
+writes one note per post and locale into the vault folder
+`40-Content/47-Blog/47.10-Site-Mirror/`; its `+ Site Mirror.md` note explains the
+workflow. Apply his comments to `src/content/blog/{en,ru}/` (both locales), build
+and test, commit, then re-export. Never edit the mirror notes as the source.
+
+```sh
+python3 -I scripts/export-blog-to-vault.py "$PWD" \
+  "$HOME/Documents/ViktorVedmich/40-Content/47-Blog/47.10-Site-Mirror" "$(git rev-parse --short HEAD)"
+```
+
 ## Speaking and presentations
 
 Talks live under `src/content/speaking/{en,ru}/`. Required fields are title,
