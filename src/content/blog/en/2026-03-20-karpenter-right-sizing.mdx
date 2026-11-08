@@ -30,7 +30,7 @@ Karpenter skips the group. It watches for unschedulable pods and batches them (b
 
 Karpenter does not shortcut this path. The scheduler still places every pod. Karpenter steps in when the scheduler gives up: it launches a node that fits the waiting pods, and the scheduler binds them once the node is ready. The time saved is around the node launch. There is no Auto Scaling group in between, and that is exactly the delay the Salesforce case calls out.
 
-How fast is "seconds" in your cluster? There is no documented number. Time from a pending pod to a running one includes instance launch, bootstrap, the node becoming Ready, image pulls, and application startup. A slow AMI or a large image can dominate all of that. Measure the stages separately; `karpenter_pods_startup_duration_seconds` gives you pod creation to running. Pre-pulling large images into the AMI or slimming the images down are common ways to cut the tail.
+How fast is "seconds" in your cluster? There is no documented number. The time from a pending pod to a running one includes instance launch, bootstrap, the node becoming Ready, image pulls, and application startup. A slow AMI or a large image can dominate all of that. Measure the stages separately; `karpenter_pods_startup_duration_seconds` gives you the time from pod creation to running. Pre-pulling large images into the AMI or slimming the images down are common ways to cut the tail.
 
 The second half of the story matters more in production. Karpenter keeps managing nodes after launch. Consolidation removes or replaces nodes when their pods fit elsewhere or on something cheaper. Drift replaces nodes that no longer match their NodePool or EC2NodeClass. Expiration retires old nodes. Most production surprises live here, and two of the three traps below are about it.
 
@@ -78,7 +78,7 @@ spec:
     memory: 1000Gi
 ```
 
-A word on Spot. With both `spot` and `on-demand` allowed, Karpenter prefers Spot and falls back to On-Demand when no compatible Spot offering is available, "generally within milliseconds" in the words of the docs. There is no 60-second timer to configure. An instance type and zone that just returned insufficient capacity is skipped for the next 3 minutes. The savings depend on the Spot market, and a PDB does nothing against a Spot reclaim. Put Spot under workloads that can live with a two-minute notice, and let interruption handling (covered below) do the draining.
+A word on Spot. With both `spot` and `on-demand` allowed, Karpenter prefers Spot and falls back to On-Demand when no compatible Spot offering is available, "generally within milliseconds" in the words of the docs. There is no 60-second timer to configure. An instance type and zone that just returned insufficient capacity is skipped for the next 3 minutes. The savings depend on the Spot market, and a PDB does nothing against a Spot reclaim. Use Spot for workloads that can live with a two-minute notice, and let interruption handling (covered below) do the draining.
 
 ## Trap 2: two autoscalers, one pending pod
 
@@ -88,7 +88,7 @@ Here is what actually happens. Both controllers react to pods the scheduler mark
 
 Note what does not happen: Karpenter does not drain the Cluster Autoscaler node. It disrupts only nodes it launched itself, the ones backed by a NodeClaim from a NodePool. Everything else is never a candidate, so the popular story of both autoscalers consolidating the same nodes is wrong. The real interaction is quieter. When Karpenter decides whether one of its own nodes can go, it counts free room on every node in the cluster, node group nodes included. Cluster Autoscaler asks the same question about its own nodes: can these pods move elsewhere? So pods drift between the two pools, and you pay for duplicate launches.
 
-The fix is to decide which pods may land where. Splitting node ownership alone does not do that, and neither does a taint on its own: a toleration lets pods onto the tainted nodes, it does not keep them there. The Kubernetes docs on dedicated nodes pair the taint with a label and a required node affinity. A common EKS convention for system nodes is the `CriticalAddonsOnly=true:NoSchedule` taint: the EKS docs note that many add-ons, CoreDNS among them, tolerate it, and so does the Karpenter Helm chart by default.
+The fix is to decide which pods may land where. Splitting node ownership alone does not do that, and neither does a taint on its own: a toleration lets pods onto the tainted nodes; it does not keep them there. The Kubernetes docs on dedicated nodes pair the taint with a label and a required node affinity. A common EKS convention for system nodes is the `CriticalAddonsOnly=true:NoSchedule` taint: the EKS docs note that many add-ons, CoreDNS among them, tolerate it, and so does the Karpenter Helm chart by default.
 
 ```yaml
 # Pod template of a system Deployment (for example, metrics-server)
@@ -150,7 +150,7 @@ Three more details. Schedules are cron in UTC, with no time zone support, so a t
 
 `5m` is a starting point, not a magic value. Watch your churn for a full week, then decide whether to stretch it or tighten it.
 
-> **Update, October 2026:** Karpenter v1.14 (July 2026) added a third policy, `consolidationPolicy: Balanced`. It still removes empty and clearly underutilized nodes, but skips a consolidation when the cost savings are small relative to the pod disruption it causes. If marginal moves are your churn problem, test it on one NodePool before you reach for longer `consolidateAfter` values.
+> **Update, October 2026:** Karpenter v1.14 (July 2026) added a third policy, `consolidationPolicy: Balanced`. It still removes empty and clearly underutilized nodes, but skips a consolidation when the cost savings are small relative to the pod disruption it causes. If marginal moves are your churn problem, test it on one NodePool before you try longer `consolidateAfter` values.
 
 Budgets limit how many nodes Karpenter disrupts. PDBs limit how many pods of one app are evicted at a time:
 
