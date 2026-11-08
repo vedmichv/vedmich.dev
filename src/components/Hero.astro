@@ -40,7 +40,7 @@ const i = t(locale);
         href="https://www.credly.com/badges/29c4754e-7a00-46aa-bc2d-4aabe735f4a3/public_url"
         target="_blank"
         rel="noopener"
-        aria-label="Verify CNCF Kubestronaut badge on Credly (opens in new tab)"
+        aria-label={`${i.hero.kubestronaut_aria} (${i.contact.opens_in_new_tab})`}
         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium bg-brand-primary-soft border border-brand-primary text-brand-primary-hover font-body hover:bg-brand-primary-hover/20 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
       >
         <span class="w-1.5 h-1.5 rounded-full bg-brand-primary-hover"></span>
@@ -50,7 +50,7 @@ const i = t(locale);
         href="#book"
         class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium bg-surface border border-border text-text-primary font-body hover:border-brand-primary hover:text-brand-primary-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
       >
-        Author «Cracking the Kubernetes Interview»
+        {i.hero.author_pill}
       </a>
       <a
         href="#podcasts"

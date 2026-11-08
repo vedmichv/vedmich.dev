@@ -30,10 +30,12 @@
     "tagline_accent": "AI Engineer",
     "tagline_after": "",
     "cta": "Get in touch",
-    "cta_secondary": "Read more"
+    "cta_secondary": "Read more",
+    "kubestronaut_aria": "Verify the CNCF Kubestronaut badge on Credly",
+    "author_pill": "Author “Cracking the Kubernetes Interview”"
   },
   "about": {
-    "title": "About Me",
+    "title": "About me",
     "bio_before": "Solutions Architect and AI Engineer with 15+ years designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and GenAI / agentic platforms. CNCF Kubestronaut and author of ",
     "bio_accent": "“Cracking the Kubernetes Interview”",
     "bio_after": ".",
@@ -52,10 +54,10 @@
   "speaking": {
     "title": "Speaking",
     "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.5-4.7/5.0",
-    "back_link": "Back to Speaking",
+    "back_link": "Back to speaking",
     "watch_video": "Watch on YouTube",
-    "view_slides": "View Slides",
-    "read_article": "Read the Article",
+    "view_slides": "View slides",
+    "read_article": "Read the article",
     "all_talks": "All talks"
   },
   "book": {
@@ -77,7 +79,7 @@
     "min_read": "min read"
   },
   "contact": {
-    "title": "Let's Connect",
+    "title": "Let's connect",
     "subtitle": "Find me on these platforms",
     "opens_in_new_tab": "opens in a new tab",
     "write_me_cta": "Write me a message",
@@ -87,7 +89,7 @@
       "email_label": "Email",
       "email_placeholder": "you@domain.com",
       "message_label": "Message",
-      "message_placeholder": "What should we build?",
+      "message_placeholder": "What would you like to talk about?",
       "send": "Send",
       "cancel": "Cancel"
     },
@@ -102,5 +104,5 @@
     "built_with": "Built with Astro",
     "copyright": "© {year} Viktor Vedmich"
   },
-  "back_to_home": "Back to Home"
+  "back_to_home": "Back to home"
 }
