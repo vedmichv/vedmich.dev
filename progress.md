@@ -47,3 +47,23 @@
 - Review complete. Remaining recommendations are documented, not silently
   represented as fixed: dependency migration, type-check tooling, Cyrillic font
   coverage, and a future unified draft/sitemap policy.
+
+## Content proofreading (2026-11-08)
+
+- `main` fast-forwarded 22 commits to `origin/main` (4fd37a5) before any edit.
+- Skills repo `~/Github/vedmich/skills` fast-forwarded to `origin/main`; `en-work-writing`
+  and `ru-tech-writing` symlinked from `plugins/brand-content/skills/` into
+  `~/.claude/skills` and `~/.agents/skills`. The previous standalone
+  `ru-tech-writing` copy was moved to `~/.claude/skills-backup/2026-11-08/`.
+- The EN scanner needs ripgrep, which is not installed; a scratch shim outside the
+  repo points `rg` to the ripgrep bundled with Claude Code. Vale is not installed,
+  so the EN scanner reports `vale: NOT_RUN` and uses its ripgrep fallback.
+- Nine parallel proofreading units: six blog pairs, the Pod Pending draft plus
+  hello-world, talk pages, and deck cards plus UI strings.
+- All units reviewed diff by diff; one RU deck-card calque fixed by hand after review.
+- Build passed (56 pages). Smoke: 20 passed after `npx playwright install chromium`.
+- Visual: 7 of 9 snapshots already failed on clean 4fd37a5 (stale since the October
+  rewrites, left untouched); the two hello-world prose snapshots changed by this work
+  were inspected (text reflow only) and refreshed.
+- Ten content commits (bc63f0e..082e9bd); report in
+  `docs/reviews/2026-11-08-content-proofreading.md`. No push.

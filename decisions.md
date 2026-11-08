@@ -14,3 +14,7 @@
   matching Chromium. Deck artifacts remain an explicit pinned-submodule task.
 - Refresh screenshot baselines only after reproducing historical failures on the
   original commit and inspecting images; remove header overlays from prose captures.
+- Proofreading uses EN EDIT level L1 and RU edit mode: grammar, calques, typography
+  and formatting only. No rewrites, no fact changes; factual doubts go to Viktor.
+- Talk and deck titles are official titles and stay as published; tags stay unchanged.
+- The `__fixture-syntax-highlighting` post is test data and is excluded.
