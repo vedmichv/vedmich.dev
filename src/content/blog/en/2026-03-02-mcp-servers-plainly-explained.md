@@ -49,7 +49,7 @@ The latest revision as of October 2026 is [2026-07-28](https://modelcontextproto
 
 The third point is the one that surprises people. Under the current spec, a server cannot send the client a single request. Everything it says is either an answer or a notification.
 
-> **Update, October 2026:** The first version of this post called MCP bidirectional, stateful and transport-agnostic, said servers could push resources to the client, and listed WebSocket as a transport. The 2025-11-25 revision did have an `initialize` handshake, sessions and server-initiated requests, but even there a subscription only signaled that a resource had changed, and WebSocket was never a standard transport. The 2026-07-28 revision removed the handshake and protocol sessions, replaced server-initiated requests with multi round-trip requests and moved change notifications to `subscriptions/listen`. It also deprecated Roots, Sampling and Logging. Clients and servers that support both eras detect the other side and fall back.
+> **Update, October 2026:** The first version of this post called MCP bidirectional, stateful and transport-agnostic, said servers could push resources to the client, and listed WebSocket as a transport. The 2025-11-25 revision did have an `initialize` handshake, sessions and server-initiated requests, but even there a subscription only signaled that a resource had changed, and WebSocket was never a standard transport. The 2026-07-28 revision removed the handshake and protocol sessions, replaced server-initiated requests with multi round-trip requests (MRTR) and moved change notifications to `subscriptions/listen`. It also deprecated Roots, Sampling and Logging. Clients and servers that support both eras detect the other side and fall back.
 
 ## Three servers I use
 
@@ -114,7 +114,7 @@ With stdio, the client launches the server as a local process. That process runs
 
 ## When to write your own
 
-Start with servers that someone maintains. On October 5, 2026, the [awslabs/mcp](https://github.com/awslabs/mcp) repository had 61 server directories under `src/`, one of them marked deprecated, for services such as EKS, ECS, CloudWatch, DynamoDB, IAM, pricing and billing.
+Start with servers that someone maintains. On 5 October 2026, the [awslabs/mcp](https://github.com/awslabs/mcp) repository had 61 server directories under `src/`, one of them marked deprecated, for services such as EKS, ECS, CloudWatch, DynamoDB, IAM, pricing and billing.
 
 Be careful with the old reference servers. The original PostgreSQL, GitHub, Slack and Google Drive servers from the MCP project are archived in [servers-archived](https://github.com/modelcontextprotocol/servers-archived), with no maintenance and no security updates. The active reference set (Filesystem, Git, Fetch, Memory and a few others) exists to demonstrate the protocol and the SDKs, and its README says these servers are not production-ready. For a real integration, pick an actively maintained server, often the vendor's own, and look it up in the [MCP Registry](https://registry.modelcontextprotocol.io/). For a sense of scale: in December 2025, the MCP project counted 10,000 active servers.
 
@@ -140,7 +140,7 @@ If you have ever built the same integration for five different AI tools, you kno
 
 ## Related
 
-- **Talk:** [Building Production GenAI: MCP and Multi-Agent Systems in Action](/en/speaking/2026-genai-mcp-systems/), Code Europe, Krakow, 2025-07-01. MCP shown through Kubernetes troubleshooting and Terraform generation demos.
+- **Talk:** [Building Production GenAI: MCP and Multi-Agent Systems in Action](/en/speaking/2026-genai-mcp-systems/), Code Europe, Kraków, 2025-07-01. MCP shown through Kubernetes troubleshooting and Terraform generation demos.
 - **Chalk talk:** AWS Summit Warsaw 2026 (DOP202), *Integrated AI Agents & Code Assistants with MCP & AWS*, 2026-05-06.
 - **Specification:** [modelcontextprotocol.io/specification/latest](https://modelcontextprotocol.io/specification/latest) (external, canonical).
 
