@@ -329,6 +329,23 @@ h1, h2, h3, h4,
   }
 }
 
+/* -- Narrow screens: keep long tokens and wide tables inside the column --
+   Inline code (metric names, annotation keys) and URL-like link text wrap
+   only when they would overflow. Tables scroll on their own below `sm`, so
+   the page never scrolls sideways; desktop table layout is unchanged. */
+.prose :not(pre) > code,
+.prose a {
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 639px) {
+  .prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
 /* =======================================================================
    Phase 2 — Code Copy Toast (D-07b / D-07c)
    Singleton <div id="code-copy-toast"> in BaseLayout.astro. Hidden via
