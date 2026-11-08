@@ -12,7 +12,7 @@ This post accompanies a talk I give as a from-zero-to-hero walkthrough. We take 
 
 One terminology note first, because the names are easy to mix up. This is **Gateway API**, the Kubernetes networking standard. It is not an "API gateway", which is a generic architectural component, and it is not Amazon API Gateway, the AWS service. Different things.
 
-## ingress-nginx is retired. The Ingress API is frozen.
+## ingress-nginx is retired. The Ingress API is frozen
 
 I spend exactly one slide on the "why now", and so will this section. Four facts:
 
@@ -25,7 +25,7 @@ That is the entire history portion. The rest is the "what" and the "how".
 
 ## How does a request even reach a Pod?
 
-Before any YAML, here is the fundamental problem. A browser has a URL, `shop.example.com`. Your code runs in a Pod with an internal IP like `10.1.2.7`. When a Pod is replaced, during a rollout or after an eviction, its replacement may come up with a different IP. You could put a Pod IP in DNS, but it would not stay correct for long. Something has to bridge that gap.
+Before any YAML, here is the fundamental problem. A browser has a URL, `shop.example.com`. Your code runs in a Pod with an internal IP like `10.1.2.7`. When a Pod is replaced, during a rollout or after an eviction, its replacement may get a different IP. You could put a Pod IP in DNS, but it would not stay correct for long. Something has to bridge that gap.
 
 <SlideEmbed slide={6} clicks={4} title="How a request reaches a Pod" caption="Browser to Pod: the Service solves the inside half, but something still has to take external traffic to the right Service. That missing piece is what Gateway API models." />
 
@@ -46,7 +46,7 @@ Keep these four in mind. Each one gets addressed below.
 
 If you remember one sentence, this is it. Gateway API takes the single Ingress object and splits it into **typed resources**, each **owned by the team responsible for it**, that **attach to each other** to describe how traffic gets from the edge of the cluster to your Pods.
 
-A few properties fall out of that. It is role-oriented: separate resources make separate ownership practical, and RBAC enforces it. It is typed: the API server validates every field against a schema, and the controller reports in status whether it could apply the configuration. It is vendor-neutral: Core features behave the same on every controller conformant with the relevant profile, and the conformance report tells you which Extended features yours supports. And the same routing API covers both ingress (north-south) and service mesh (east-west). Now let's earn that sentence by building the resources one at a time.
+A few properties fall out of that. It is role-oriented: separate resources make separate ownership practical, and RBAC enforces it. It is typed: the API server validates every field against a schema, and the controller reports in the status whether it could apply the configuration. It is vendor-neutral: Core features behave the same on every controller conformant with the relevant profile, and the conformance report tells you which Extended features yours supports. And the same routing API covers both ingress (north-south) and service mesh (east-west). Now let's earn that sentence by building the resources one at a time.
 
 ## The four resources
 
@@ -249,7 +249,7 @@ Finally, **filters** process a request as it passes through, and they are typed 
 
 ## Production: TLS, multi-team, cross-namespace
 
-The shop is routing, but production needs more. First, TLS, and notice **where** it lives: on a Gateway listener, owned by the platform team, not in the developer's route. First create the `shop-tls` Secret in `infra` with a certificate for `shop.example.com`. Then replace the HTTP listener with the HTTPS one below (if you keep HTTP, add a redirect to HTTPS). It keeps the same `allowedRoutes` selector, otherwise it would only admit routes from the Gateway's own namespace:
+The shop is routing, but production needs more. First, TLS, and notice **where** it lives: on a Gateway listener, owned by the platform team, not in the developer's route. First create the `shop-tls` Secret in `infra` with a certificate for `shop.example.com`. Then replace the HTTP listener with the HTTPS one below (if you keep HTTP, add a redirect to HTTPS). It keeps the same `allowedRoutes` selector; otherwise it would only admit routes from the Gateway's own namespace:
 
 ```yaml
 listeners:
