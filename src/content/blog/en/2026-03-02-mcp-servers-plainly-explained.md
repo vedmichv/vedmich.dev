@@ -53,7 +53,7 @@ The third point is the one that surprises people. Under the current spec, a serv
 
 ## Three servers I use
 
-Two of the three are AWS servers, and yes, I work at AWS. Here is what each one does and where it runs.
+Two of the three are AWS servers, and yes, I work at AWS; this is my own view. Here is what each one does and where it runs.
 
 **AWS Documentation MCP** is a local server. The client starts it with `uvx` and talks to it over stdio. Its tools search the AWS documentation through the official AWS documentation search API (`search_documentation`), fetch a page as Markdown (`read_documentation`, `read_sections`), pull matching rows out of large tables such as service quotas (`search_table`) and suggest related pages (`recommend`). I ask: "Which fields does a VPC flow log record contain? Cite the page." The model searches, reads the page and answers from the current documentation, with a link I can check.
 
