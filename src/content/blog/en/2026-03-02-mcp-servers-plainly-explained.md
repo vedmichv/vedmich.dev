@@ -49,7 +49,7 @@ The latest revision as of October 2026 is [2026-07-28](https://modelcontextproto
 
 The third point is the one that surprises people. Under the current spec, a server cannot send the client a single request. Everything it says is either an answer or a notification.
 
-> **Update, October 2026:** The first version of this post called MCP bidirectional, stateful and transport-agnostic, said servers could push resources to the client, and listed WebSocket as a transport. The 2025-11-25 revision did have an `initialize` handshake, sessions and server-initiated requests, but even there a subscription only signalled that a resource had changed, and WebSocket was never a standard transport. The 2026-07-28 revision removed the handshake and protocol sessions, replaced server-initiated requests with multi round-trip requests and moved change notifications to `subscriptions/listen`. It also deprecated Roots, Sampling and Logging. Clients and servers that support both eras detect the other side and fall back.
+> **Update, October 2026:** The first version of this post called MCP bidirectional, stateful and transport-agnostic, said servers could push resources to the client, and listed WebSocket as a transport. The 2025-11-25 revision did have an `initialize` handshake, sessions and server-initiated requests, but even there a subscription only signaled that a resource had changed, and WebSocket was never a standard transport. The 2026-07-28 revision removed the handshake and protocol sessions, replaced server-initiated requests with multi round-trip requests and moved change notifications to `subscriptions/listen`. It also deprecated Roots, Sampling and Logging. Clients and servers that support both eras detect the other side and fall back.
 
 ## Three servers I use
 
@@ -71,7 +71,7 @@ The difference in one table:
 
 If your client supports remote servers, Knowledge MCP covers more ground, and its own FAQ suggests simply trying it. Documentation MCP still earns its place when you want a local process or need the AWS China documentation. With `AWS_DOCUMENTATION_PARTITION=aws-cn` it exposes only `read_documentation` and `get_available_services`.
 
-**QMD** searches my Obsidian vault. [QMD](https://github.com/tobi/qmd) ("Query Markup Documents") is an open-source local search engine for Markdown. It offers BM25 full-text search (`qmd search`), vector search (`qmd vsearch`) and a hybrid mode with query expansion, reciprocal rank fusion and LLM reranking (`qmd query`), with the models running on your machine. `qmd mcp` exposes the same search as an MCP server, over stdio by default, or over HTTP when you want one shared long-lived process. My vault holds architecture notes, Kubernetes troubleshooting write-ups and course material. I ask "Show me my notes on Karpenter consolidation", the model calls QMD's `query` tool, gets the matching notes with their paths and answers from my own notes instead of generic training data.
+**QMD** searches my Obsidian vault. [QMD](https://github.com/tobi/qmd) ("Query Markup Documents") is an open-source local search engine for Markdown. It offers BM25 full-text search (`qmd search`), vector search (`qmd vsearch`) and a hybrid mode with query expansion, reciprocal rank fusion and LLM reranking (`qmd query`), with the models running on your machine. `qmd mcp` exposes the same search as an MCP server, over stdio by default, or over HTTP when you want one shared long-lived process. My vault holds architecture notes, Kubernetes troubleshooting write-ups and course material. I ask: "Show me my notes on Karpenter consolidation." The model calls QMD's `query` tool, gets the matching notes with their paths and answers from my own notes instead of generic training data.
 
 Here are all three in a Claude Code project `.mcp.json`: two local processes and one remote endpoint.
 
@@ -114,7 +114,7 @@ With stdio, the client launches the server as a local process. That process runs
 
 ## When to write your own
 
-Start with servers that someone maintains. On 5 October 2026, the [awslabs/mcp](https://github.com/awslabs/mcp) repository had 61 server directories under `src/`, one of them marked deprecated, for services such as EKS, ECS, CloudWatch, DynamoDB, IAM, pricing and billing.
+Start with servers that someone maintains. On October 5, 2026, the [awslabs/mcp](https://github.com/awslabs/mcp) repository had 61 server directories under `src/`, one of them marked deprecated, for services such as EKS, ECS, CloudWatch, DynamoDB, IAM, pricing and billing.
 
 Be careful with the old reference servers. The original PostgreSQL, GitHub, Slack and Google Drive servers from the MCP project are archived in [servers-archived](https://github.com/modelcontextprotocol/servers-archived), with no maintenance and no security updates. The active reference set (Filesystem, Git, Fetch, Memory and a few others) exists to demonstrate the protocol and the SDKs, and its README says these servers are not production-ready. For a real integration, pick an actively maintained server, often the vendor's own, and look it up in the [MCP Registry](https://registry.modelcontextprotocol.io/). For a sense of scale: in December 2025, the MCP project counted 10,000 active servers.
 
