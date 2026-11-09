@@ -79,11 +79,13 @@ test('a post links back to the talk it grew out of, outside the prose', async ({
   const block = page.locator('aside[aria-labelledby="post-origins-heading"]');
   await expect(block).toBeVisible();
   await expect(block.getByRole('heading', { name: 'This post grew out of' })).toBeVisible();
-  const talk = block.getByRole('link', { name: 'Building an RCA Agent with Amazon Bedrock AgentCore', exact: true });
-  await expect(talk).toHaveAttribute('href', '/en/speaking/2026-rca-agent-agentcore/');
+  // The same talk was given at more than one event, so match each link by its target.
+  await expect(block.locator('a[href="/en/speaking/2026-rca-agent-agentcore/"]'))
+    .toHaveText('Building an RCA Agent with Amazon Bedrock AgentCore');
+  await expect(block.locator('a[href="/en/speaking/2026-adria-rca-agent-agentcore/"]')).toHaveCount(1);
   await expect(block).toContainText('AWS Community Day Central Asia, 25 September 2026');
   await expect(block.getByRole('link', { name: /^Video/ })).toHaveAttribute('href', /youtube\.com/);
-  await expect(block.getByRole('link', { name: /^Slides/ })).toHaveAttribute('href', /slides\/ai-agents-devops-tashkent/);
+  await expect(block.getByRole('link', { name: /^Slides/ }).first()).toHaveAttribute('href', /slides\/ai-agents-devops-tashkent/);
   // Outside the prose container, so prose screenshots stay unchanged.
   await expect(page.locator('.prose aside')).toHaveCount(0);
   expect((await page.request.get('/en/speaking/2026-rca-agent-agentcore/')).status()).toBe(200);
@@ -95,9 +97,9 @@ test('the Russian post renders the back-link in Russian with day-month-year date
   await expect(block.getByRole('heading', { name: 'Эта статья выросла из' })).toBeVisible();
   await expect(block).toContainText('25 сентября 2026');
   await expect(block.getByRole('link', { name: /^Видео/ })).toBeVisible();
-  await expect(block.getByRole('link', { name: /^Слайды/ })).toBeVisible();
-  await expect(block.getByRole('link', { name: 'Building an RCA Agent with Amazon Bedrock AgentCore', exact: true }))
-    .toHaveAttribute('href', '/ru/speaking/2026-rca-agent-agentcore/');
+  await expect(block.getByRole('link', { name: /^Слайды/ }).first()).toBeVisible();
+  await expect(block.locator('a[href="/ru/speaking/2026-rca-agent-agentcore/"]'))
+    .toHaveText('Building an RCA Agent with Amazon Bedrock AgentCore');
 });
 
 test('a deck-only article links to its slides, and a post without a talk shows no block', async ({ page }) => {
