@@ -108,6 +108,43 @@ test('search opens a post and excludes unlisted content', async ({ page }) => {
   await expect(page).toHaveURL(/\/en\/blog\/2026-06-11-latency-throughput-bandwidth\/?$/);
 });
 
+// Real built index: talks, home sections, body text, word forms and typos, with localized kind labels.
+const searchCases: Array<[path: string, query: string, kind: string, text: string]> = [
+  ['/en/', 'tashkent', 'Talk', 'devopsdays Tashkent'],
+  ['/en/', 're:Invent', 'Talk', 'AWS re:Invent'],
+  ['/en/', 'cdk8s', 'Talk', 'cdk8s'],
+  ['/en/', 'podcast', 'Page', 'DevOps Kitchen Talks'],
+  ['/en/', 'Dovnar', 'Page', 'Cracking the Kubernetes Interview'],
+  ['/en/', 'kubernets', 'Post', 'Kubernetes'],
+  ['/ru/', 'кластеры', 'Пост', 'кластеров'],
+  ['/ru/', 'ташкент', 'Доклад', 'Ташкент'],
+  ['/ru/', 'подкаст', 'Раздел', 'DevOps Kitchen Talks'],
+  ['/ru/', 'книга', 'Раздел', 'Cracking the Kubernetes Interview'],
+];
+
+for (const [path, query, kind, text] of searchCases) {
+  test(`search ${path} finds "${query}" as ${kind}`, async ({ page }) => {
+    await page.goto(path);
+    await page.keyboard.press('/');
+    await page.getByRole('combobox').fill(query);
+    const match = page.getByRole('option').filter({ hasText: text }).filter({ has: page.locator('.kind-badge', { hasText: new RegExp(`^${kind}$`) }) });
+    await expect(match.first()).toBeVisible();
+  });
+}
+
+test('search opens a home section from another page and never exposes drafts', async ({ page }) => {
+  await page.goto('/en/blog/');
+  await page.keyboard.press('/');
+  await page.getByRole('combobox').fill('book');
+  await expect(page.getByRole('option').first()).toContainText('Cracking the Kubernetes Interview');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/en\/#book$/);
+  const data = await page.locator('#search-index-data').textContent();
+  expect(data).not.toContain('__fixture');
+  expect(data).not.toContain('Syntax Highlighting Fixture');
+  expect(data).not.toContain('slurm');
+});
+
 test('content and contact fallback remain usable without JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();

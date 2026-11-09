@@ -24,6 +24,8 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
   data-i18n-no-results={i.search.no_results}
   data-i18n-kind-slides={i.search.kind_slides}
   data-i18n-kind-post={i.search.kind_post}
+  data-i18n-kind-talk={i.search.kind_talk}
+  data-i18n-kind-page={i.search.kind_page}
   data-i18n-empty-hint={i.search.empty_hint}
   data-i18n-results-count={i.search.results_count}
 >
@@ -91,7 +93,7 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
   }
   .search-result {
     display: grid;
-    grid-template-columns: 62px 1fr auto;
+    grid-template-columns: 74px 1fr auto;
     gap: 14px;
     align-items: center;
     padding: 14px 18px;
@@ -125,6 +127,16 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
     background: rgba(245, 158, 11, 0.12);
     border-color: rgba(245, 158, 11, 0.3);
   }
+  .search-result .kind-talk {
+    color: var(--brand-primary-hover);
+    background: transparent;
+    border-color: var(--brand-primary);
+  }
+  .search-result .kind-page {
+    color: var(--text-secondary);
+    background: rgba(148, 163, 184, 0.08);
+    border-color: var(--border-strong);
+  }
   .search-result .title {
     font-family: var(--font-display);
     font-size: 15px;
@@ -151,26 +163,7 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
 </style>
 
 <script>
-  type SearchItem = {
-    kind: 'slides' | 'post';
-    title: string;
-    sub: string;
-    url: string;
-    tags: readonly string[];
-    body: string;
-    date: string;
-  };
-
-  function fuzzyScore(q: string, item: SearchItem): number {
-    const needle = q.toLowerCase().trim();
-    if (!needle) return 0;
-    const hay = `${item.title} ${item.body} ${item.tags.join(' ')} ${item.kind}`.toLowerCase();
-    if (item.title.toLowerCase().includes(needle)) return 100 - item.title.length * 0.1;
-    if (hay.includes(needle)) return 60;
-    const tokens = needle.split(/\s+/).filter(Boolean);
-    if (tokens.every((t) => hay.includes(t))) return 30;
-    return 0;
-  }
+  import { searchItems, type SearchItem, type SearchKind } from '../data/search-match';
 
   function escapeHtml(s: string): string {
     return s
@@ -196,18 +189,17 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
     let lastFocused: HTMLElement | null = null;
 
     const noResultsLabel = palette.getAttribute('data-i18n-no-results') || 'No matches for';
-    const slidesLabel = palette.getAttribute('data-i18n-kind-slides') || 'Slides';
-    const postLabel = palette.getAttribute('data-i18n-kind-post') || 'Post';
+    const kindLabels: Record<SearchKind, string> = {
+      slides: palette.getAttribute('data-i18n-kind-slides') || 'Slides',
+      post: palette.getAttribute('data-i18n-kind-post') || 'Post',
+      talk: palette.getAttribute('data-i18n-kind-talk') || 'Talk',
+      page: palette.getAttribute('data-i18n-kind-page') || 'Page',
+    };
     const countLabel = palette.getAttribute('data-i18n-results-count') || 'Results: {n} of {total}';
 
     function computeResults(q: string): SearchItem[] {
       if (!q.trim()) return index.slice(0, 6);
-      return index
-        .map((item) => ({ item, score: fuzzyScore(q, item) }))
-        .filter((r) => r.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 8)
-        .map((r) => r.item);
+      return searchItems(q, index, 8);
     }
 
     function render() {
@@ -224,8 +216,8 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
         resultsEl!.innerHTML = currentResults
           .map((r, i) => {
             const isSelected = i === selectedIndex;
-            const badgeLabel = r.kind === 'slides' ? slidesLabel : postLabel;
-            const badgeClass = r.kind === 'slides' ? 'kind-slides' : 'kind-post';
+            const badgeLabel = kindLabels[r.kind] ?? r.kind;
+            const badgeClass = `kind-${r.kind}`;
             return `
               <div id="search-result-${i}" class="search-result ${isSelected ? 'is-selected' : ''}" role="option" aria-selected="${isSelected}" data-idx="${i}">
                 <span class="kind-badge ${badgeClass}">${escapeHtml(badgeLabel)}</span>
@@ -297,8 +289,7 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
       document.body.style.overflow = '';
       if (lastFocused && typeof lastFocused.focus === 'function') {
         lastFocused.focus();
-      }
-    }
+      }    }
 
     document.addEventListener('vv:search:open', () => open());
     document.addEventListener('vv:search:close', () => close());
