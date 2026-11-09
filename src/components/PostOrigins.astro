@@ -1,0 +1,78 @@
+---
+/**
+ * PostOrigins: back-links from an article to the talks and decks it grew out of.
+ * Matches same-locale `speaking` and `presentations` entries whose `post` equals
+ * the article URL. Renders nothing when there is no match.
+ */
+import { getCollection } from 'astro:content';
+import { type Locale, t } from '../i18n/utils';
+import { findPostOrigins } from '../lib/cross-links';
+import { formatDate } from '../lib/seo';
+
+interface Props {
+  locale: Locale;
+  /** Article URL as stored in the `post` field, e.g. "/en/blog/<slug>/". */
+  postUrl: string;
+}
+
+const { locale, postUrl } = Astro.props;
+const i = t(locale);
+const [talks, decks] = await Promise.all([
+  getCollection('speaking', ({ id }) => id.startsWith(`${locale}/`)),
+  getCollection('presentations', ({ id }) => id.startsWith(`${locale}/`)),
+]);
+const origins = findPostOrigins(postUrl, locale, talks, decks);
+const newTab = i.contact.opens_in_new_tab;
+---
+
+{origins.length > 0 && (
+  <aside class="mt-12 rounded-xl bg-surface border border-border p-5" aria-labelledby="post-origins-heading">
+    <h2 id="post-origins-heading" class="font-mono text-xs uppercase tracking-[0.08em] text-text-muted mb-3">
+      {i.crosslinks.post_origins}
+    </h2>
+    <ul class="flex flex-col gap-3">
+      {origins.map((origin) => (
+        <li class="text-sm leading-relaxed text-text-secondary">
+          {origin.href ? (
+            <a href={origin.href} class="font-semibold text-brand-primary hover:text-brand-primary-hover transition-colors">
+              {origin.title}
+            </a>
+          ) : (
+            <span class="font-semibold text-text-primary">{origin.title}</span>
+          )}
+          <span class="text-text-muted">
+            {' '}({[origin.event, formatDate(origin.date, locale)].filter(Boolean).join(', ')})
+          </span>
+          {origin.video && (
+            <>
+              <span aria-hidden="true"> · </span>
+              <a
+                href={origin.video}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-brand-primary hover:text-brand-primary-hover transition-colors"
+                aria-label={`${i.crosslinks.video}: ${origin.title} (${newTab})`}
+              >
+                {i.crosslinks.video}
+              </a>
+            </>
+          )}
+          {origin.slides && (
+            <>
+              <span aria-hidden="true"> · </span>
+              <a
+                href={origin.slides}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-brand-primary hover:text-brand-primary-hover transition-colors"
+                aria-label={`${i.crosslinks.slides}: ${origin.title} (${newTab})`}
+              >
+                {i.crosslinks.slides}
+              </a>
+            </>
+          )}
+        </li>
+      ))}
+    </ul>
+  </aside>
+)}

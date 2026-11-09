@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import { YouTube } from '@astro-community/astro-embed-youtube';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiblingTalks from '../../../components/SiblingTalks.astro';
 import { t } from '../../../i18n/utils';
 import { pageTitle, summarize } from '../../../lib/seo';
 import { talkEventJsonLd } from '../../../lib/structured-data';
@@ -125,5 +126,6 @@ const videoStart = talk.data.video
     ">
       <Content />
     </div>
+    <SiblingTalks locale={locale} talk={talk} />
   </article>
 </BaseLayout>

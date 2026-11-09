@@ -80,6 +80,12 @@
     "all_posts": "Все посты",
     "min_read": "мин чтения"
   },
+  "crosslinks": {
+    "post_origins": "Эта статья выросла из",
+    "video": "Видео",
+    "slides": "Слайды",
+    "also_at": "Другие доклады на {event} {year}"
+  },
   "contact": {
     "title": "Связаться",
     "subtitle": "Найдите меня на этих платформах",
