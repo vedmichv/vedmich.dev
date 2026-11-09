@@ -132,8 +132,9 @@
     }
   },
   "footer": {
-    "built_with": "Создано на Astro",
-    "copyright": "© {year} Виктор Ведмич"
+    "copyright": "© {year} Виктор Ведмич",
+    "opinions": "Мнения мои личные",
+    "rss": "RSS"
   },
   "back_to_home": "Назад на главную"
 }

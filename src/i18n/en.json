@@ -132,8 +132,9 @@
     }
   },
   "footer": {
-    "built_with": "Built with Astro",
-    "copyright": "© {year} Viktor Vedmich"
+    "copyright": "© {year} Viktor Vedmich",
+    "opinions": "Opinions are my own",
+    "rss": "RSS"
   },
   "back_to_home": "Back to home"
 }
