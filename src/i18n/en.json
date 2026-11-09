@@ -114,6 +114,7 @@
     "lang_en": "English",
     "lang_ru": "Russian",
     "copy": "Copy",
+    "copied": "Copied",
     "copy_label": "Copy the bio: {words}, {language}",
     "copy_done": "Copied: {words}, {language}",
     "copy_failed": "Could not copy. Select the text and copy it by hand.",

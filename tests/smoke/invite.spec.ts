@@ -14,6 +14,7 @@ const strings = {
     kit: 'Speaker kit',
     download: 'Download photo',
     copy: 'Copy',
+    copied: 'Copied',
     done: (words: string, language: string) => `Copied: ${words}, ${language}`,
     failed: 'Could not copy. Select the text and copy it by hand.',
     cards: [
@@ -33,6 +34,7 @@ const strings = {
     kit: 'Материалы спикера',
     download: 'Скачать фото',
     copy: 'Копировать',
+    copied: 'Скопировано',
     done: (words: string, language: string) => `Скопировано: ${words}, ${language}`,
     failed: 'Не получилось скопировать. Выдели текст и скопируй вручную.',
     cards: [
@@ -110,6 +112,8 @@ for (const locale of ['en', 'ru'] as const) {
         const expected = (await page.locator(`#${card.id}`).textContent())!.trim();
         expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(expected);
         await expect(button).toBeFocused();
+        // The button itself confirms the copy, so the result is visible next to the finger on a phone.
+        await expect(button).toHaveText(s.copied);
       }
     });
 

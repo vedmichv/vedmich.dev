@@ -135,6 +135,8 @@ const focusRing =
                     type="button"
                     hidden
                     data-copy-bio={id}
+                    data-label={inv.copy}
+                    data-label-done={inv.copied}
                     data-done={inv.copy_done.replace('{words}', words).replace('{language}', language)}
                     data-failed={inv.copy_failed}
                     aria-label={inv.copy_label.replace('{words}', words).replace('{language}', language)}
@@ -163,6 +165,7 @@ const focusRing =
 
   if (kit && status && buttons.length > 0) {
     let statusTimer: number | undefined;
+    const labelTimers = new Map<HTMLButtonElement, number>();
 
     // Empty first, then fill: pressing the same button again announces the message again.
     function announce(message: string): void {
@@ -228,6 +231,15 @@ const focusRing =
         button.focus();
         if (ok) {
           announce(button.dataset.done ?? '');
+          // Visible feedback on the button itself: the status line can be far away on a phone.
+          button.textContent = button.dataset.labelDone ?? '';
+          window.clearTimeout(labelTimers.get(button));
+          labelTimers.set(
+            button,
+            window.setTimeout(() => {
+              button.textContent = button.dataset.label ?? '';
+            }, 2000),
+          );
         } else {
           selectText(source);
           announce(button.dataset.failed ?? '');
