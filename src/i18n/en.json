@@ -88,7 +88,8 @@
     "title": "Blog",
     "read_more": "Read more",
     "all_posts": "All posts",
-    "min_read": "min read"
+    "min_read": "min read",
+    "rss": "RSS feed"
   },
   "crosslinks": {
     "post_origins": "This post grew out of",

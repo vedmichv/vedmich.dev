@@ -1,8 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { t } from '../../../i18n/utils';
 import BlogCard from '../../../components/BlogCard.astro';
+import { feedPath } from '../../../lib/feed';
 
 const locale = 'ru';
 const i = t(locale);
@@ -27,7 +29,16 @@ const posts = (await getCollection('blog', ({ data, id }) => {
         ← {i.back_to_home}
       </a>
 
-      <h1 class="font-display text-4xl font-bold mb-12 animate-on-scroll">{i.blog.title}</h1>
+      <div class="flex items-baseline justify-between gap-6 mb-12 animate-on-scroll">
+        <h1 class="font-display text-4xl font-bold">{i.blog.title}</h1>
+        <a
+          href={feedPath(locale)}
+          class="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap"
+        >
+          <Icon name="lucide:rss" width="14" height="14" aria-hidden="true" />
+          {i.blog.rss}
+        </a>
+      </div>
 
       {posts.length > 0 ? (
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

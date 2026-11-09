@@ -88,7 +88,8 @@
     "title": "Блог",
     "read_more": "Читать дальше",
     "all_posts": "Все посты",
-    "min_read": "мин чтения"
+    "min_read": "мин чтения",
+    "rss": "RSS-лента"
   },
   "crosslinks": {
     "post_origins": "Эта статья выросла из",
