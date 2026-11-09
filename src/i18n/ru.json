@@ -39,8 +39,14 @@
     "speaker_pill": "Спикер re:Invent и keynote-докладов",
     "host_pill": "Ведущий · DKT + AWS RU"
   },
+  "latest": {
+    "title": "Новое",
+    "post": "Пост",
+    "talk": "Доклад"
+  },
   "about": {
     "title": "Обо мне",
+    "photo_alt": "Виктор Ведмич выступает на AWS Summit Berlin",
     "bio_before": "Я Solutions Architect и AI Engineer, в индустрии с 2009 года. С 2021 года работаю в AWS: проектирую архитектуру для крупных клиентов. Это hybrid cloud, Kubernetes, GenAI и агентные платформы. CNCF Kubestronaut. Вместе с Александром Довнаром написал книгу ",
     "bio_accent": "«Cracking the Kubernetes Interview»",
     "bio_after": ".",
@@ -72,11 +78,46 @@
     "view_slides": "Посмотреть слайды",
     "read_article": "Читать статью",
     "all_talks": "Все выступления",
+    "badges": {
+      "video": "Видео",
+      "slides": "Слайды",
+      "article": "Статья"
+    },
     "formats": {
       "workshop": "Воркшоп",
       "chalk_talk": "Chalk talk",
       "panel": "Панель"
     }
+  },
+  "invite": {
+    "title": "Пригласить выступить",
+    "teaser": "Нужен докладчик?",
+    "lede": "Нужен докладчик? Дата, формат и аудитория: {email}.",
+    "topics_title": "Темы",
+    "topics": [
+      "AI-агенты для инцидентов: RCA-агент на Amazon Bedrock AgentCore, AWS DevOps Agent",
+      "MCP и AI-ассистенты для кода в работе инженера",
+      "Kubernetes в продакшене: Karpenter, Gateway API, GenAI на Amazon EKS",
+      "Зрелость AI и платформа для AI в крупных компаниях"
+    ],
+    "formats_title": "Форматы",
+    "formats": ["Доклад", "Chalk talk", "Воркшоп"],
+    "languages_title": "Языки",
+    "languages": ["Английский", "Русский"],
+    "cta": "Написать про выступление",
+    "mail_subject": "vedmich.dev: приглашение выступить",
+    "mail_body": "Событие:\nДата:\nФормат (доклад, chalk talk, воркшоп):\nАудитория:\nЯзык (английский или русский):\n",
+    "kit_title": "Материалы спикера",
+    "kit_intro": "Биографии и фото для программ конференций и сайтов.",
+    "bio_short": "50 слов",
+    "bio_long": "100 слов",
+    "lang_en": "английский",
+    "lang_ru": "русский",
+    "copy": "Копировать",
+    "copy_label": "Копировать биографию: {words}, {language}",
+    "copy_done": "Скопировано: {words}, {language}",
+    "copy_failed": "Не получилось скопировать. Выдели текст и скопируй вручную.",
+    "download_photo": "Скачать фото"
   },
   "book": {
     "title": "Книга",

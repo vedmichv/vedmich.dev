@@ -39,8 +39,14 @@
     "speaker_pill": "re:Invent & keynote speaker",
     "host_pill": "Host · DKT + AWS RU"
   },
+  "latest": {
+    "title": "Latest",
+    "post": "Post",
+    "talk": "Talk"
+  },
   "about": {
     "title": "About me",
+    "photo_alt": "Viktor Vedmich speaking at AWS Summit Berlin",
     "bio_before": "I am a Solutions Architect and AI Engineer, working in the industry since 2009. Since 2021 I have been at AWS, where I design architecture for enterprise customers: hybrid cloud, Kubernetes, and GenAI and agentic platforms. I am a CNCF Kubestronaut and the co-author, with Alexander Dovnar, of ",
     "bio_accent": "“Cracking the Kubernetes Interview”",
     "bio_after": ".",
@@ -72,11 +78,46 @@
     "view_slides": "View slides",
     "read_article": "Read the article",
     "all_talks": "All talks",
+    "badges": {
+      "video": "Video",
+      "slides": "Slides",
+      "article": "Article"
+    },
     "formats": {
       "workshop": "Workshop",
       "chalk_talk": "Chalk talk",
       "panel": "Panel"
     }
+  },
+  "invite": {
+    "title": "Invite me to speak",
+    "teaser": "Need a speaker?",
+    "lede": "Need a speaker? Send the date, format and audience to {email}.",
+    "topics_title": "Topics",
+    "topics": [
+      "AI agents for incidents: an RCA agent on Amazon Bedrock AgentCore, AWS DevOps Agent",
+      "MCP and AI coding assistants for engineers",
+      "Kubernetes in production: Karpenter, Gateway API, GenAI on Amazon EKS",
+      "AI maturity and a platform for enterprise AI"
+    ],
+    "formats_title": "Formats",
+    "formats": ["Talk", "Chalk talk", "Workshop"],
+    "languages_title": "Languages",
+    "languages": ["English", "Russian"],
+    "cta": "Write about a talk",
+    "mail_subject": "vedmich.dev: speaking invitation",
+    "mail_body": "Event:\nDate:\nFormat (talk, chalk talk, workshop):\nAudience:\nLanguage (English or Russian):\n",
+    "kit_title": "Speaker kit",
+    "kit_intro": "Bios and a photo for conference programs and websites.",
+    "bio_short": "50 words",
+    "bio_long": "100 words",
+    "lang_en": "English",
+    "lang_ru": "Russian",
+    "copy": "Copy",
+    "copy_label": "Copy the bio: {words}, {language}",
+    "copy_done": "Copied: {words}, {language}",
+    "copy_failed": "Could not copy. Select the text and copy it by hand.",
+    "download_photo": "Download photo"
   },
   "book": {
     "title": "Book",
