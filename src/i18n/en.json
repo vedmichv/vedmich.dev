@@ -49,12 +49,20 @@
   "podcasts": {
     "title": "Podcasts",
     "dkt_name": "DevOps Kitchen Talks",
-    "dkt_desc": "Technical deep-dives into DevOps, Kubernetes, and infrastructure. Interviews with industry experts, mock interviews, and hands-on topics.",
-    "dkt_stats": "100+ episodes · ~10K subscribers",
+    "dkt_desc": "A podcast and community about DevOps, SRE, AI, system design and cloud. Interviews with engineers, mock interviews, and news that listeners send in. I host it with Alexander Dovnar.",
+    "dkt_stats": "100+ episodes · ~10K subscribers (November 2026)",
     "aws_name": "AWS на русском",
-    "aws_desc": "AWS services, architectural patterns, AI applications, and IT careers, all in Russian. Vendor-agnostic perspective from inside AWS.",
-    "aws_stats": "70+ episodes · 70K+ listens",
-    "listen": "Listen"
+    "aws_desc": "A Russian-language podcast about AWS services, architecture patterns, AI applications and IT careers. I have hosted it since 2021, so you hear the view from inside AWS.",
+    "aws_stats": "70+ episodes · 70K+ listens (November 2026)",
+    "listen": "Listen on",
+    "platforms": {
+      "apple": "Apple Podcasts",
+      "spotify": "Spotify",
+      "yandex": "Yandex Music",
+      "youtube": "YouTube",
+      "podbean": "Podbean",
+      "site": "dk-t.dev"
+    }
   },
   "speaking": {
     "title": "Speaking",
