@@ -31,8 +31,9 @@
     "tagline_before": "Распределённые системы · Kubernetes · ",
     "tagline_accent": "AI Engineer",
     "tagline_after": "",
+    "lede": "Я проектирую облачную архитектуру для крупных клиентов в AWS. Здесь пишу про Kubernetes и AI-агентов в проде, выкладываю доклады со слайдами и веду два подкаста.",
     "cta": "Связаться",
-    "cta_secondary": "Подробнее",
+    "cta_secondary": "Читать блог",
     "kubestronaut_aria": "Проверить бейдж CNCF Kubestronaut на Credly",
     "author_pill": "Автор «Cracking the Kubernetes Interview»",
     "speaker_pill": "Спикер re:Invent и keynote-докладов",
@@ -40,7 +41,7 @@
   },
   "about": {
     "title": "Обо мне",
-    "bio_before": "Solutions Architect и AI Engineer с 15+ годами опыта в проектировании и развитии масштабных распределённых систем. Работаю в AWS, отвечаю за сквозную архитектуру для enterprise-клиентов: hybrid cloud, Kubernetes, GenAI и agentic-платформы. CNCF Kubestronaut и автор книги ",
+    "bio_before": "Я Solutions Architect и AI Engineer, в индустрии с 2009 года. С 2021 года работаю в AWS: проектирую архитектуру для крупных клиентов. Это hybrid cloud, Kubernetes, GenAI и агентные платформы. CNCF Kubestronaut. Вместе с Александром Довнаром написал книгу ",
     "bio_accent": "«Cracking the Kubernetes Interview»",
     "bio_after": ".",
     "skills_title": "Экспертиза"

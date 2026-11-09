@@ -31,8 +31,9 @@
     "tagline_before": "Distributed Systems · Kubernetes · ",
     "tagline_accent": "AI Engineer",
     "tagline_after": "",
+    "lede": "I design cloud architecture for enterprise teams at AWS. Here I write about Kubernetes and AI agents in production, share my talks and slides, and host two podcasts.",
     "cta": "Get in touch",
-    "cta_secondary": "Read more",
+    "cta_secondary": "Read the blog",
     "kubestronaut_aria": "Verify the CNCF Kubestronaut badge on Credly",
     "author_pill": "Author “Cracking the Kubernetes Interview”",
     "speaker_pill": "re:Invent & keynote speaker",
@@ -40,7 +41,7 @@
   },
   "about": {
     "title": "About me",
-    "bio_before": "Solutions Architect and AI Engineer with 15+ years designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and GenAI / agentic platforms. CNCF Kubestronaut and author of ",
+    "bio_before": "I am a Solutions Architect and AI Engineer, working in the industry since 2009. Since 2021 I have been at AWS, where I design architecture for enterprise customers: hybrid cloud, Kubernetes, and GenAI and agentic platforms. I am a CNCF Kubestronaut and the co-author, with Alexander Dovnar, of ",
     "bio_accent": "“Cracking the Kubernetes Interview”",
     "bio_after": ".",
     "skills_title": "Expertise"

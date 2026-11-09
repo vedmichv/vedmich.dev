@@ -28,6 +28,11 @@ const i = t(locale);
       {i.hero.tagline_before}<span class="text-text-primary">{i.hero.tagline_accent}</span>{i.hero.tagline_after}
     </p>
 
+    <!-- Lede: what a visitor gets here (C-01) -->
+    <p class="font-body text-base sm:text-lg leading-relaxed text-text-primary max-w-[640px] mt-4 mb-0">
+      {i.hero.lede}
+    </p>
+
     <!-- Authority pills per D-02, D-03, D-05, D-06, D-07, D-08 -->
     <div class="flex flex-wrap gap-2.5 mt-7">
       <a
@@ -69,7 +74,7 @@ const i = t(locale);
         {i.hero.cta}
       </a>
       <a
-        href="#about"
+        href={`/${locale}/blog/`}
         class="inline-flex items-center gap-2 px-5 py-2.5 border border-border hover:border-brand-primary hover:text-brand-primary-hover text-text-primary font-medium rounded-lg transition-colors"
       >
         {i.hero.cta_secondary}<span aria-hidden="true">→</span>
