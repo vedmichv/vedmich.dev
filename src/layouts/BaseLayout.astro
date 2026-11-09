@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import SearchPalette from '../components/SearchPalette.astro';
 import { getCollection } from 'astro:content';
 import { type Locale, getAlternateLocale, getLocalizedPath, t } from '../i18n/utils';
+import { type JsonLd, serializeJsonLd } from '../lib/structured-data';
 
 interface Props {
   title: string;
@@ -16,9 +17,11 @@ interface Props {
   /** Unlisted pages (e.g. draft blog posts): emit <meta robots="noindex"> so the
    *  public direct link is not indexed by search engines until it is promoted. */
   noindex?: boolean;
+  /** Schema.org data for this page, emitted as one JSON-LD script. Skipped on unlisted pages. */
+  jsonLd?: JsonLd;
 }
 
-const { title, description = 'Viktor Vedmich: Senior Solutions Architect @ AWS, CNCF Kubestronaut, Author, Speaker', locale, path = '', noindex = false } = Astro.props;
+const { title, description = 'Viktor Vedmich: Senior Solutions Architect @ AWS, CNCF Kubestronaut, Author, Speaker', locale, path = '', noindex = false, jsonLd } = Astro.props;
 const altLocale = getAlternateLocale(locale);
 const i = t(locale);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -49,6 +52,7 @@ const imageURL = new URL(Astro.props.image || '/og-default.png', Astro.site);
     <link rel="canonical" href={canonicalURL} />
     {!noindex && hasTranslation && <link rel="alternate" hreflang={altLocale} href={altURL} />}
     {!noindex && <link rel="alternate" hreflang={locale} href={canonicalURL} />}
+    {!noindex && hasTranslation && <link rel="alternate" hreflang="x-default" href={locale === 'en' ? canonicalURL : altURL} />}
 
     <!-- Icons + PWA manifest -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -82,6 +86,9 @@ const imageURL = new URL(Astro.props.image || '/og-default.png', Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageURL} />
     <meta name="twitter:image:alt" content={Astro.props.image ? title : 'Viktor Vedmich: Architect, Author, Speaker'} />
+
+    <!-- Structured data. serializeJsonLd escapes "<" so no value can close the script. -->
+    {jsonLd && !noindex && <script is:inline type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />}
 
     <!-- Keep <noscript> last in <head>: the Astro compiler ends the head early when
          expressions follow it, which moved the meta tags below into <body>. -->

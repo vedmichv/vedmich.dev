@@ -85,6 +85,12 @@
     "all_posts": "All posts",
     "min_read": "min read"
   },
+  "crosslinks": {
+    "post_origins": "This post grew out of",
+    "video": "Video",
+    "slides": "Slides",
+    "also_at": "Also at {event} {year}"
+  },
   "contact": {
     "title": "Let's connect",
     "subtitle": "Find me on these platforms",

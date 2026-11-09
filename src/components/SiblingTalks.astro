@@ -1,0 +1,44 @@
+---
+/**
+ * SiblingTalks: other talks of the same event and year as the current talk
+ * ("Also at AWS re:Invent 2024"). Renders nothing when there are none.
+ */
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { type Locale, t } from '../i18n/utils';
+import { findSiblingTalks } from '../lib/cross-links';
+import { formatDate } from '../lib/seo';
+
+interface Props {
+  locale: Locale;
+  talk: CollectionEntry<'speaking'>;
+}
+
+const { locale, talk } = Astro.props;
+const i = t(locale);
+const talks = await getCollection('speaking', ({ id }) => id.startsWith(`${locale}/`));
+const siblings = findSiblingTalks(talk, talks);
+const heading = i.crosslinks.also_at
+  .replace('{event}', talk.data.event)
+  .replace('{year}', String(talk.data.date.getUTCFullYear()));
+---
+
+{siblings.length > 0 && (
+  <aside class="mt-12 rounded-xl bg-surface border border-border p-5" aria-labelledby="sibling-talks-heading">
+    <h2 id="sibling-talks-heading" class="font-mono text-xs tracking-[0.04em] text-text-muted mb-3">
+      {heading}
+    </h2>
+    <ul class="flex flex-col gap-3">
+      {siblings.map((sibling) => (
+        <li class="text-sm leading-relaxed text-text-secondary">
+          <a
+            href={`/${locale}/speaking/${sibling.id.replace(/^(en|ru)\//, '')}/`}
+            class="font-semibold text-brand-primary hover:text-brand-primary-hover transition-colors"
+          >
+            {sibling.data.title}
+          </a>
+          <span class="text-text-muted"> ({formatDate(sibling.data.date, locale)})</span>
+        </li>
+      ))}
+    </ul>
+  </aside>
+)}

@@ -2,7 +2,10 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CodeCopyEnhancer from '../../../components/CodeCopyEnhancer.astro';
+import PostOrigins from '../../../components/PostOrigins.astro';
 import { t } from '../../../i18n/utils';
+import { pageTitle } from '../../../lib/seo';
+import { blogPostingJsonLd } from '../../../lib/structured-data';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
@@ -18,20 +21,36 @@ const locale = 'en';
 const i = t(locale);
 
 const readingTime = post.data.reading_time ?? remarkPluginFrontmatter.minutesRead;
+
+const title = pageTitle(post.data.title, locale);
+const canonicalPath = `/${locale}/blog/${post.id.replace('en/', '')}/`;
+const canonical = new URL(canonicalPath, Astro.site).href;
+const jsonLd = blogPostingJsonLd({
+  site: Astro.site!,
+  locale,
+  url: canonical,
+  title: post.data.title,
+  description: post.data.description,
+  date: post.data.date,
+  author: post.data.author,
+  tags: post.data.tags,
+  image: post.data.cover_image,
+});
 ---
 
 <BaseLayout
-  title={`${post.data.title} · Viktor Vedmich`}
+  title={title}
   description={post.data.description}
   locale={locale}
   path={`/blog/${post.id.replace('en/', '')}`}
   noindex={post.data.draft}
   image={post.data.cover_image}
   articleDate={post.data.date}
+  jsonLd={jsonLd}
 >
   <article class="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
     <header class="mb-10">
-      <a href="/en/blog" class="text-sm text-accent hover:text-accent-light transition-colors mb-4 inline-block">
+      <a href="/en/blog/" class="text-sm text-accent hover:text-accent-light transition-colors mb-4 inline-block">
         &larr; Back to blog
       </a>
       <time datetime={post.data.date.toISOString()} class="font-mono text-xs text-text-muted mb-2 block">
@@ -67,6 +86,7 @@ const readingTime = post.data.reading_time ?? remarkPluginFrontmatter.minutesRea
     ">
       <Content />
     </div>
+    <PostOrigins locale={locale} postUrl={canonicalPath} />
   </article>
   <CodeCopyEnhancer locale="en" />
 </BaseLayout>

@@ -2,7 +2,10 @@
 import { getCollection, render } from 'astro:content';
 import { YouTube } from '@astro-community/astro-embed-youtube';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiblingTalks from '../../../components/SiblingTalks.astro';
 import { t } from '../../../i18n/utils';
+import { pageTitle, summarize } from '../../../lib/seo';
+import { talkEventJsonLd } from '../../../lib/structured-data';
 
 export async function getStaticPaths() {
   const talks = await getCollection('speaking', ({ id }) => id.startsWith('en/'));
@@ -17,17 +20,20 @@ const { Content } = await render(talk);
 const locale = 'en';
 const i = t(locale);
 
-// Meta description: the first ~160 characters of the talk body, plain text.
-const plain = (talk.body ?? '')
-  .replace(/```[\s\S]*?```/g, ' ')
-  .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-  .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-  .replace(/[*_`>#]/g, '')
-  .replace(/\s+/g, ' ')
-  .trim();
-const description = plain.length > 160
-  ? `${plain.slice(0, plain.lastIndexOf(' ', 157))}…`
-  : plain || `Talk at ${talk.data.event}, ${talk.data.city}`;
+// Meta description: whole sentences of the talk body, at most 155 characters, plain text.
+const description = summarize(talk.body, `Talk at ${talk.data.event}, ${talk.data.city}`);
+
+const jsonLd = talkEventJsonLd({
+  site: Astro.site!,
+  locale,
+  url: new URL(Astro.url.pathname, Astro.site).href,
+  title: talk.data.title,
+  description,
+  event: talk.data.event,
+  city: talk.data.city,
+  date: talk.data.date,
+  video: talk.data.video,
+});
 
 // A `t=` timestamp in the video URL (e.g. &t=4500s) becomes the embed's start time.
 const videoStart = talk.data.video
@@ -36,10 +42,11 @@ const videoStart = talk.data.video
 ---
 
 <BaseLayout
-  title={`${talk.data.title} · Viktor Vedmich`}
+  title={pageTitle(talk.data.title, locale)}
   description={description}
   locale={locale}
   noindex={talk.data.draft}
+  jsonLd={jsonLd}
   path={`/speaking/${talk.id.replace('en/', '')}`}
 >
   <article class="max-w-3xl mx-auto px-6 py-20 sm:py-28">
@@ -119,5 +126,6 @@ const videoStart = talk.data.video
     ">
       <Content />
     </div>
+    <SiblingTalks locale={locale} talk={talk} />
   </article>
 </BaseLayout>

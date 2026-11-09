@@ -8,15 +8,18 @@ import Book from '../../components/Book.astro';
 import Presentations from '../../components/Presentations.astro';
 import BlogPreview from '../../components/BlogPreview.astro';
 import Contact from '../../components/Contact.astro';
+import { homePageJsonLd } from '../../lib/structured-data';
 
 const locale = 'ru';
+const description = 'Виктор Ведмич: Senior Solutions Architect в AWS, CNCF Kubestronaut, автор книги и спикер. Kubernetes, облачная архитектура и AI для DevOps.';
 ---
 
 <BaseLayout
   title="Виктор Ведмич · Solutions Architect, автор, спикер"
-  description="Виктор Ведмич: Senior Solutions Architect в AWS, CNCF Kubestronaut, автор книги и спикер. Kubernetes, облачная архитектура и AI для DevOps."
+  description={description}
   locale={locale}
   path="/"
+  jsonLd={homePageJsonLd(Astro.site!, locale, description)}
 >
   <Hero locale={locale} />
   <About locale={locale} />
