@@ -8,11 +8,19 @@ import Book from '../../components/Book.astro';
 import Presentations from '../../components/Presentations.astro';
 import BlogPreview from '../../components/BlogPreview.astro';
 import Contact from '../../components/Contact.astro';
+import { homePageJsonLd } from '../../lib/structured-data';
 
 const locale = 'en';
+const description = 'Viktor Vedmich: Senior Solutions Architect @ AWS, CNCF Kubestronaut, Author, Speaker';
 ---
 
-<BaseLayout title="Viktor Vedmich · Solutions Architect, Author, Speaker" locale={locale} path="/">
+<BaseLayout
+  title="Viktor Vedmich · Solutions Architect, Author, Speaker"
+  description={description}
+  locale={locale}
+  path="/"
+  jsonLd={homePageJsonLd(Astro.site!, locale, description)}
+>
   <Hero locale={locale} />
   <About locale={locale} />
   <Podcasts locale={locale} />

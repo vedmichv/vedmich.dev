@@ -4,6 +4,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CodeCopyEnhancer from '../../../components/CodeCopyEnhancer.astro';
 import { t } from '../../../i18n/utils';
 import { pageTitle } from '../../../lib/seo';
+import { blogPostingJsonLd } from '../../../lib/structured-data';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ id }) => id.startsWith('ru/'));
@@ -20,6 +21,20 @@ const i = t(locale);
 
 const readingTime = post.data.reading_time ?? remarkPluginFrontmatter.minutesRead;
 
+const title = pageTitle(post.data.title, locale);
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const jsonLd = blogPostingJsonLd({
+  site: Astro.site!,
+  locale,
+  url: canonical,
+  title: post.data.title,
+  description: post.data.description,
+  date: post.data.date,
+  author: post.data.author,
+  tags: post.data.tags,
+  image: post.data.cover_image,
+});
+
 // Locale-aware author rendering (UI-SPEC §L398 byline contract).
 // Schema defaults author to Latin "Viktor Vedmich" — on the RU slug page we
 // translate it to Cyrillic "Виктор Ведмич" so RU posts that do NOT override
@@ -32,13 +47,14 @@ const authorDisplay = post.data.author === 'Viktor Vedmich'
 ---
 
 <BaseLayout
-  title={pageTitle(post.data.title, locale)}
+  title={title}
   description={post.data.description}
   locale={locale}
   path={`/blog/${post.id.replace('ru/', '')}`}
   noindex={post.data.draft}
   image={post.data.cover_image}
   articleDate={post.data.date}
+  jsonLd={jsonLd}
 >
   <article class="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
     <header class="mb-10">
