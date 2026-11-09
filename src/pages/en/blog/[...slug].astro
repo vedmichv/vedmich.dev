@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CodeCopyEnhancer from '../../../components/CodeCopyEnhancer.astro';
 import { t } from '../../../i18n/utils';
+import { pageTitle } from '../../../lib/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
@@ -21,7 +22,7 @@ const readingTime = post.data.reading_time ?? remarkPluginFrontmatter.minutesRea
 ---
 
 <BaseLayout
-  title={`${post.data.title} · Viktor Vedmich`}
+  title={pageTitle(post.data.title, locale)}
   description={post.data.description}
   locale={locale}
   path={`/blog/${post.id.replace('en/', '')}`}
