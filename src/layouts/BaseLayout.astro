@@ -66,6 +66,15 @@ const imageURL = new URL(Astro.props.image || '/og-default.png', Astro.site);
     <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Russian pages also paint Cyrillic text on the first screen: body and nav (Inter) and
+         the H1 (Manrope, the Cyrillic half of the display family). English pages never request these. -->
+    {locale === 'ru' && (
+      <>
+        <link rel="preload" href="/fonts/inter-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="/fonts/inter-cyrillic-500-normal.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="/fonts/manrope-cyrillic-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+      </>
+    )}
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
