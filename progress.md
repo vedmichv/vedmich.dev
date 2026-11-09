@@ -86,3 +86,19 @@
   broken `<head>`, is fixed. The rest needs Viktor's decisions.
 - Posts mirrored to the vault (`40-Content/47-Blog/47.10-Site-Mirror/`) for comments.
 - Build, smoke (20), visual (9, baselines refreshed after inspection), unit (69) pass.
+
+## Site decisions implemented (2026-11-09)
+
+- Speaking: one timeline row per event, `format` labels, eight new activities (Warsaw,
+  InfoQ Munich, Adria talk and workshop, Malta workshops), back-links and sibling talks.
+- Search indexes talks, podcasts and the book with normalized, typo-tolerant matching.
+- JSON-LD (Person, WebSite, BlogPosting, Event), trimmed titles, `x-default` hreflang.
+- Design and a11y: tag contrast 6.14:1, no inline-code backticks, one left edge and H2
+  style, `lang` on foreign titles, "Slides" naming, RU 404, robots for /slides/vv-demo/.
+- Copy: hero lede and blog CTA, new bio, podcast and book copy with verified platform and
+  Packt links, visible contact address with copy button, RU UI address, new footer.
+- RSS (`@astrojs/rss`), `uk` to /en/, self-hosted Cyrillic fonts with Manrope headings,
+  no Google Fonts anywhere; homepage reordered with Latest strip, six events, invite
+  block and speaker kit with photo.
+- Checks: build 68 pages, unit 155, smoke 138, visual 9; 67 pages clean at 320/1440 px.
+- Pending on Viktor: GoatCounter code; Search Console and Bing (vault checklist).
