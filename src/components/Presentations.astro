@@ -22,9 +22,9 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
 ---
 
 <section id="presentations" class="py-20 sm:py-28 bg-surface">
-  <div class="max-w-[1120px] mx-auto px-6">
+  <div class="section-container">
     <div class="flex items-baseline justify-between gap-6 mb-2 animate-on-scroll">
-      <h2 class="font-display text-3xl font-bold">{i.presentations.title}</h2>
+      <h2 class="section-title">{i.presentations.title}</h2>
       {totalCount > 0 && (
         <a
           href={`/${locale}/presentations/`}

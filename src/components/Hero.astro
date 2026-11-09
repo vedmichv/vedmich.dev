@@ -9,8 +9,8 @@ const { locale } = Astro.props;
 const i = t(locale);
 ---
 
-<section id="hero" class="hero-deep-signal noise-overlay relative overflow-hidden pt-24 pb-16 px-6">
-  <div class="max-w-[1120px] mx-auto w-full">
+<section id="hero" class="hero-deep-signal noise-overlay relative overflow-hidden pt-24 pb-16">
+  <div class="section-container w-full">
     <!-- Greeting — two separate blocks per D-17 -->
     <div class="font-mono text-brand-primary text-sm mb-4">~/vedmich.dev $ whoami</div>
     <div class="font-mono text-text-secondary text-base mb-1">{i.hero.greeting}</div>

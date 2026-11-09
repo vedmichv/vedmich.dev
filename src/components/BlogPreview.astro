@@ -20,9 +20,9 @@ const posts = allPosts
 ---
 
 <section id="blog" class="py-20 sm:py-28">
-  <div class="max-w-[1120px] mx-auto px-6">
+  <div class="section-container">
     <div class="flex items-baseline justify-between gap-6 mb-12 animate-on-scroll">
-      <h2 class="font-display text-3xl font-bold">{i.blog.title}</h2>
+      <h2 class="section-title">{i.blog.title}</h2>
       {posts.length > 0 && (
         <a
           href={`/${locale}/blog/`}
