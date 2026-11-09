@@ -6,6 +6,7 @@ import SiblingTalks from '../../../components/SiblingTalks.astro';
 import { t } from '../../../i18n/utils';
 import { pageTitle, summarize } from '../../../lib/seo';
 import { talkEventJsonLd } from '../../../lib/structured-data';
+import { langOfText } from '../../../i18n/lang-of-parts';
 
 export async function getStaticPaths() {
   const talks = await getCollection('speaking', ({ id }) => id.startsWith('en/'));
@@ -54,7 +55,7 @@ const videoStart = talk.data.video
       ← {i.speaking.back_link}
     </a>
 
-    <h1 class="font-display text-4xl break-words hyphens-auto font-bold text-text-primary mb-4">{talk.data.title}</h1>
+    <h1 lang={langOfText(talk.data.title, locale)} class="font-display text-4xl break-words hyphens-auto font-bold text-text-primary mb-4">{talk.data.title}</h1>
 
     <p class="text-base font-medium text-text-secondary mb-6">
       {talk.data.event} · {talk.data.city} · {talk.data.date.toLocaleDateString('en-GB', {
@@ -68,7 +69,7 @@ const videoStart = talk.data.video
       <div class="flex flex-wrap gap-1.5 mb-8" role="list">
         {talk.data.tags.map((tag) => (
           <span
-            class="text-sm font-medium px-3 py-1 rounded-full bg-brand-primary-soft border border-brand-primary text-brand-primary"
+            class="tag-chip"
             role="listitem"
           >
             {tag}

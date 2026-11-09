@@ -6,6 +6,7 @@ import PostOrigins from '../../../components/PostOrigins.astro';
 import { t } from '../../../i18n/utils';
 import { pageTitle } from '../../../lib/seo';
 import { blogPostingJsonLd } from '../../../lib/structured-data';
+import { langOfText } from '../../../i18n/lang-of-parts';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ id }) => id.startsWith('ru/'));
@@ -70,7 +71,7 @@ const authorDisplay = post.data.author === 'Viktor Vedmich'
           day: 'numeric',
         }).replace(/\s*г\.?$/, '')}
       </time>
-      <h1 class="font-display text-4xl break-words hyphens-auto sm:text-5xl font-bold tracking-[-0.02em] mb-4">{post.data.title}</h1>
+      <h1 lang={langOfText(post.data.title, locale)} class="font-display text-4xl break-words hyphens-auto sm:text-5xl font-bold tracking-[-0.02em] mb-4">{post.data.title}</h1>
       <p class="text-lg text-text-muted">{post.data.description}</p>
       <p class="text-sm text-text-muted mt-3">
         {authorDisplay} · {readingTime} {i.blog.min_read}
@@ -79,7 +80,7 @@ const authorDisplay = post.data.author === 'Viktor Vedmich'
         {post.data.tags.map((tag) => (
           <span
             role="listitem"
-            class="font-mono text-[11px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded text-brand-primary bg-brand-primary-soft/30 border border-brand-primary/40"
+            class="tag-chip"
           >
             {tag}
           </span>

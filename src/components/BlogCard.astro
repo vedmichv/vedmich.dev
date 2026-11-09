@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import type { Locale } from '../i18n/utils';
+import { langOfText } from '../i18n/lang-of-parts';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -28,7 +29,7 @@ const formattedDate = locale === 'ru'
   <div class="font-mono text-xs text-text-muted mb-2">{formattedDate}</div>
 
   <!-- Row 2: Title -->
-  <h3 class="font-display text-lg font-semibold leading-snug mt-0 text-text-primary group-hover:text-brand-primary transition-colors">
+  <h3 lang={langOfText(data.title, locale)} class="font-display text-lg font-semibold leading-snug mt-0 text-text-primary group-hover:text-brand-primary transition-colors">
     {data.title}
   </h3>
 
@@ -42,7 +43,7 @@ const formattedDate = locale === 'ru'
     {data.tags.map((tag) => (
       <span
         role="listitem"
-        class="font-mono text-[11px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded text-brand-primary bg-brand-primary-soft/30 border border-brand-primary/40"
+        class="tag-chip"
       >
         {tag}
       </span>

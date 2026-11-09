@@ -17,14 +17,12 @@ const allDecks = await getCollection('presentations', ({ data, id }) => {
 const sortedDecks = allDecks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const totalCount = sortedDecks.length;
 const homepageDecks = sortedDecks.slice(0, 6);
-
-const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
 ---
 
 <section id="presentations" class="py-20 sm:py-28 bg-surface">
-  <div class="max-w-[1120px] mx-auto px-6">
+  <div class="section-container">
     <div class="flex items-baseline justify-between gap-6 mb-2 animate-on-scroll">
-      <h2 class="font-display text-3xl font-bold">{i.presentations.title}</h2>
+      <h2 class="section-title">{i.presentations.title}</h2>
       {totalCount > 0 && (
         <a
           href={`/${locale}/presentations/`}
@@ -37,7 +35,7 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
 
     {totalCount > 0 ? (
       <>
-        <p class="text-text-muted mb-12 animate-on-scroll">{subtitle}</p>
+        <p class="text-text-muted mb-12 animate-on-scroll">{i.presentations.subtitle}</p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-on-scroll-stagger">
           {homepageDecks.map((deck) => (
@@ -56,7 +54,7 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
       </>
     ) : (
       <p class="text-text-muted animate-on-scroll">
-        {locale === 'ru' ? 'Слайды появятся скоро...' : 'Decks coming soon...'}
+        {i.presentations.empty}
       </p>
     )}
   </div>

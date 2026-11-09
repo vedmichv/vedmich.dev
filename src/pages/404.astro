@@ -26,6 +26,8 @@
 //     on the correct slide AND keeps the clean /N URL.
 //
 // Other misses retain their URL and show a recovery page with both locales.
+// Paths under /ru/ swap the text to Russian and set lang="ru" (the markup is
+// English, each translated node carries its Russian text in data-ru).
 import '../styles/global.css';
 ---
 
@@ -63,18 +65,47 @@ import '../styles/global.css';
           return;
         }
         // Non-deck misses keep the requested URL and the real 404 response.
+        // Russian paths get Russian text, lang="ru" and the Russian links first.
+        if (/^\/ru(\/|$)/.test(path)) {
+          document.documentElement.lang = 'ru';
+          document.title = 'Страница не найдена | Виктор Ведмич';
+          var localize = function () {
+            var nodes = document.querySelectorAll('[data-ru]');
+            for (var k = 0; k < nodes.length; k++) {
+              nodes[k].textContent = nodes[k].getAttribute('data-ru');
+            }
+            var group = document.querySelector('[data-nav-group]');
+            var ruNav = group && group.querySelector('nav[lang="ru"]');
+            if (ruNav) group.insertBefore(ruNav, group.firstChild);
+          };
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', localize);
+          } else {
+            localize();
+          }
+        }
       })();
     </script>
   </head>
   <body class="min-h-screen grid place-items-center px-6">
     <main class="max-w-xl py-16">
       <p class="font-mono text-brand-primary mb-4">404</p>
-      <h1 class="font-display text-4xl font-bold mb-4">Page not found</h1>
-      <p class="text-text-secondary mb-8">This link may have moved or the page may not be published yet.</p>
-      <nav aria-label="Home pages" class="flex flex-wrap gap-4">
-        <a href="/en/" class="text-brand-primary hover:underline">English home</a>
-        <a href="/ru/" lang="ru" class="text-brand-primary hover:underline">Главная на русском</a>
-      </nav>
+      <h1 class="font-display text-4xl font-bold mb-4" data-ru="Страница не найдена">Page not found</h1>
+      <p class="text-text-secondary mb-8" data-ru="Ссылка могла устареть, или страницы ещё нет.">This link may have moved or the page may not be published yet.</p>
+      <div class="flex flex-col gap-3" data-nav-group>
+        <nav aria-label="English" lang="en" class="flex flex-wrap items-baseline gap-x-5 gap-y-1">
+          <span class="font-mono text-sm text-text-muted w-20">English</span>
+          <a href="/en/" class="text-brand-primary hover:underline py-1">Home</a>
+          <a href="/en/blog/" class="text-brand-primary hover:underline py-1">Blog</a>
+          <a href="/en/speaking/" class="text-brand-primary hover:underline py-1">Talks</a>
+        </nav>
+        <nav aria-label="Русский" lang="ru" class="flex flex-wrap items-baseline gap-x-5 gap-y-1">
+          <span class="font-mono text-sm text-text-muted w-20">Русский</span>
+          <a href="/ru/" class="text-brand-primary hover:underline py-1">Главная</a>
+          <a href="/ru/blog/" class="text-brand-primary hover:underline py-1">Блог</a>
+          <a href="/ru/speaking/" class="text-brand-primary hover:underline py-1">Выступления</a>
+        </nav>
+      </div>
     </main>
   </body>
 </html>

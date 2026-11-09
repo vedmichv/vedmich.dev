@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { t } from '../i18n/utils';
+import { langOfText } from '../i18n/lang-of-parts';
 
 interface Props {
   deck: CollectionEntry<'presentations'>;
@@ -11,8 +12,8 @@ const { data, id } = deck;
 
 const slug = id.replace(/^(en|ru)\//, '');
 const deckUrl = data.slides ?? `/slides/${slug}/`;
-const displayUrl = `vedmich.dev/slides/${slug}`;
-const i = t(id.startsWith('ru/') ? 'ru' : 'en');
+const locale = id.startsWith('ru/') ? 'ru' : 'en';
+const i = t(locale);
 
 const dateStr = data.date.toISOString().slice(0, 10);
 
@@ -33,6 +34,7 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
       href={deckUrl}
       target="_blank"
       rel="noopener noreferrer"
+      lang={langOfText(data.title, locale)}
       class="after:absolute after:inset-0 after:rounded-xl"
     >
       {data.title}
@@ -44,12 +46,7 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
     {data.description}
   </p>
 
-  <!-- Row 4: Slug URL -->
-  <div class="font-mono text-[11px] text-brand-primary tracking-[0.06em] mt-2 mb-2.5 truncate">
-    {displayUrl}
-  </div>
-
-  <!-- Row 4b: Companion article -->
+  <!-- Row 4: Companion article -->
   {data.post && (
     <a
       href={data.post}
@@ -64,7 +61,7 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
     {data.tags.map((tag) => (
       <span
         role="listitem"
-        class="font-mono text-[11px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded text-brand-primary bg-brand-primary-soft/30 border border-brand-primary/40"
+        class="tag-chip"
       >
         {tag}
       </span>

@@ -1,5 +1,6 @@
 ---
 import { t, type Locale } from '../i18n/utils';
+import { langOfText } from '../i18n/lang-of-parts';
 
 interface Props {
   locale: Locale;
@@ -10,8 +11,8 @@ const i = t(locale);
 ---
 
 <section id="podcasts" class="py-20 sm:py-28 bg-surface/30">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-    <h2 class="font-display text-3xl font-bold mb-12 animate-on-scroll">{i.podcasts.title}</h2>
+  <div class="section-container">
+    <h2 class="section-title mb-12 animate-on-scroll">{i.podcasts.title}</h2>
 
     <div class="grid md:grid-cols-2 gap-5">
       <!-- DKT card — PNG logo in badge slot per D-01, D-15 -->
@@ -32,7 +33,7 @@ const i = t(locale);
             class="w-full h-full object-contain"
           />
         </div>
-        <h3 class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
+        <h3 lang={langOfText(i.podcasts.dkt_name, locale)} class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
           {i.podcasts.dkt_name}
         </h3>
         <p class="font-body text-[15px] text-text-muted leading-relaxed">
@@ -59,7 +60,7 @@ const i = t(locale);
         <span class="inline-block font-body text-[11px] font-semibold uppercase tracking-[0.08em] px-2 py-1 rounded text-brand-accent bg-brand-accent-soft border border-brand-accent/40">
           AWS RU
         </span>
-        <h3 class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
+        <h3 lang={langOfText(i.podcasts.aws_name, locale)} class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
           {i.podcasts.aws_name}
         </h3>
         <p class="font-body text-[15px] text-text-muted leading-relaxed">

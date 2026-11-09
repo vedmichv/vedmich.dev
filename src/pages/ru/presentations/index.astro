@@ -12,8 +12,6 @@ const allDecks = await getCollection('presentations', ({ data, id }) => {
 });
 
 const decks = allDecks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const totalCount = decks.length;
-const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
 ---
 
 <BaseLayout
@@ -23,7 +21,7 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
   path="/presentations"
 >
   <div class="py-20 sm:py-28">
-    <div class="max-w-[1120px] mx-auto px-6">
+    <div class="section-container">
       <a
         href={`/${locale}/`}
         class="font-body text-sm text-brand-primary hover:text-brand-primary-hover transition-colors mb-6 inline-block"
@@ -32,7 +30,7 @@ const subtitle = i.presentations.subtitle.replace('{N}', String(totalCount));
       </a>
 
       <h1 class="font-display text-4xl font-bold mb-2 animate-on-scroll">{i.presentations.title}</h1>
-      <p class="text-text-muted mb-12 animate-on-scroll">{subtitle}</p>
+      <p class="text-text-muted mb-12 animate-on-scroll">{i.presentations.subtitle}</p>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {decks.map((deck) => (

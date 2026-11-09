@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { t, type Locale } from '../i18n/utils';
+import { langOfText } from '../i18n/lang-of-parts';
 
 interface Props {
   talks: CollectionEntry<'speaking'>[];
@@ -33,7 +34,6 @@ for (const group of [...groups.values()].sort((a, b) => b.latest - a.latest)) {
 
 const formatLabel = (format?: string) =>
   format && format !== 'talk' ? i.speaking.formats[format.replace('-', '_') as keyof typeof i.speaking.formats] : undefined;
-const hasCyrillic = (text: string) => /[Ѐ-ӿ]/.test(text);
 ---
 
 <div class="flex flex-col gap-8">
@@ -59,7 +59,7 @@ const hasCyrillic = (text: string) => /[Ѐ-ӿ]/.test(text);
                       class="font-body text-sm text-text-muted hover:text-brand-primary transition-colors"
                     >
                       <span class="text-brand-primary">→</span>{' '}
-                      <span lang={locale === 'ru' && !hasCyrillic(talk.data.title) ? 'en' : undefined}>{talk.data.title}</span>
+                      <span lang={langOfText(talk.data.title, locale)}>{talk.data.title}</span>
                     </a>
                     {label && (
                       <span class="ml-2 font-mono text-[11px] uppercase tracking-[0.08em] text-brand-accent whitespace-nowrap">{label}</span>

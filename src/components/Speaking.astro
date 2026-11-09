@@ -20,8 +20,8 @@ const talks = allTalks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueO
 ---
 
 <section id="speaking" class="py-20 sm:py-28 bg-surface">
-  <div class="max-w-[1120px] mx-auto px-6">
-    <h2 class="font-display text-3xl font-bold mb-2 animate-on-scroll">{i.speaking.title}</h2>
+  <div class="section-container">
+    <h2 class="section-title mb-2 animate-on-scroll">{i.speaking.title}</h2>
     <p class="text-text-muted mb-12 animate-on-scroll">{i.speaking.subtitle}</p>
 
     <TalkTimeline talks={talks} locale={locale} />
