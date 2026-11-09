@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { t } from '../../../i18n/utils';
 import TalkTimeline from '../../../components/TalkTimeline.astro';
+import InviteBlock from '../../../components/InviteBlock.astro';
 
 const locale = 'ru';
 const i = t(locale);
@@ -25,9 +26,18 @@ const talks = allTalks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueO
   <div class="py-20 sm:py-28">
     <div class="max-w-[1120px] mx-auto px-6">
       <h1 class="font-display text-4xl font-bold mb-2 animate-on-scroll">{i.speaking.title}</h1>
-      <p class="text-text-muted mb-12 animate-on-scroll">{i.speaking.subtitle}</p>
+      <p class="text-text-muted mb-3 animate-on-scroll">{i.speaking.subtitle}</p>
+      <p class="mb-12 flex flex-wrap items-baseline gap-x-6 gap-y-1 text-sm text-text-muted animate-on-scroll">
+        <span>
+          {i.invite.teaser}{' '}
+          <a href="#invite" class="font-medium text-brand-primary hover:text-brand-primary-hover transition-colors">{i.invite.title}<span aria-hidden="true"> ↓</span></a>
+        </span>
+        <a href={`/${locale}/presentations/`} class="hover:text-brand-primary transition-colors whitespace-nowrap">{i.presentations.all_decks} →</a>
+      </p>
 
       <TalkTimeline talks={talks} locale={locale} />
+
+      <InviteBlock locale={locale} />
     </div>
   </div>
 </BaseLayout>
