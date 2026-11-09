@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /slides/vv-demo/
 
 Sitemap: https://vedmich.dev/sitemap-index.xml
