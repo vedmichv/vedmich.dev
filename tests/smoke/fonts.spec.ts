@@ -122,14 +122,16 @@ test('Russian pages preload their first-screen Cyrillic fonts, English pages do 
 });
 
 test('English pages without Cyrillic text never download a Cyrillic font file', async ({ page }) => {
+  // /en/speaking/ shows the Russian speaker bios, so it legitimately loads a Cyrillic face. A fresh page
+  // per path keeps a late font request from such a page out of the next page's list.
   for (const path of ['/en/blog/', '/en/speaking/', '/en/presentations/', '/en/blog/2026-03-20-karpenter-right-sizing/']) {
+    const fresh = await page.context().newPage();
     const urls: string[] = [];
-    const listener = (request: { url(): string }) => urls.push(request.url());
-    page.on('request', listener);
-    await page.goto(path, { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready);
-    page.off('request', listener);
-    const hasCyrillic = await page.evaluate(() => /[\u0400-\u04FF]/.test(document.body.innerText));
+    fresh.on('request', (request) => urls.push(request.url()));
+    await fresh.goto(path, { waitUntil: 'load' });
+    await fresh.evaluate(() => document.fonts.ready);
+    const hasCyrillic = await fresh.evaluate(() => /[\u0400-\u04FF]/.test(document.body.innerText));
+    await fresh.close();
     if (hasCyrillic) continue;
     expect(urls.filter((url) => url.includes('cyrillic')), path).toEqual([]);
   }
