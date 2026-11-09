@@ -15,7 +15,7 @@
   "search": {
     "results_count": "Результаты: {n} из {total}",
     "placeholder": "Поиск по докладам, слайдам, постам, тегам…",
-    "empty_hint": "Начните вводить запрос. Попробуйте: «karpenter», «mcp», «kubernetes».",
+    "empty_hint": "Введи запрос. Например: «karpenter», «mcp», «kubernetes».",
     "no_results": "Ничего не найдено для",
     "footer_move": "навигация",
     "footer_open": "открыть",
