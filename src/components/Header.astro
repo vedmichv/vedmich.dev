@@ -21,13 +21,13 @@ const anchorPrefix = isHome ? '' : homePath;
 const enSwitchPath = locale === 'en' ? currentPath : alternatePath;
 const ruSwitchPath = locale === 'ru' ? currentPath : alternatePath;
 
+// Same order as the homepage sections. Slides are reached from Speaking, not from the header.
 const navItems = [
-  { href: `${anchorPrefix}#about`, label: i.nav.about },
+  { href: `${anchorPrefix}#blog`, label: i.nav.blog },
+  { href: `${anchorPrefix}#speaking`, label: i.nav.speaking },
   { href: `${anchorPrefix}#podcasts`, label: i.nav.podcasts },
   { href: `${anchorPrefix}#book`, label: i.nav.book },
-  { href: `${anchorPrefix}#speaking`, label: i.nav.speaking },
-  { href: `${anchorPrefix}#presentations`, label: i.nav.presentations },
-  { href: `${anchorPrefix}#blog`, label: i.nav.blog },
+  { href: `${anchorPrefix}#about`, label: i.nav.about },
   { href: `${anchorPrefix}#contact`, label: i.nav.contact },
 ];
 ---

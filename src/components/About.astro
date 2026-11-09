@@ -1,6 +1,7 @@
 ---
 import { t, type Locale } from '../i18n/utils';
 import { skills } from '../data/social';
+import { speakerPhoto } from '../data/speaker-kit';
 
 interface Props {
   locale: Locale;
@@ -14,23 +15,40 @@ const i = t(locale);
   <div class="section-container">
     <h2 class="section-title mb-10 animate-on-scroll">{i.about.title}</h2>
 
-    <div class="grid md:grid-cols-[1.4fr_1fr] gap-10 items-start">
-      <!-- Bio (left) -->
-      <p class="font-body text-lg leading-[1.7] text-text-primary animate-on-scroll m-0">
-        {i.about.bio_before}<span class="text-brand-primary">{i.about.bio_accent}</span>{i.about.bio_after}
-      </p>
+    <div class="grid gap-8 md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr] md:gap-12 items-start">
+      <!-- Photo (left on wide screens, above the bio on phones where it stays small) -->
+      <figure class="m-0 w-40 sm:w-48 md:w-full animate-on-scroll">
+        <img
+          src={speakerPhoto.src640}
+          srcset={`${speakerPhoto.src640} 640w, ${speakerPhoto.src1280} 1280w`}
+          sizes="(min-width: 1024px) 280px, (min-width: 768px) 240px, (min-width: 640px) 192px, 160px"
+          alt={i.about.photo_alt}
+          width={speakerPhoto.width}
+          height={speakerPhoto.height}
+          loading="lazy"
+          decoding="async"
+          class="block w-full h-auto rounded-xl border border-border bg-surface"
+        />
+      </figure>
 
-      <!-- Expertise (right) -->
-      <div class="animate-on-scroll">
-        <div class="font-body text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary mb-3">
-          {i.about.skills_title}
-        </div>
-        <div class="flex flex-wrap gap-2">
-          {skills.map((skill) => (
-            <span class="inline-flex items-center rounded-full px-3.5 py-1.5 text-[13px] font-medium bg-surface border border-border text-text-primary">
-              {skill}
-            </span>
-          ))}
+      <div class="flex flex-col gap-8">
+        <!-- Bio -->
+        <p class="font-body text-lg leading-[1.7] text-text-primary animate-on-scroll m-0">
+          {i.about.bio_before}<span class="text-brand-primary">{i.about.bio_accent}</span>{i.about.bio_after}
+        </p>
+
+        <!-- Expertise -->
+        <div class="animate-on-scroll">
+          <div class="font-body text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary mb-3">
+            {i.about.skills_title}
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {skills.map((skill) => (
+              <span class="inline-flex items-center rounded-full px-3.5 py-1.5 text-[13px] font-medium bg-surface border border-border text-text-primary">
+                {skill}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

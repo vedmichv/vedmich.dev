@@ -162,7 +162,7 @@ To activate a deck manually:
 
 ## Step 5: (Optional) Un-draft the MDX entry
 
-Flip the presentation's MDX frontmatter from `draft: true` to `draft: false` so the deck appears on the homepage + presentations index + search index.
+Flip the presentation's MDX frontmatter from `draft: true` to `draft: false` so the deck appears on the presentations index (linked from Speaking) + search index.
 
 Files to edit (both locales for bilingual parity per AGENTS.md):
 
@@ -209,7 +209,7 @@ grep -oE '(src|href)="/[^"]*"' dist/slides/<slug>/index.html | grep -vE '^(src|h
 git push origin main   # auto-deploys; main is unprotected
 ```
 
-`deploy-deck.sh` performs exactly this gate automatically (the `rm -rf dist .astro` is `ci_equiv_gate`'s CI-equivalence cleanup — without it a stale cache fail-closes a legit deploy). It then makes a **single atomic `main` commit** containing the submodule bump + whitelist edit + (for a real talk) the un-drafted `src/content/presentations/{en,ru}/<slug>.md` cards — so a `git revert` of that one SHA cleanly undoes everything, and the homepage card never publishes without its deck. After pushing, the script polls the Pages run keyed on the pushed SHA, then curls the live root (hard gate, auto-reverts on miss) plus a hashed asset and a deep-link (soft warns). The manual PR route is retained only as a fallback when `main` is later branch-protected (the script aborts and says so).
+`deploy-deck.sh` performs exactly this gate automatically (the `rm -rf dist .astro` is `ci_equiv_gate`'s CI-equivalence cleanup — without it a stale cache fail-closes a legit deploy). It then makes a **single atomic `main` commit** containing the submodule bump + whitelist edit + (for a real talk) the un-drafted `src/content/presentations/{en,ru}/<slug>.md` cards — so a `git revert` of that one SHA cleanly undoes everything, and the deck card never publishes without its deck. After pushing, the script polls the Pages run keyed on the pushed SHA, then curls the live root (hard gate, auto-reverts on miss) plus a hashed asset and a deep-link (soft warns). The manual PR route is retained only as a fallback when `main` is later branch-protected (the script aborts and says so).
 
 Post-deploy curl checks (run after GitHub Actions finishes):
 

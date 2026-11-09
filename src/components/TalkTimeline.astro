@@ -2,56 +2,55 @@
 import type { CollectionEntry } from 'astro:content';
 import { t, type Locale } from '../i18n/utils';
 import { langOfText } from '../i18n/lang-of-parts';
+import { groupEventsByYear, groupTalksByEvent, limitEvents } from '../lib/talk-groups';
 
 interface Props {
   talks: CollectionEntry<'speaking'>[];
   locale: Locale;
+  /** Show only the newest N events (not sessions). Omit for the full list. */
+  limit?: number;
 }
 
-const { talks, locale } = Astro.props;
+const { talks, locale, limit } = Astro.props;
 const i = t(locale);
 
 // One row per event: talks at the same event, city and year are grouped, so an
-// event with two sessions or a talk plus a workshop shows up once.
-type Group = { key: string; event: string; city: string; latest: number; talks: CollectionEntry<'speaking'>[] };
-const groups = new Map<string, Group>();
-for (const talk of talks) {
-  const year = talk.data.date.getFullYear();
-  const key = `${year}|${talk.data.event}|${talk.data.city}`;
-  const group = groups.get(key) ?? { key, event: talk.data.event, city: talk.data.city, latest: 0, talks: [] };
-  group.talks.push(talk);
-  group.latest = Math.max(group.latest, talk.data.date.valueOf());
-  groups.set(key, group);
-}
-
-// Years and events newest first; sessions inside an event in agenda order.
-const byYear = new Map<number, Group[]>();
-for (const group of [...groups.values()].sort((a, b) => b.latest - a.latest)) {
-  group.talks.sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
-  const year = new Date(group.latest).getFullYear();
-  byYear.set(year, [...(byYear.get(year) ?? []), group]);
-}
+// event with two sessions or a talk plus a workshop shows up once. The limit
+// counts those rows, so a three-session event still uses one slot.
+const byYear = groupEventsByYear(limitEvents(groupTalksByEvent(talks), limit));
 
 const formatLabel = (format?: string) =>
   format && format !== 'talk' ? i.speaking.formats[format.replace('-', '_') as keyof typeof i.speaking.formats] : undefined;
+
+// Resource badges per session: Video, Slides, Article. Each one links to a field the talk already has.
+const badgeClass =
+  'inline-flex items-center min-h-6 px-2 rounded border border-border font-mono text-[11px] font-semibold tracking-[0.04em] text-text-secondary hover:border-brand-primary hover:text-brand-primary-hover transition-colors';
+const badgesOf = (talk: CollectionEntry<'speaking'>) =>
+  [
+    { key: 'video', label: i.speaking.badges.video, href: talk.data.video, external: true },
+    { key: 'slides', label: i.speaking.badges.slides, href: talk.data.slides, external: true },
+    { key: 'article', label: i.speaking.badges.article, href: talk.data.post, external: false },
+  ].filter((badge): badge is typeof badge & { href: string } => Boolean(badge.href));
 ---
 
 <div class="flex flex-col gap-8">
-  {[...byYear.entries()].map(([year, yearGroups]) => (
-    <div class="grid grid-cols-[64px_1fr] gap-4 sm:grid-cols-[100px_1fr] sm:gap-6 animate-on-scroll">
+  {byYear.map(([year, yearGroups]) => (
+    <div data-talk-year={year} class="grid grid-cols-1 gap-2 sm:grid-cols-[100px_1fr] sm:gap-6 animate-on-scroll">
       <div class="font-display text-2xl sm:text-4xl font-bold text-brand-primary tracking-[-0.02em]">
         {year}
       </div>
 
       <div class="flex flex-col gap-4">
         {yearGroups.map((group) => (
-          <div class="border-l-2 border-border pl-5">
+          <div data-talk-event class="border-l-2 border-border pl-5">
             <div class="font-display text-lg font-semibold text-text-primary">
               {group.event} <span class="font-normal text-text-muted">· {group.city}</span>
             </div>
             <ul class="mt-2 flex flex-col gap-1.5">
               {group.talks.map((talk) => {
                 const label = formatLabel(talk.data.format);
+                const badges = badgesOf(talk);
+                const titleLang = langOfText(talk.data.title, locale);
                 return (
                   <li>
                     <a
@@ -59,13 +58,30 @@ const formatLabel = (format?: string) =>
                       class="font-body text-sm text-text-muted hover:text-brand-primary transition-colors"
                     >
                       <span class="text-brand-primary">→</span>{' '}
-                      <span lang={langOfText(talk.data.title, locale)}>{talk.data.title}</span>
+                      <span lang={titleLang}>{talk.data.title}</span>
                     </a>
                     {label && (
                       <span class="ml-2 font-mono text-[11px] uppercase tracking-[0.08em] text-brand-accent whitespace-nowrap">{label}</span>
                     )}
                     {talk.data.highlight && (
                       <div class="font-mono text-xs text-warm mt-1">★ {talk.data.highlight}</div>
+                    )}
+                    {badges.length > 0 && (
+                      <ul data-talk-badges class="mt-1.5 ml-5 flex flex-wrap gap-1.5 list-none p-0">
+                        {badges.map((badge) => (
+                          <li>
+                            <a
+                              href={badge.href}
+                              target={badge.external ? '_blank' : undefined}
+                              rel={badge.external ? 'noopener noreferrer' : undefined}
+                              aria-label={`${badge.label}: ${talk.data.title}${badge.external ? ` (${i.contact.opens_in_new_tab})` : ''}`}
+                              class={badgeClass}
+                            >
+                              {badge.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </li>
                 );

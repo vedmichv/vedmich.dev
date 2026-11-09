@@ -10,6 +10,9 @@ interface Props {
 const { locale } = Astro.props;
 const i = t(locale);
 
+// The homepage shows the newest events only; the full list lives on /speaking/.
+const HOME_EVENT_LIMIT = 6;
+
 // Query all speaking entries for current locale
 const allTalks = await getCollection('speaking', ({ data, id }) => {
   return id.startsWith(`${locale}/`) && !data.draft;
@@ -17,6 +20,8 @@ const allTalks = await getCollection('speaking', ({ data, id }) => {
 
 // Sort by date descending
 const talks = allTalks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const linkClass = 'text-sm text-text-muted hover:text-brand-primary transition-colors';
 ---
 
 <section id="speaking" class="py-20 sm:py-28 bg-surface">
@@ -24,12 +29,21 @@ const talks = allTalks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueO
     <h2 class="section-title mb-2 animate-on-scroll">{i.speaking.title}</h2>
     <p class="text-text-muted mb-12 animate-on-scroll">{i.speaking.subtitle}</p>
 
-    <TalkTimeline talks={talks} locale={locale} />
+    <TalkTimeline talks={talks} locale={locale} limit={HOME_EVENT_LIMIT} />
 
-    <div class="mt-10 animate-on-scroll">
-      <a href={`/${locale}/speaking/`} class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap">
+    <div class="mt-10 flex flex-wrap items-baseline gap-x-6 gap-y-2 animate-on-scroll">
+      <a href={`/${locale}/speaking/`} class={`${linkClass} whitespace-nowrap`}>
         {i.speaking.all_talks} →
       </a>
+      <a href={`/${locale}/presentations/`} class={`${linkClass} whitespace-nowrap`}>
+        {i.presentations.all_decks} →
+      </a>
+      <span class="text-sm text-text-muted">
+        {i.invite.teaser}{' '}
+        <a href={`/${locale}/speaking/#invite`} class="font-medium text-brand-primary hover:text-brand-primary-hover transition-colors">
+          {i.invite.title} →
+        </a>
+      </span>
     </div>
   </div>
 </section>

@@ -11,9 +11,10 @@ const { locale } = Astro.props;
 const i = t(locale);
 ---
 
-<section id="podcasts" class="py-20 sm:py-28 bg-surface/30">
-  <div class="section-container">
-    <h2 class="section-title mb-12 animate-on-scroll">{i.podcasts.title}</h2>
+<!-- Rendered inside AlsoBand, which owns the band background, padding and container. -->
+<section id="podcasts" aria-labelledby="podcasts-title" class="min-w-0">
+  <div>
+    <h2 id="podcasts-title" class="section-title mb-10 animate-on-scroll">{i.podcasts.title}</h2>
 
     <div class="grid md:grid-cols-2 gap-5">
       <!-- DKT card: PNG logo in badge slot per D-01, D-15. Not a link itself: the platform row holds the links. -->
