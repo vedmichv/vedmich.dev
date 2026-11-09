@@ -1,4 +1,6 @@
 ---
+import { bookLinks } from '../data/social';
+
 /**
  * BookLink: the "Cracking the Kubernetes Interview" cover as a clickable link
  * to the canonical Amazon listing. Used across the K8s Interview blog series
@@ -11,7 +13,7 @@
  *
  * `caption` defaults to the book name; pass a localized caption for RU.
  */
-const AMAZON_URL = 'https://www.amazon.com/dp/1835460038';
+const AMAZON_URL = bookLinks.amazon;
 
 interface Props {
   cover: string;

@@ -83,8 +83,9 @@
     "cover_alt": "Cover of the book “Cracking the Kubernetes Interview”",
     "rating_label": "Rated {rating} out of 5 on Amazon",
     "name": "Cracking the Kubernetes Interview",
-    "desc": "A comprehensive guide covering Kubernetes concepts, architecture, networking, security, and real-world scenarios to help you ace your next interview.",
-    "cta": "Get on Amazon"
+    "desc": "A guide to Kubernetes interviews: core concepts, architecture, networking, security and real-world scenarios. Written with Alexander Dovnar and published by Packt.",
+    "cta": "Get on Amazon",
+    "cta_packt": "Buy from Packt"
   },
   "presentations": {
     "title": "Slides",

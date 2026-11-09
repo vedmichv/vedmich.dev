@@ -83,8 +83,9 @@
     "cover_alt": "Обложка книги «Cracking the Kubernetes Interview»",
     "rating_label": "Оценка {rating} из 5 на Amazon",
     "name": "Cracking the Kubernetes Interview",
-    "desc": "Полное руководство по концепциям, архитектуре, сетям, безопасности Kubernetes и реальным сценариям для подготовки к собеседованию.",
-    "cta": "Купить на Amazon"
+    "desc": "Книга для подготовки к собеседованию по Kubernetes: основные понятия, архитектура, сети, безопасность и реальные сценарии. Написана вместе с Александром Довнаром, издательство Packt.",
+    "cta": "Купить на Amazon",
+    "cta_packt": "Купить у Packt"
   },
   "presentations": {
     "title": "Слайды",

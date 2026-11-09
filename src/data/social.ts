@@ -50,6 +50,13 @@ export const podcastLinks = {
   ],
 } as const satisfies Record<string, readonly { platform: PodcastPlatform; url: string }[]>;
 
+// Book stores. The Packt URL was opened on 2026-11-09: "Cracking the Kubernetes Interview",
+// Viktor Vedmich and Alexander Dovnar, paperback, October 2025.
+export const bookLinks = {
+  amazon: 'https://www.amazon.com/dp/1835460038',
+  packt: 'https://www.packtpub.com/en-us/product/cracking-the-kubernetes-interview-9781835460030',
+} as const;
+
 export const certifications = [
   { name: 'CNCF Kubestronaut', badge: 'kubestronaut' },
   { name: 'CKA', badge: 'cka' },
