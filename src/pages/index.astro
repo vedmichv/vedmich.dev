@@ -30,9 +30,11 @@
           return;
         }
 
-        // Auto-detect from browser language
+        // Auto-detect from the primary subtag of the browser language. Russian and
+        // Belarusian browsers get /ru/. There is no Ukrainian version, so uk gets /en/.
         var lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
-        var target = (lang.startsWith('ru') || lang.startsWith('be') || lang.startsWith('uk')) ? 'ru' : 'en';
+        var primary = lang.split(/[-_]/)[0];
+        var target = (primary === 'ru' || primary === 'be') ? 'ru' : 'en';
 
         // Save preference and redirect
         try { localStorage.setItem('vedmich-lang', target); } catch (_) {}

@@ -36,6 +36,14 @@ from homepage/list/search/sitemap, and marked noindex. This is not access
 control. Never include private information, credentials, or client material.
 Promote only with publication authorization.
 
+`/en/rss.xml` and `/ru/rss.xml` are generated at build by `@astrojs/rss`
+(`src/lib/feed.ts`, `src/pages/{en,ru}/rss.xml.ts`). Each feed lists its locale's
+posts newest first with title, absolute link, date, and description only, and
+leaves out drafts and `__` fixtures like the sitemap does. `BaseLayout` advertises
+it with `rel="alternate"` and the blog index links to it. A new post needs
+nothing extra; promoting a draft adds it to the feed. Do not use the package's
+`rssSchema` in a content collection: it is built on zod 4 and Astro 5 uses zod 3.
+
 Use reusable components for code copying, book links, diagrams, `HtmlEmbed`,
 and `SlideEmbed`. Keep images responsive; provide alt text and iframe titles;
 respect reduced motion. `HtmlEmbed` assumes trusted same-origin HTML.
