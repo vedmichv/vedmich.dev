@@ -49,6 +49,7 @@ const imageURL = new URL(Astro.props.image || '/og-default.png', Astro.site);
     <link rel="canonical" href={canonicalURL} />
     {!noindex && hasTranslation && <link rel="alternate" hreflang={altLocale} href={altURL} />}
     {!noindex && <link rel="alternate" hreflang={locale} href={canonicalURL} />}
+    {!noindex && hasTranslation && <link rel="alternate" hreflang="x-default" href={locale === 'en' ? canonicalURL : altURL} />}
 
     <!-- Icons + PWA manifest -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -88,8 +88,12 @@ export default defineConfig({
     // homepage/BlogPreview/index/search filter via `!data.draft`, but
     // @astrojs/sitemap only sees the URL, so we drop draft URLs explicitly
     // (DRAFT_URLS, computed above) plus the `__` fixtures. Keep SEO clean.
+    // The root page is a language redirect whose canonical is /en/, so it is not listed.
+    // `i18n` adds xhtml:link alternates for URLs that exist in both locales.
     sitemap({
-      filter: (page) => !/\/blog\/__/.test(page) && !DRAFT_URLS.has(page),
+      filter: (page) =>
+        page !== 'https://vedmich.dev/' && !/\/blog\/__/.test(page) && !DRAFT_URLS.has(page),
+      i18n: { defaultLocale: 'en', locales: { en: 'en', ru: 'ru' } },
     }),
     icon(),
   ],
