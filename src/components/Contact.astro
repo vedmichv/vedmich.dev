@@ -1,6 +1,6 @@
 ---
 import { t, type Locale } from '../i18n/utils';
-import { socialLinks } from '../data/social';
+import { socialLinks, contactEmail } from '../data/social';
 
 interface Props {
   locale: Locale;
@@ -8,59 +8,47 @@ interface Props {
 
 const { locale } = Astro.props;
 const i = t(locale);
+
+// The intro sentence carries the address as plain visible text (it is also the copy target).
+const [introBefore, introAfter = ''] = i.contact.intro.split('{email}');
+const mailto = `mailto:${contactEmail}`;
 ---
 
-<section id="contact" data-state="cta" class="py-20 sm:py-28 bg-surface/30">
+<section id="contact" data-state="cta" data-email={contactEmail} class="py-20 sm:py-28 bg-surface/30">
   <div class="section-container text-center">
     <h2 class="section-title mb-3 animate-on-scroll">{i.contact.title}</h2>
-    <p class="text-text-muted mb-10 animate-on-scroll">{i.contact.subtitle}</p>
+    <p class="text-text-secondary mb-8 animate-on-scroll">{introBefore}<span data-contact-address class="font-mono text-text-primary select-all [overflow-wrap:anywhere]">{contactEmail}</span>{introAfter}</p>
 
-    {/* Social chips — compact inline pills, flex-wrap per reference */}
-    <div class="flex flex-wrap justify-center gap-3 mb-8 animate-on-scroll">
-      {socialLinks.map(({ name, url, icon }) => {
-        const isX = icon === 'twitter';
-        const letter = isX ? '𝕏' : Array.from(name)[0];
-        const displayName = isX ? 'X' : name;
-        return (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-bg-base border border-border card-glow"
-            aria-label={`${displayName} (${i.contact.opens_in_new_tab})`}
-          >
-            <span class="font-display text-[16px] font-bold text-brand-primary leading-none">{letter}</span>
-            <span class="font-body text-[14px] text-text-primary">{displayName}</span>
-          </a>
-        );
-      })}
-    </div>
-
-    {/* CTA state — primary teal button + noscript fallback (D-23/24/35).
-        noscript anchor sits OUTSIDE animate-on-scroll so JS-off visitors see it (CR-01 fix). */}
-    <div class="mt-8" data-contact-cta-wrapper>
-      <div class="animate-on-scroll">
-        <button
-          type="button"
+    {/* CTA state: "Write an email" is a plain mailto link, so it works without JavaScript.
+        With JavaScript a plain click opens the form instead (modified clicks keep the link behavior).
+        The copy button is JavaScript-only, so it starts hidden. */}
+    <div data-contact-cta-wrapper>
+      <div class="animate-on-scroll flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={mailto}
           data-contact-open-form
           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-primary text-bg-base font-body text-[15px] font-medium hover:bg-brand-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
         >
           {i.contact.write_me_cta}
+        </a>
+        <button
+          type="button"
+          hidden
+          data-contact-copy
+          data-done={i.contact.copy_done}
+          data-failed={i.contact.copy_failed}
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-transparent text-text-primary border border-border hover:border-brand-primary font-body text-[15px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+        >
+          {i.contact.copy_address}
         </button>
       </div>
-      <noscript>
-        <a
-          href="mailto:viktor@vedmich.dev"
-          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-primary text-bg-base font-body text-[15px] font-medium hover:bg-brand-primary-hover transition-colors"
-        >
-          {i.contact.write_me_cta}
-        </a>
-      </noscript>
+      {/* Live region exists from page load so the result of Copy is announced. */}
+      <p data-contact-copy-status role="status" aria-live="polite" class="font-body text-[13px] text-text-secondary mt-3 mb-0 min-h-[1.25rem]"></p>
     </div>
 
-    {/* Form state — Card with Name / Email / Message / Send / Cancel (D-25/26/27/28) */}
+    {/* Form state: Name and Message only. Submitting opens the visitor's own mail app with a draft. */}
     <div class="max-w-[480px] mx-auto mt-8 p-6 rounded-xl bg-bg-surface border border-border text-left" data-contact-form-wrapper>
-      <form data-contact-form class="flex flex-col gap-[14px]">
+      <form data-contact-form data-subject={i.contact.form.subject} class="flex flex-col gap-[14px]">
         <label class="flex flex-col gap-[6px]">
           <span class="font-body text-[13px] font-medium text-text-primary">{i.contact.form.name_label}</span>
           <input
@@ -69,17 +57,6 @@ const i = t(locale);
             name="name"
             autocomplete="name"
             placeholder={i.contact.form.name_placeholder}
-            class="bg-bg-base text-text-primary border border-border rounded-lg px-[14px] py-[10px] font-body text-[15px] outline-none focus-visible:border-brand-primary focus-visible:ring-1 focus-visible:ring-brand-primary/40 placeholder:text-text-muted"
-          />
-        </label>
-        <label class="flex flex-col gap-[6px]">
-          <span class="font-body text-[13px] font-medium text-text-primary">{i.contact.form.email_label}</span>
-          <input
-            required
-            type="email"
-            name="email"
-            autocomplete="email"
-            placeholder={i.contact.form.email_placeholder}
             class="bg-bg-base text-text-primary border border-border rounded-lg px-[14px] py-[10px] font-body text-[15px] outline-none focus-visible:border-brand-primary focus-visible:ring-1 focus-visible:ring-brand-primary/40 placeholder:text-text-muted"
           />
         </label>
@@ -95,7 +72,7 @@ const i = t(locale);
             class="bg-bg-base text-text-primary border border-border rounded-lg px-[14px] py-[10px] font-body text-[15px] outline-none focus-visible:border-brand-primary focus-visible:ring-1 focus-visible:ring-brand-primary/40 placeholder:text-text-muted resize-y"
           ></textarea>
         </label>
-        <div class="flex gap-[10px] mt-1.5">
+        <div class="flex flex-wrap gap-[10px] mt-1.5">
           <button
             type="submit"
             class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-primary text-bg-base font-body text-[15px] font-medium hover:bg-brand-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
@@ -113,19 +90,21 @@ const i = t(locale);
       </form>
     </div>
 
-    {/* Success state — honest copy per D-13/14/15/16.
+    {/* Handoff state: honest copy. The page never sends anything; the mail app does, and only if the visitor sends the draft.
         role=status + aria-live announces the panel change to SR users (WR-02 fix). */}
     <div class="max-w-[480px] mx-auto mt-8 p-6 rounded-xl bg-bg-surface border border-border" data-contact-success-wrapper role="status" aria-live="polite">
       <div class="text-center py-5">
-        <div class="font-mono text-[32px] text-brand-primary leading-none" aria-hidden="true">✓</div>
+        <svg class="w-8 h-8 mx-auto text-brand-primary" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9a2.5 2.5 0 01-2.5 2.5h-13A2.5 2.5 0 013 16.5v-9zm0 .5l9 6 9-6" />
+        </svg>
         <h3 tabindex="-1" data-contact-success-heading class="font-display text-[20px] text-text-primary my-2 outline-none">{i.contact.success.heading}</h3>
         <p class="font-body text-text-muted m-0">{i.contact.success.body}</p>
         <p class="font-body text-[13px] text-text-muted mt-2 m-0">
           {i.contact.success.fallback}{' '}
           <a
-            href="mailto:viktor@vedmich.dev"
+            href={mailto}
             class="text-brand-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface rounded"
-          >viktor@vedmich.dev</a>.
+          >{contactEmail}</a>.
         </p>
         <button
           type="button"
@@ -135,6 +114,28 @@ const i = t(locale);
           {i.contact.success.close}
         </button>
       </div>
+    </div>
+
+    {/* Other places to find me: compact inline pills, flex-wrap per reference */}
+    <p class="text-text-secondary mt-12 mb-4 animate-on-scroll">{i.contact.subtitle}</p>
+    <div class="flex flex-wrap justify-center gap-3 animate-on-scroll">
+      {socialLinks.map(({ name, url, icon }) => {
+        const isX = icon === 'twitter';
+        const letter = isX ? '𝕏' : Array.from(name)[0];
+        const displayName = isX ? 'X' : name;
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-bg-base border border-border card-glow"
+            aria-label={`${displayName} (${i.contact.opens_in_new_tab})`}
+          >
+            <span class="font-display text-[16px] font-bold text-brand-primary leading-none">{letter}</span>
+            <span class="font-body text-[14px] text-text-primary">{displayName}</span>
+          </a>
+        );
+      })}
     </div>
   </div>
 </section>
@@ -160,18 +161,25 @@ const i = t(locale);
   type ContactState = 'cta' | 'form' | 'success';
 
   const section = document.getElementById('contact');
-  const openBtn = section?.querySelector<HTMLButtonElement>('[data-contact-open-form]');
+  const email = section?.dataset.email ?? '';
+  const addressEl = section?.querySelector<HTMLElement>('[data-contact-address]');
+  const openLink = section?.querySelector<HTMLAnchorElement>('[data-contact-open-form]');
+  const copyBtn = section?.querySelector<HTMLButtonElement>('[data-contact-copy]');
+  const copyStatus = section?.querySelector<HTMLElement>('[data-contact-copy-status]');
   const form = section?.querySelector<HTMLFormElement>('[data-contact-form]');
   const cancelBtn = section?.querySelector<HTMLButtonElement>('[data-contact-cancel]');
   const closeBtn = section?.querySelector<HTMLButtonElement>('[data-contact-close-success]');
   const nameInput = form?.querySelector<HTMLInputElement>('input[name="name"]');
   const successHeading = section?.querySelector<HTMLElement>('[data-contact-success-heading]');
 
-  if (section && openBtn && form && cancelBtn && closeBtn && nameInput && successHeading) {
+  if (section && email && addressEl && openLink && copyBtn && copyStatus && form && cancelBtn && closeBtn && nameInput && successHeading) {
     let lastFocused: HTMLElement | null = null;
+    let statusTimer: number | undefined;
 
     function setState(next: ContactState): void {
-      if (next === 'form' || next === 'success') {
+      // Remember the opener only when leaving the CTA state, so form -> success keeps it
+      // and closing returns focus to a control that is visible again.
+      if ((next === 'form' || next === 'success') && section!.getAttribute('data-state') === 'cta') {
         const active = document.activeElement as HTMLElement | null;
         if (active && active !== document.body) {
           lastFocused = active;
@@ -188,37 +196,107 @@ const i = t(locale);
       }
     }
 
-    openBtn.addEventListener('click', () => setState('form'));
+    // A plain click on the mailto link opens the form. Ctrl/Cmd/Shift/Alt and non-primary
+    // clicks keep the normal link behavior, so the visitor can still open the mail app directly.
+    openLink.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      setState('form');
+    });
     cancelBtn.addEventListener('click', () => setState('cta'));
     closeBtn.addEventListener('click', () => setState('cta'));
+
+    // Copy address: Clipboard API first, then a hidden-textarea fallback for older browsers
+    // and insecure contexts. The result is announced through the aria-live status line.
+    function announce(message: string): void {
+      window.clearTimeout(statusTimer);
+      copyStatus!.textContent = '';
+      // Empty first, then fill: a repeated click announces the same message again.
+      window.setTimeout(() => {
+        copyStatus!.textContent = message;
+      }, 50);
+      statusTimer = window.setTimeout(() => {
+        copyStatus!.textContent = '';
+      }, 5000);
+    }
+
+    function selectAddressText(): void {
+      const selection = window.getSelection();
+      if (!selection) return;
+      const range = document.createRange();
+      range.selectNodeContents(addressEl!);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    async function copyViaClipboardApi(): Promise<boolean> {
+      if (!navigator.clipboard || !window.isSecureContext) return false;
+      try {
+        await navigator.clipboard.writeText(email);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function copyViaSelection(): boolean {
+      const helper = document.createElement('textarea');
+      helper.value = email;
+      helper.setAttribute('readonly', '');
+      helper.setAttribute('aria-hidden', 'true');
+      helper.style.position = 'fixed';
+      helper.style.top = '0';
+      helper.style.left = '0';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      helper.setSelectionRange(0, helper.value.length);
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      document.body.removeChild(helper);
+      return ok;
+    }
+
+    copyBtn.hidden = false;
+    copyBtn.addEventListener('click', async () => {
+      const ok = (await copyViaClipboardApi()) || copyViaSelection();
+      copyBtn.focus();
+      if (ok) {
+        announce(copyBtn.dataset.done ?? '');
+      } else {
+        selectAddressText();
+        announce(copyBtn.dataset.failed ?? '');
+      }
+    });
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const fd = new FormData(form!);
       const name = String(fd.get('name') || '').trim();
-      const email = String(fd.get('email') || '').trim();
       const message = String(fd.get('message') || '');
 
-      const subject = name
-        ? `vedmich.dev — ${name}`
-        : 'vedmich.dev — Contact';
-      const body = `From: ${name} <${email}>\n\n${message}`;
+      // The replacement is a function so "$&" and similar in a name stay literal.
+      const subject = (form!.dataset.subject ?? '').replace('{name}', () => name).trim();
 
       // T-10-01 mitigation: encodeURIComponent on EVERY interpolated value.
       // Prevents CRLF / & / ; injection into mail headers.
-      // Recipient is inlined as a literal string (D-01/D-03) — no interpolation.
+      // The recipient is the site constant from the data attribute, never user input.
       const mailto =
-        `mailto:viktor@vedmich.dev` +
+        `mailto:${email}` +
         `?subject=${encodeURIComponent(subject)}` +
-        `&body=${encodeURIComponent(body)}`;
+        `&body=${encodeURIComponent(message)}`;
 
       // WR-03 mitigation: persist the draft so the user can recover if the
       // mailto: handoff silently fails (no handler / blocked / dismissed).
       try {
         sessionStorage.setItem(
           'vv-contact-draft',
-          JSON.stringify({ name, email, message, ts: Date.now() })
+          JSON.stringify({ name, message, ts: Date.now() })
         );
       } catch {
         // sessionStorage may be disabled; draft recovery is best-effort.
@@ -228,10 +306,10 @@ const i = t(locale);
       setState('success');
     });
 
-    // D-34: ESC scoped to the section, NOT document — avoids conflict with
+    // D-34: ESC scoped to the section, NOT document, to avoid a conflict with
     // SearchPalette's global ESC handler. Known minor limitation: if focus
     // leaves the section (e.g. user clicks on the footer), ESC won't collapse
-    // the form — user re-enters the section first. Accepted per D-34.
+    // the form, so the user re-enters the section first. Accepted per D-34.
     section.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
       const state = section!.getAttribute('data-state');

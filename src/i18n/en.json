@@ -107,24 +107,27 @@
     "also_at": "Also at {event} {year}"
   },
   "contact": {
-    "title": "Let's connect",
-    "subtitle": "Find me on these platforms",
+    "title": "Contact",
+    "intro": "Talk invitations, podcast guests, questions about a post: {email}.",
+    "subtitle": "You can also find me here:",
     "opens_in_new_tab": "opens in a new tab",
-    "write_me_cta": "Write me a message",
+    "write_me_cta": "Write an email",
+    "copy_address": "Copy address",
+    "copy_done": "Address copied",
+    "copy_failed": "Could not copy. Select the address and copy it by hand.",
     "form": {
       "name_label": "Name",
       "name_placeholder": "Your name",
-      "email_label": "Email",
-      "email_placeholder": "you@domain.com",
       "message_label": "Message",
       "message_placeholder": "What would you like to talk about?",
-      "send": "Send",
+      "subject": "vedmich.dev: message from {name}",
+      "send": "Open in my email app",
       "cancel": "Cancel"
     },
     "success": {
-      "heading": "Check your email client",
-      "body": "Your default mail app should have opened with a draft. Send when ready. I'll reply as soon as I can.",
-      "fallback": "If it didn't open, email",
+      "heading": "Your email app should open",
+      "body": "A draft is ready in your email app. Send it from there.",
+      "fallback": "If nothing opened, the address is",
       "close": "Close"
     }
   },

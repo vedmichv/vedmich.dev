@@ -163,7 +163,7 @@ test('content and contact fallback remain usable without JavaScript', async ({ b
   await page.goto('/en/');
   await expect(page.locator('#about h2')).toBeVisible();
   await expect(page.locator('#blog h2')).toBeVisible();
-  await expect(page.locator('noscript a[href="mailto:viktor@vedmich.dev"]')).toBeVisible();
+  await expect(page.locator('#contact a[href="mailto:viktor@vedmich.dev"]').first()).toBeVisible();
   await context.close();
 });
 

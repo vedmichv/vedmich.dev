@@ -1,3 +1,6 @@
+// The one public address: shown as text in Contact and the footer, used by every mailto link.
+export const contactEmail = 'viktor@vedmich.dev';
+
 export const socialLinks = [
   {
     name: 'LinkedIn',
