@@ -15,7 +15,7 @@
   "search": {
     "results_count": "Результаты: {n} из {total}",
     "placeholder": "Поиск по докладам, слайдам, постам, тегам…",
-    "empty_hint": "Начните вводить запрос. Попробуйте: «karpenter», «mcp», «kubernetes».",
+    "empty_hint": "Введи запрос. Например: «karpenter», «mcp», «kubernetes».",
     "no_results": "Ничего не найдено для",
     "footer_move": "навигация",
     "footer_open": "открыть",
@@ -31,8 +31,9 @@
     "tagline_before": "Распределённые системы · Kubernetes · ",
     "tagline_accent": "AI Engineer",
     "tagline_after": "",
+    "lede": "Я проектирую облачную архитектуру для крупных клиентов в AWS. Здесь пишу про Kubernetes и AI-агентов в проде, выкладываю доклады со слайдами и веду два подкаста.",
     "cta": "Связаться",
-    "cta_secondary": "Подробнее",
+    "cta_secondary": "Читать блог",
     "kubestronaut_aria": "Проверить бейдж CNCF Kubestronaut на Credly",
     "author_pill": "Автор «Cracking the Kubernetes Interview»",
     "speaker_pill": "Спикер re:Invent и keynote-докладов",
@@ -40,7 +41,7 @@
   },
   "about": {
     "title": "Обо мне",
-    "bio_before": "Solutions Architect и AI Engineer с 15+ годами опыта в проектировании и развитии масштабных распределённых систем. Работаю в AWS, отвечаю за сквозную архитектуру для enterprise-клиентов: hybrid cloud, Kubernetes, GenAI и agentic-платформы. CNCF Kubestronaut и автор книги ",
+    "bio_before": "Я Solutions Architect и AI Engineer, в индустрии с 2009 года. С 2021 года работаю в AWS: проектирую архитектуру для крупных клиентов. Это hybrid cloud, Kubernetes, GenAI и агентные платформы. CNCF Kubestronaut. Вместе с Александром Довнаром написал книгу ",
     "bio_accent": "«Cracking the Kubernetes Interview»",
     "bio_after": ".",
     "skills_title": "Экспертиза"
@@ -48,12 +49,20 @@
   "podcasts": {
     "title": "Подкасты",
     "dkt_name": "DevOps Kitchen Talks",
-    "dkt_desc": "Глубокие технические погружения в DevOps, Kubernetes и инфраструктуру. Интервью с экспертами, мок-интервью и практические темы.",
-    "dkt_stats": "100+ выпусков · ~10K подписчиков",
+    "dkt_desc": "Подкаст и сообщество про DevOps, SRE, AI, system design и облака. Интервью с инженерами, мок-интервью и разбор новостей, которые присылают слушатели. Веду его вместе с Александром Довнаром.",
+    "dkt_stats": "100+ выпусков · ~10K подписчиков (ноябрь 2026)",
     "aws_name": "AWS на русском",
-    "aws_desc": "Сервисы AWS, архитектурные паттерны, применение AI и IT-карьера. Всё на русском. Взгляд изнутри AWS без привязки к вендору.",
-    "aws_stats": "70+ выпусков · 70K+ прослушиваний",
-    "listen": "Слушать"
+    "aws_desc": "Подкаст о сервисах AWS, архитектурных паттернах, применении AI и IT-карьере. Веду его с 2021 года, поэтому смотрю на всё изнутри AWS.",
+    "aws_stats": "70+ выпусков · 70K+ прослушиваний (ноябрь 2026)",
+    "listen": "Слушать",
+    "platforms": {
+      "apple": "Apple Podcasts",
+      "spotify": "Spotify",
+      "yandex": "Яндекс Музыка",
+      "youtube": "YouTube",
+      "podbean": "Podbean",
+      "site": "dk-t.dev"
+    }
   },
   "speaking": {
     "title": "Выступления",
@@ -74,8 +83,9 @@
     "cover_alt": "Обложка книги «Cracking the Kubernetes Interview»",
     "rating_label": "Оценка {rating} из 5 на Amazon",
     "name": "Cracking the Kubernetes Interview",
-    "desc": "Полное руководство по концепциям, архитектуре, сетям, безопасности Kubernetes и реальным сценариям для подготовки к собеседованию.",
-    "cta": "Купить на Amazon"
+    "desc": "Книга для подготовки к собеседованию по Kubernetes: основные понятия, архитектура, сети, безопасность и реальные сценарии. Написана вместе с Александром Довнаром, издательство Packt.",
+    "cta": "Купить на Amazon",
+    "cta_packt": "Купить у Packt"
   },
   "presentations": {
     "title": "Слайды",
@@ -98,30 +108,34 @@
     "also_at": "Другие доклады на {event} {year}"
   },
   "contact": {
-    "title": "Связаться",
-    "subtitle": "Найдите меня на этих платформах",
+    "title": "Контакты",
+    "intro": "Приглашения выступить, гости подкастов, вопросы по статьям: {email}.",
+    "subtitle": "Ещё я здесь:",
     "opens_in_new_tab": "откроется в новой вкладке",
-    "write_me_cta": "Напишите мне",
+    "write_me_cta": "Написать письмо",
+    "copy_address": "Скопировать адрес",
+    "copy_done": "Адрес скопирован",
+    "copy_failed": "Не получилось скопировать. Выдели адрес и скопируй вручную.",
     "form": {
       "name_label": "Имя",
-      "name_placeholder": "Ваше имя",
-      "email_label": "Email",
-      "email_placeholder": "you@domain.com",
+      "name_placeholder": "Имя",
       "message_label": "Сообщение",
-      "message_placeholder": "О чём хотите поговорить?",
-      "send": "Отправить",
+      "message_placeholder": "О чём поговорим?",
+      "subject": "vedmich.dev: сообщение от {name}",
+      "send": "Открыть в почтовом приложении",
       "cancel": "Отмена"
     },
     "success": {
-      "heading": "Проверьте почтовый клиент",
-      "body": "Почтовое приложение должно было открыться с черновиком. Отправьте его, когда будете готовы, а я отвечу, как только смогу.",
-      "fallback": "Если не открылось, напишите на",
+      "heading": "Почтовое приложение должно открыться",
+      "body": "Черновик письма появится в почтовом приложении, отправить его нужно оттуда.",
+      "fallback": "Если ничего не открылось, адрес для письма:",
       "close": "Закрыть"
     }
   },
   "footer": {
-    "built_with": "Создано на Astro",
-    "copyright": "© {year} Виктор Ведмич"
+    "copyright": "© {year} Виктор Ведмич",
+    "opinions": "Мнения мои личные",
+    "rss": "RSS"
   },
   "back_to_home": "Назад на главную"
 }

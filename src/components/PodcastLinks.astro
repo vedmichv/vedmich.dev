@@ -1,0 +1,41 @@
+---
+/**
+ * PodcastLinks: the "Listen on" row of small platform links under a podcast card.
+ * URLs come from `podcastLinks` in src/data/social.ts, labels from i18n (`podcasts.platforms`).
+ */
+import { t, type Locale } from '../i18n/utils';
+import { podcastLinks } from '../data/social';
+
+interface Props {
+  locale: Locale;
+  show: keyof typeof podcastLinks;
+}
+
+const { locale, show } = Astro.props;
+const i = t(locale);
+const labelId = `podcast-${show}-listen`;
+---
+
+<div class="mt-5">
+  <p id={labelId} class="font-body text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary mt-0 mb-2">
+    {i.podcasts.listen}
+  </p>
+  <ul aria-labelledby={labelId} class="flex flex-wrap gap-2 list-none p-0 m-0">
+    {podcastLinks[show].map(({ platform, url }) => {
+      const label = i.podcasts.platforms[platform];
+      return (
+        <li>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${label} (${i.contact.opens_in_new_tab})`}
+            class="inline-flex items-center rounded-full px-3 py-1.5 text-[13px] font-medium bg-bg-base border border-border text-text-primary hover:border-brand-primary hover:text-brand-primary-hover transition-colors"
+          >
+            {label}
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</div>

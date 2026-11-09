@@ -149,7 +149,8 @@ test('every listed page keeps titles, descriptions and hreflang within the contr
     const english = await page.locator('link[hreflang="en"]').getAttribute('href');
     if (xDefault !== english) problems.push(`${path}: x-default ${xDefault} is not the English URL ${english}`);
     const bare = await page.locator('a[href^="/en/"], a[href^="/ru/"]').evaluateAll(
-      (anchors) => anchors.map((a) => a.getAttribute('href') ?? '').filter((href) => !href.endsWith('/') && !href.includes('#') && !href.endsWith('/rss.xml')),
+      // Page links end with a slash; links to files such as the RSS feed (/en/rss.xml) do not.
+      (anchors) => anchors.map((a) => a.getAttribute('href') ?? '').filter((href) => !href.endsWith('/') && !href.includes('#') && !/\.[a-z0-9]+$/i.test(href)),
     );
     if (bare.length) problems.push(`${path}: links without trailing slash ${bare.join(', ')}`);
   }

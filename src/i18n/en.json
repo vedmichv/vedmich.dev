@@ -31,8 +31,9 @@
     "tagline_before": "Distributed Systems · Kubernetes · ",
     "tagline_accent": "AI Engineer",
     "tagline_after": "",
+    "lede": "I design cloud architecture for enterprise teams at AWS. Here I write about Kubernetes and AI agents in production, share my talks and slides, and host two podcasts.",
     "cta": "Get in touch",
-    "cta_secondary": "Read more",
+    "cta_secondary": "Read the blog",
     "kubestronaut_aria": "Verify the CNCF Kubestronaut badge on Credly",
     "author_pill": "Author “Cracking the Kubernetes Interview”",
     "speaker_pill": "re:Invent & keynote speaker",
@@ -40,7 +41,7 @@
   },
   "about": {
     "title": "About me",
-    "bio_before": "Solutions Architect and AI Engineer with 15+ years designing and evolving distributed systems at scale. Currently at AWS, owning end-to-end architecture for enterprise clients across hybrid cloud, Kubernetes, and GenAI / agentic platforms. CNCF Kubestronaut and author of ",
+    "bio_before": "I am a Solutions Architect and AI Engineer, working in the industry since 2009. Since 2021 I have been at AWS, where I design architecture for enterprise customers: hybrid cloud, Kubernetes, and GenAI and agentic platforms. I am a CNCF Kubestronaut and the co-author, with Alexander Dovnar, of ",
     "bio_accent": "“Cracking the Kubernetes Interview”",
     "bio_after": ".",
     "skills_title": "Expertise"
@@ -48,12 +49,20 @@
   "podcasts": {
     "title": "Podcasts",
     "dkt_name": "DevOps Kitchen Talks",
-    "dkt_desc": "Technical deep-dives into DevOps, Kubernetes, and infrastructure. Interviews with industry experts, mock interviews, and hands-on topics.",
-    "dkt_stats": "100+ episodes · ~10K subscribers",
+    "dkt_desc": "A podcast and community about DevOps, SRE, AI, system design and cloud. Interviews with engineers, mock interviews, and news that listeners send in. I host it with Alexander Dovnar.",
+    "dkt_stats": "100+ episodes · ~10K subscribers (November 2026)",
     "aws_name": "AWS на русском",
-    "aws_desc": "AWS services, architectural patterns, AI applications, and IT careers, all in Russian. Vendor-agnostic perspective from inside AWS.",
-    "aws_stats": "70+ episodes · 70K+ listens",
-    "listen": "Listen"
+    "aws_desc": "A Russian-language podcast about AWS services, architecture patterns, AI applications and IT careers. I have hosted it since 2021, so you hear the view from inside AWS.",
+    "aws_stats": "70+ episodes · 70K+ listens (November 2026)",
+    "listen": "Listen on",
+    "platforms": {
+      "apple": "Apple Podcasts",
+      "spotify": "Spotify",
+      "yandex": "Yandex Music",
+      "youtube": "YouTube",
+      "podbean": "Podbean",
+      "site": "dk-t.dev"
+    }
   },
   "speaking": {
     "title": "Speaking",
@@ -74,8 +83,9 @@
     "cover_alt": "Cover of the book “Cracking the Kubernetes Interview”",
     "rating_label": "Rated {rating} out of 5 on Amazon",
     "name": "Cracking the Kubernetes Interview",
-    "desc": "A comprehensive guide covering Kubernetes concepts, architecture, networking, security, and real-world scenarios to help you ace your next interview.",
-    "cta": "Get on Amazon"
+    "desc": "A guide to Kubernetes interviews: core concepts, architecture, networking, security and real-world scenarios. Written with Alexander Dovnar and published by Packt.",
+    "cta": "Get on Amazon",
+    "cta_packt": "Buy from Packt"
   },
   "presentations": {
     "title": "Slides",
@@ -98,30 +108,34 @@
     "also_at": "Also at {event} {year}"
   },
   "contact": {
-    "title": "Let's connect",
-    "subtitle": "Find me on these platforms",
+    "title": "Contact",
+    "intro": "Talk invitations, podcast guests, questions about a post: {email}.",
+    "subtitle": "You can also find me here:",
     "opens_in_new_tab": "opens in a new tab",
-    "write_me_cta": "Write me a message",
+    "write_me_cta": "Write an email",
+    "copy_address": "Copy address",
+    "copy_done": "Address copied",
+    "copy_failed": "Could not copy. Select the address and copy it by hand.",
     "form": {
       "name_label": "Name",
       "name_placeholder": "Your name",
-      "email_label": "Email",
-      "email_placeholder": "you@domain.com",
       "message_label": "Message",
       "message_placeholder": "What would you like to talk about?",
-      "send": "Send",
+      "subject": "vedmich.dev: message from {name}",
+      "send": "Open in my email app",
       "cancel": "Cancel"
     },
     "success": {
-      "heading": "Check your email client",
-      "body": "Your default mail app should have opened with a draft. Send when ready. I'll reply as soon as I can.",
-      "fallback": "If it didn't open, email",
+      "heading": "Your email app should open",
+      "body": "A draft is ready in your email app. Send it from there.",
+      "fallback": "If nothing opened, the address is",
       "close": "Close"
     }
   },
   "footer": {
-    "built_with": "Built with Astro",
-    "copyright": "© {year} Viktor Vedmich"
+    "copyright": "© {year} Viktor Vedmich",
+    "opinions": "Opinions are my own",
+    "rss": "RSS"
   },
   "back_to_home": "Back to home"
 }
