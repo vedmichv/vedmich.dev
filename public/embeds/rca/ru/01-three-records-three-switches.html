@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Три записи, три переключателя: CloudTrail, трейсы OpenTelemetry и логирование вызовов моделей</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/embeds/embed-fonts.css">
 <script>
   // Animate only when motion is allowed and scripting works; otherwise the final (all on) state is the static view.
   if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
@@ -13,22 +12,13 @@
   }
 </script>
 <style>
-  @font-face{font-family:'DS Inter';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/inter-latin-400-normal.woff2') format('woff2')}
-  @font-face{font-family:'DS Inter';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/inter-latin-500-normal.woff2') format('woff2')}
-  @font-face{font-family:'DS Inter';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/inter-latin-600-normal.woff2') format('woff2')}
-  @font-face{font-family:'DS Inter';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/inter-latin-700-normal.woff2') format('woff2')}
-  @font-face{font-family:'DS Space Grotesk';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/space-grotesk-latin-600-normal.woff2') format('woff2')}
-  @font-face{font-family:'DS Space Grotesk';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/space-grotesk-latin-700-normal.woff2') format('woff2')}
-  @font-face{font-family:'DS JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2')}
-  @font-face{font-family:'DS JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2')}
-
   :root{
     --bg:#0F172A; --surface:#1E293B; --border:rgba(148,163,184,.16); --slate:#334155;
     --teal:#14B8A6; --teal-soft:rgba(20,184,166,.14); --amber:#F59E0B;
     --text:#E2E8F0; --dim:#94A3B8;
-    --sans:'Inter','DS Inter',system-ui,sans-serif;
-    --display:'Space Grotesk','DS Space Grotesk','Inter','DS Inter',system-ui,sans-serif;
-    --mono:'JetBrains Mono','DS JetBrains Mono',ui-monospace,monospace;
+    --sans:'Inter',system-ui,sans-serif;
+    --display:'Space Grotesk','Inter',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:var(--bg);color:var(--text);font-family:var(--sans)}
