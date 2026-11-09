@@ -26,3 +26,19 @@
 - Viktor, 2026-11-08: RU prose keeps Latin `taint`/`toleration` in the Karpenter post.
 - Viktor, 2026-11-08: factual problems are fixed against primary sources, and EN/RU
   divergences are resolved so both locales carry the same facts.
+- Viktor, 2026-11-09: the headline claims ("keynote", "30+ talks per year", ~10K
+  subscribers, 70K+ listens, book 4.8) are true and stay; the speaker rating is 4.6-4.8.
+- Viktor, 2026-11-09: hero lede and "Read the blog" CTA; new bio ("since 2009", co-author
+  Alexander Dovnar); new podcast and book copy with platform links and a Packt button;
+  visible contact address with copy button and a Name + Message form; RU UI neutral for
+  controls and «ты» for sentences; footer with "Opinions are my own", RSS and the address.
+- Viktor, 2026-11-09: Hello World stays in the blog.
+- Viktor, 2026-11-09: new homepage order (hero, latest, blog, six speaking events,
+  about, podcasts and book, contact); the Slides section moves into Speaking.
+- Viktor, 2026-11-09: RSS via `@astrojs/rss` (dependency approved); Manrope for RU
+  headings with self-hosted Cyrillic fonts and no Google Fonts; `uk` browsers go to /en/.
+- Viktor, 2026-11-09: "Invite me to speak" block with topics from delivered talks and a
+  speaker photo (his stage photo from AWS Summit Berlin); Search Console, Bing Webmaster
+  and a privacy-friendly visit counter.
+- Viktor, 2026-11-09: one row per event in the speaking timeline; Malta and Adria
+  workshops added; the Malta DevOps Agent workshop is the public AWS catalog workshop.
