@@ -1,0 +1,68 @@
+---
+/**
+ * LatestStrip: the newest post and the newest talk, one line each, computed at build
+ * time from the collections. No podcast row: the repository has no episode data and the
+ * build makes no network calls, so the strip shows only what the collections hold.
+ */
+import { getCollection } from 'astro:content';
+import { t, type Locale } from '../i18n/utils';
+import { langOfText } from '../i18n/lang-of-parts';
+import { formatDate } from '../lib/seo';
+import { newestTalk } from '../lib/talk-groups';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const i = t(locale);
+
+const posts = await getCollection('blog', ({ id, data }) => id.startsWith(`${locale}/`) && !data.draft);
+const talks = await getCollection('speaking', ({ id, data }) => id.startsWith(`${locale}/`) && !data.draft);
+
+const post = [...posts].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())[0];
+const talk = newestTalk(talks);
+const slugOf = (id: string) => id.replace(/^(en|ru)\//, '');
+
+const rows = [
+  post && {
+    kind: 'post',
+    label: i.latest.post,
+    href: `/${locale}/blog/${slugOf(post.id)}/`,
+    title: post.data.title,
+    meta: formatDate(post.data.date, locale),
+  },
+  talk && {
+    kind: 'talk',
+    label: i.latest.talk,
+    href: `/${locale}/speaking/${slugOf(talk.id)}/`,
+    title: talk.data.title,
+    meta: [talk.data.event, talk.data.city, formatDate(talk.data.date, locale)].join(' · '),
+  },
+].filter((row): row is NonNullable<typeof row> => Boolean(row));
+---
+
+{rows.length > 0 && (
+  <section id="latest" aria-labelledby="latest-title" class="border-b border-border bg-surface/30 py-6 sm:py-7">
+    <div class="section-container">
+      <h2 id="latest-title" class="font-body text-[11px] font-semibold uppercase tracking-[0.08em] text-text-secondary mt-0 mb-3 animate-on-scroll">
+        {i.latest.title}
+      </h2>
+      <ul class="list-none p-0 m-0 flex flex-col gap-3 animate-on-scroll">
+        {rows.map((row) => (
+          <li data-latest={row.kind} class="grid gap-x-4 gap-y-0.5 sm:grid-cols-[72px_1fr] sm:items-baseline">
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-accent">{row.label}</span>
+            <p class="m-0 font-body text-[15px] leading-snug">
+              <a
+                href={row.href}
+                lang={langOfText(row.title, locale)}
+                class="font-semibold text-text-primary hover:text-brand-primary transition-colors"
+              >{row.title}</a>
+              <span class="block sm:inline font-mono text-xs text-text-muted sm:ml-3 mt-0.5 sm:mt-0">{row.meta}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}

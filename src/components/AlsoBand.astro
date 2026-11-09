@@ -1,0 +1,23 @@
+---
+/**
+ * AlsoBand: Podcasts and Book in one band. Side by side from the lg breakpoint,
+ * stacked below it. The two sections keep their own ids (#podcasts, #book), so
+ * header links, hero pills and search results still land on them.
+ */
+import type { Locale } from '../i18n/utils';
+import Podcasts from './Podcasts.astro';
+import Book from './Book.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div class="border-y border-brand-accent/30 bg-surface/30 py-20 sm:py-28">
+  <div class="section-container grid gap-16 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-12 lg:items-start">
+    <Podcasts locale={locale} />
+    <Book locale={locale} />
+  </div>
+</div>
