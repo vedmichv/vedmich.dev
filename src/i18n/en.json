@@ -71,9 +71,10 @@
     "cta": "Get on Amazon"
   },
   "presentations": {
-    "title": "Recent decks",
-    "subtitle": "Decks: {N} · slides open right in the browser",
-    "all_decks": "All decks",
+    "title": "Slides",
+    "subtitle": "Slides open in the browser.",
+    "all_decks": "All slides",
+    "empty": "Slides are coming soon.",
     "read_article": "Read the article"
   },
   "blog": {

@@ -12,7 +12,6 @@ const { data, id } = deck;
 
 const slug = id.replace(/^(en|ru)\//, '');
 const deckUrl = data.slides ?? `/slides/${slug}/`;
-const displayUrl = `vedmich.dev/slides/${slug}`;
 const locale = id.startsWith('ru/') ? 'ru' : 'en';
 const i = t(locale);
 
@@ -47,12 +46,7 @@ const overlineParts = [dateStr, data.event, data.city].filter(Boolean);
     {data.description}
   </p>
 
-  <!-- Row 4: Slug URL -->
-  <div class="font-mono text-[11px] text-brand-primary tracking-[0.06em] mt-2 mb-2.5 truncate">
-    {displayUrl}
-  </div>
-
-  <!-- Row 4b: Companion article -->
+  <!-- Row 4: Companion article -->
   {data.post && (
     <a
       href={data.post}
