@@ -338,6 +338,14 @@ h1, h2, h3, h4,
   }
 }
 
+/* -- Inline code: drop the literal backticks that @tailwindcss/typography adds
+   around `code` (it reads like a Markdown leak). Color and font stay as set by
+   the prose-code utilities on each prose wrapper. -- */
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none;
+}
+
 /* -- Narrow screens: keep long tokens and wide tables inside the column --
    Inline code (metric names, annotation keys) and URL-like link text wrap
    only when they would overflow. Tables scroll on their own below `sm`, so
