@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { t, type Locale } from '../i18n/utils';
+import TalkTimeline from './TalkTimeline.astro';
 
 interface Props {
   locale: Locale;
@@ -16,14 +17,6 @@ const allTalks = await getCollection('speaking', ({ data, id }) => {
 
 // Sort by date descending
 const talks = allTalks.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-
-// Group by year (for reference grid layout)
-const talksByYear = talks.reduce((acc, talk) => {
-  const year = talk.data.date.getFullYear().toString();
-  if (!acc[year]) acc[year] = [];
-  acc[year].push(talk);
-  return acc;
-}, {} as Record<string, typeof talks>);
 ---
 
 <section id="speaking" class="py-20 sm:py-28 bg-surface">
@@ -31,36 +24,7 @@ const talksByYear = talks.reduce((acc, talk) => {
     <h2 class="font-display text-3xl font-bold mb-2 animate-on-scroll">{i.speaking.title}</h2>
     <p class="text-text-muted mb-12 animate-on-scroll">{i.speaking.subtitle}</p>
 
-    <div class="flex flex-col gap-8">
-      {Object.entries(talksByYear).sort((a, b) => Number(b[0]) - Number(a[0])).map(([year, yearTalks]) => (
-        <div class="grid grid-cols-[100px_1fr] gap-6 animate-on-scroll">
-          <!-- Year column -->
-          <div class="font-display text-4xl font-bold text-brand-primary tracking-[-0.02em]">
-            {year}
-          </div>
-
-          <!-- Events column -->
-          <div class="flex flex-col gap-4">
-            {yearTalks.map((talk) => (
-              <div class="border-l-2 border-border pl-5">
-                <div class="font-display text-lg font-semibold text-text-primary">
-                  {talk.data.event} <span class="font-normal text-text-muted">· {talk.data.city}</span>
-                </div>
-                <a
-                  href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}/`}
-                  class="font-body text-sm text-text-muted mt-2 block hover:text-brand-primary transition-colors"
-                >
-                  <span class="text-brand-primary">→</span> {talk.data.title}
-                </a>
-                {talk.data.highlight && (
-                  <div class="font-mono text-xs text-warm mt-2">★ {talk.data.highlight}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
+    <TalkTimeline talks={talks} locale={locale} />
 
     <div class="mt-10 animate-on-scroll">
       <a href={`/${locale}/speaking/`} class="text-sm text-text-muted hover:text-brand-primary transition-colors whitespace-nowrap">

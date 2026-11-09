@@ -60,7 +60,12 @@
     "watch_video": "Watch on YouTube",
     "view_slides": "View slides",
     "read_article": "Read the article",
-    "all_talks": "All talks"
+    "all_talks": "All talks",
+    "formats": {
+      "workshop": "Workshop",
+      "chalk_talk": "Chalk talk",
+      "panel": "Panel"
+    }
   },
   "book": {
     "title": "Book",

@@ -60,7 +60,12 @@
     "watch_video": "Смотреть на YouTube",
     "view_slides": "Посмотреть слайды",
     "read_article": "Читать статью",
-    "all_talks": "Все выступления"
+    "all_talks": "Все выступления",
+    "formats": {
+      "workshop": "Воркшоп",
+      "chalk_talk": "Chalk talk",
+      "panel": "Панель"
+    }
   },
   "book": {
     "title": "Книга",

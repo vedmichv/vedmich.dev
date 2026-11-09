@@ -31,6 +31,8 @@ const speaking = defineCollection({
     post: companionPost,
     rating: z.string().optional(),
     highlight: z.string().optional(),
+    // Omitted for a regular talk; other formats get a small label in the timeline.
+    format: z.enum(['talk', 'workshop', 'chalk-talk', 'panel']).optional(),
     draft: z.boolean().default(false),
   }),
 });

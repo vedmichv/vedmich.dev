@@ -1,0 +1,79 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { t, type Locale } from '../i18n/utils';
+
+interface Props {
+  talks: CollectionEntry<'speaking'>[];
+  locale: Locale;
+}
+
+const { talks, locale } = Astro.props;
+const i = t(locale);
+
+// One row per event: talks at the same event, city and year are grouped, so an
+// event with two sessions or a talk plus a workshop shows up once.
+type Group = { key: string; event: string; city: string; latest: number; talks: CollectionEntry<'speaking'>[] };
+const groups = new Map<string, Group>();
+for (const talk of talks) {
+  const year = talk.data.date.getFullYear();
+  const key = `${year}|${talk.data.event}|${talk.data.city}`;
+  const group = groups.get(key) ?? { key, event: talk.data.event, city: talk.data.city, latest: 0, talks: [] };
+  group.talks.push(talk);
+  group.latest = Math.max(group.latest, talk.data.date.valueOf());
+  groups.set(key, group);
+}
+
+// Years and events newest first; sessions inside an event in agenda order.
+const byYear = new Map<number, Group[]>();
+for (const group of [...groups.values()].sort((a, b) => b.latest - a.latest)) {
+  group.talks.sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+  const year = new Date(group.latest).getFullYear();
+  byYear.set(year, [...(byYear.get(year) ?? []), group]);
+}
+
+const formatLabel = (format?: string) =>
+  format && format !== 'talk' ? i.speaking.formats[format.replace('-', '_') as keyof typeof i.speaking.formats] : undefined;
+const hasCyrillic = (text: string) => /[Ѐ-ӿ]/.test(text);
+---
+
+<div class="flex flex-col gap-8">
+  {[...byYear.entries()].map(([year, yearGroups]) => (
+    <div class="grid grid-cols-[64px_1fr] gap-4 sm:grid-cols-[100px_1fr] sm:gap-6 animate-on-scroll">
+      <div class="font-display text-2xl sm:text-4xl font-bold text-brand-primary tracking-[-0.02em]">
+        {year}
+      </div>
+
+      <div class="flex flex-col gap-4">
+        {yearGroups.map((group) => (
+          <div class="border-l-2 border-border pl-5">
+            <div class="font-display text-lg font-semibold text-text-primary">
+              {group.event} <span class="font-normal text-text-muted">· {group.city}</span>
+            </div>
+            <ul class="mt-2 flex flex-col gap-1.5">
+              {group.talks.map((talk) => {
+                const label = formatLabel(talk.data.format);
+                return (
+                  <li>
+                    <a
+                      href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}/`}
+                      class="font-body text-sm text-text-muted hover:text-brand-primary transition-colors"
+                    >
+                      <span class="text-brand-primary">→</span>{' '}
+                      <span lang={locale === 'ru' && !hasCyrillic(talk.data.title) ? 'en' : undefined}>{talk.data.title}</span>
+                    </a>
+                    {label && (
+                      <span class="ml-2 font-mono text-[11px] uppercase tracking-[0.08em] text-brand-accent whitespace-nowrap">{label}</span>
+                    )}
+                    {talk.data.highlight && (
+                      <div class="font-mono text-xs text-warm mt-1">★ {talk.data.highlight}</div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>

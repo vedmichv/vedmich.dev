@@ -4,6 +4,7 @@ event: "AWS re:Invent"
 city: "Лас-Вегас"
 date: 2024-12-05
 tags: ["Latency", "Networking", "Observability", "Architecture", "AWS"]
+format: "chalk-talk"
 draft: false
 ---
 
