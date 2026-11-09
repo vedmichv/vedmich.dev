@@ -135,6 +135,21 @@ test('missing pages retain the requested URL and offer recovery links', async ({
   await expect(page.locator('a[href="/ru/"]')).toBeVisible();
 });
 
+test('missing Russian pages are localized and link to the blog and talks in both locales', async ({ page }) => {
+  const response = await page.goto('/ru/does-not-exist/');
+  expect(response?.status()).toBe(404);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+  await expect(page.getByRole('heading', { name: 'Страница не найдена' })).toBeVisible();
+  await expect(page.getByText('Ссылка могла устареть, или страницы ещё нет.')).toBeVisible();
+  await expect(page).toHaveURL(/\/ru\/does-not-exist\/$/);
+  for (const href of ['/en/blog/', '/en/speaking/', '/ru/blog/', '/ru/speaking/']) {
+    await expect(page.locator(`a[href="${href}"]`)).toBeVisible();
+  }
+  const english = await page.goto('/en/does-not-exist/');
+  expect(english?.status()).toBe(404);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+});
+
 test('404 bootstrap preserves the slide deep link while loading its shell', async ({ page }) => {
   await page.route('**/slides/review-fixture/index.html', (route) => route.fulfill({
     contentType: 'text/html',
