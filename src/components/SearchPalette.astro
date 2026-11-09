@@ -151,6 +151,8 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
 </style>
 
 <script>
+  import { langOfText } from '../i18n/lang-of-parts';
+
   type SearchItem = {
     kind: 'slides' | 'post';
     title: string;
@@ -190,6 +192,7 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
 
   if (palette && card && input && resultsEl && countEl && indexEl) {
     const index: SearchItem[] = JSON.parse(indexEl.textContent || '[]');
+    const pageLocale = document.documentElement.lang === 'ru' ? 'ru' : 'en';
     let query = '';
     let selectedIndex = 0;
     let currentResults: SearchItem[] = [];
@@ -226,11 +229,13 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
             const isSelected = i === selectedIndex;
             const badgeLabel = r.kind === 'slides' ? slidesLabel : postLabel;
             const badgeClass = r.kind === 'slides' ? 'kind-slides' : 'kind-post';
+            const titleLang = langOfText(r.title, pageLocale);
+            const titleLangAttr = titleLang ? ` lang="${titleLang}"` : '';
             return `
               <div id="search-result-${i}" class="search-result ${isSelected ? 'is-selected' : ''}" role="option" aria-selected="${isSelected}" data-idx="${i}">
                 <span class="kind-badge ${badgeClass}">${escapeHtml(badgeLabel)}</span>
                 <div style="min-width: 0;">
-                  <div class="title">${escapeHtml(r.title)}</div>
+                  <div class="title"${titleLangAttr}>${escapeHtml(r.title)}</div>
                   <div class="sub">${escapeHtml(r.sub)}</div>
                 </div>
                 <span class="enter-arrow">↵</span>

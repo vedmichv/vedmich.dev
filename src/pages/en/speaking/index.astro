@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { t } from '../../../i18n/utils';
+import { langOfText } from '../../../i18n/lang-of-parts';
 
 const locale = 'en';
 const i = t(locale);
@@ -49,6 +50,7 @@ const talksByYear = talks.reduce((acc, talk) => {
                   </div>
                   <a
                     href={`/${locale}/speaking/${talk.id.replace(`${locale}/`, '')}/`}
+                    lang={langOfText(talk.data.title, locale)}
                     class="font-body text-sm text-text-muted mt-2 block hover:text-brand-primary transition-colors"
                   >
                     <span class="text-brand-primary">→</span> {talk.data.title}

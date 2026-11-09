@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { YouTube } from '@astro-community/astro-embed-youtube';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { t } from '../../../i18n/utils';
+import { langOfText } from '../../../i18n/lang-of-parts';
 
 export async function getStaticPaths() {
   const talks = await getCollection('speaking', ({ id }) => id.startsWith('en/'));
@@ -47,7 +48,7 @@ const videoStart = talk.data.video
       ← {i.speaking.back_link}
     </a>
 
-    <h1 class="font-display text-4xl break-words hyphens-auto font-bold text-text-primary mb-4">{talk.data.title}</h1>
+    <h1 lang={langOfText(talk.data.title, locale)} class="font-display text-4xl break-words hyphens-auto font-bold text-text-primary mb-4">{talk.data.title}</h1>
 
     <p class="text-base font-medium text-text-secondary mb-6">
       {talk.data.event} · {talk.data.city} · {talk.data.date.toLocaleDateString('en-GB', {

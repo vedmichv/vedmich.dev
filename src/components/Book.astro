@@ -1,5 +1,6 @@
 ---
 import { t, type Locale } from '../i18n/utils';
+import { langOfText } from '../i18n/lang-of-parts';
 
 const amazonUrl = 'https://www.amazon.com/dp/1835460038';
 // Hardcoded per D-17: Amazon has no public ratings API.
@@ -57,7 +58,7 @@ const i = t(locale);
           <div class="book-cover-wrap flex justify-center sm:justify-start">
             <img
               src="/images/book-cover-3d.jpg"
-              alt={`${i.book.name} — book cover`}
+              alt={i.book.cover_alt}
               width="200"
               height="247"
               loading="lazy"
@@ -67,10 +68,10 @@ const i = t(locale);
           </div>
 
           <div>
-            <h3 class="font-display text-xl font-semibold group-hover:text-accent transition-colors">
+            <h3 lang={langOfText(i.book.name, locale)} class="font-display text-xl font-semibold group-hover:text-accent transition-colors">
               {i.book.name}
             </h3>
-            <div class="flex items-center gap-2 mt-2 mb-4" aria-label={`${rating} out of 5 on Amazon`}>
+            <div class="flex items-center gap-2 mt-2 mb-4" aria-label={i.book.rating_label.replace('{rating}', String(rating))}>
               <span class="text-brand-accent text-base" aria-hidden="true">★★★★★</span>
               <span class="font-mono text-sm text-text-secondary">{rating}</span>
               <span class="text-text-muted" aria-hidden="true">·</span>

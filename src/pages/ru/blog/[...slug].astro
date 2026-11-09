@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CodeCopyEnhancer from '../../../components/CodeCopyEnhancer.astro';
 import { t } from '../../../i18n/utils';
+import { langOfText } from '../../../i18n/lang-of-parts';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ id }) => id.startsWith('ru/'));
@@ -51,7 +52,7 @@ const authorDisplay = post.data.author === 'Viktor Vedmich'
           day: 'numeric',
         }).replace(/\s*г\.?$/, '')}
       </time>
-      <h1 class="font-display text-4xl break-words hyphens-auto sm:text-5xl font-bold tracking-[-0.02em] mb-4">{post.data.title}</h1>
+      <h1 lang={langOfText(post.data.title, locale)} class="font-display text-4xl break-words hyphens-auto sm:text-5xl font-bold tracking-[-0.02em] mb-4">{post.data.title}</h1>
       <p class="text-lg text-text-muted">{post.data.description}</p>
       <p class="text-sm text-text-muted mt-3">
         {authorDisplay} · {readingTime} {i.blog.min_read}
