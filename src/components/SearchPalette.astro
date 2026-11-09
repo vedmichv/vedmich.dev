@@ -289,7 +289,10 @@ const sortedIndex = [...index].sort((a, b) => b.date.localeCompare(a.date));
       document.body.style.overflow = '';
       if (lastFocused && typeof lastFocused.focus === 'function') {
         lastFocused.focus();
-      }    }
+      }
+      // Opened with "/" from the page body: there is nothing to restore, and the hidden input
+      // would stay the active element, which blocks the "/" shortcut until the next click.
+      if (document.activeElement === input) input!.blur();    }
 
     document.addEventListener('vv:search:open', () => open());
     document.addEventListener('vv:search:close', () => close());

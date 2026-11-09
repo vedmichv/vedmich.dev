@@ -132,6 +132,18 @@ for (const [path, query, kind, text] of searchCases) {
   });
 }
 
+test('search reopens with the slash shortcut after Escape', async ({ page }) => {
+  await page.goto('/en/');
+  const dialog = page.getByRole('dialog');
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.keyboard.press('/');
+    await expect(dialog).toBeVisible();
+    await expect(page.getByRole('combobox')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+  }
+});
+
 test('search opens a home section from another page and never exposes drafts', async ({ page }) => {
   await page.goto('/en/blog/');
   await page.keyboard.press('/');
