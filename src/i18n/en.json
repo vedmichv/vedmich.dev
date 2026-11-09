@@ -14,13 +14,15 @@
   },
   "search": {
     "results_count": "Results: {n} of {total}",
-    "placeholder": "Search slides, posts, tags…",
+    "placeholder": "Search talks, slides, posts, tags…",
     "empty_hint": "Start typing to search. Try: “karpenter”, “mcp”, “kubernetes”.",
     "no_results": "No matches for",
     "footer_move": "move",
     "footer_open": "open",
     "kind_slides": "Slides",
-    "kind_post": "Post"
+    "kind_post": "Post",
+    "kind_talk": "Talk",
+    "kind_page": "Page"
   },
   "hero": {
     "greeting": "Hi, I'm",

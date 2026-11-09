@@ -14,13 +14,15 @@
   },
   "search": {
     "results_count": "Результаты: {n} из {total}",
-    "placeholder": "Поиск по слайдам, постам, тегам…",
+    "placeholder": "Поиск по докладам, слайдам, постам, тегам…",
     "empty_hint": "Начните вводить запрос. Попробуйте: «karpenter», «mcp», «kubernetes».",
     "no_results": "Ничего не найдено для",
     "footer_move": "навигация",
     "footer_open": "открыть",
     "kind_slides": "Слайды",
-    "kind_post": "Пост"
+    "kind_post": "Пост",
+    "kind_talk": "Доклад",
+    "kind_page": "Раздел"
   },
   "hero": {
     "greeting": "Привет, я",

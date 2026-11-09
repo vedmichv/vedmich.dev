@@ -48,3 +48,9 @@ export const skills = [
   'Python',
   'Cost Optimization',
 ] as const;
+
+// Authors of "Cracking the Kubernetes Interview", as printed on the cover and in BookLink alt text.
+export const bookAuthors = {
+  en: 'Viktor Vedmich and Alexander Dovnar',
+  ru: 'Виктор Ведмич и Александр Довнар',
+} as const;
