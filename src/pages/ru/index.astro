@@ -5,7 +5,8 @@ import LatestStrip from '../../components/LatestStrip.astro';
 import BlogPreview from '../../components/BlogPreview.astro';
 import Speaking from '../../components/Speaking.astro';
 import About from '../../components/About.astro';
-import AlsoBand from '../../components/AlsoBand.astro';
+import Podcasts from '../../components/Podcasts.astro';
+import Book from '../../components/Book.astro';
 import Contact from '../../components/Contact.astro';
 import { homePageJsonLd } from '../../lib/structured-data';
 
@@ -25,6 +26,7 @@ const description = 'Виктор Ведмич: Senior Solutions Architect в AW
   <BlogPreview locale={locale} />
   <Speaking locale={locale} />
   <About locale={locale} />
-  <AlsoBand locale={locale} />
+  <Podcasts locale={locale} />
+  <Book locale={locale} />
   <Contact locale={locale} />
 </BaseLayout>

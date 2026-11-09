@@ -55,8 +55,21 @@
   "podcasts": {
     "title": "Podcasts",
     "dkt_name": "DevOps Kitchen Talks",
-    "dkt_desc": "A podcast and community about DevOps, SRE, AI, system design and cloud. Interviews with engineers, mock interviews, and news that listeners send in. I host it with Alexander Dovnar.",
-    "dkt_stats": "100+ episodes · ~10K subscribers (November 2026)",
+    "dkt_role": "Founder and host\u00a0· since\u00a02020",
+    "dkt_desc": "A Russian-language podcast and community about DevOps, SRE, AI, system design and cloud. Max Belitsky and I launched it in 2020. I host it with Alexander Dovnar. There are news episodes, interviews with engineers and mock interviews. Listeners send in the news and help choose what we discuss on air.",
+    "dkt_site": "The community site dk-t.dev has every episode with its notes, the news collection for the next episode, articles, slides and conference recordings.",
+    "dkt_conf": "On 15 August 2026 the community held its first conference of its own, DKT Conf, in Minsk and online. It had four talks, a panel on AI and engineers' mental health, and a DevOps quiz.",
+    "dkt_conf_link": "How it went",
+    "dkt_cta": "Go to dk-t.dev",
+    "dkt_telegram": "Telegram channel",
+    "dkt_facts_title": "DevOps Kitchen Talks in numbers",
+    "dkt_facts": [
+      { "value": "100+", "label": "episodes" },
+      { "value": "~10K", "label": "YouTube subscribers" },
+      { "value": "500K+", "label": "YouTube views" },
+      { "value": "2020", "label": "first episode" }
+    ],
+    "dkt_facts_note": "Figures as of November 2026",
     "aws_name": "AWS на русском",
     "aws_desc": "A Russian-language podcast about AWS services, architecture patterns, AI applications and IT careers. I have hosted it since 2021, so you hear the view from inside AWS.",
     "aws_stats": "70+ episodes · 70K+ listens (November 2026)",
@@ -66,8 +79,7 @@
       "spotify": "Spotify",
       "yandex": "Yandex Music",
       "youtube": "YouTube",
-      "podbean": "Podbean",
-      "site": "dk-t.dev"
+      "podbean": "Podbean"
     }
   },
   "speaking": {

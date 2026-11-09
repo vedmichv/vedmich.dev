@@ -42,3 +42,7 @@
   and a privacy-friendly visit counter.
 - Viktor, 2026-11-09: one row per event in the speaking timeline; Malta and Adria
   workshops added; the Malta DevOps Agent workshop is the public AWS catalog workshop.
+- Viktor, 2026-11-09: Podcasts and Book are separate full-width sections again. The DKT
+  card leads to dk-t.dev and tells more about the project: founders, the listener news
+  collection, DKT Conf 2026 and its numbers (YouTube 9.91K subscribers and 512K views,
+  104 episodes, first episode in 2020; checked on 2026-11-09).

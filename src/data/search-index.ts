@@ -114,7 +114,7 @@ export async function buildSearchIndex(locale: Locale): Promise<SearchItem[]> {
       sub: i.nav.podcasts,
       url: `/${locale}/#podcasts`,
       tags: [],
-      body: i.podcasts.dkt_desc,
+      body: [i.podcasts.dkt_desc, i.podcasts.dkt_site, i.podcasts.dkt_conf].join(' '),
       date: '',
       meta: label.page,
     },

@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// Homepage order, navigation, the six-event Speaking list, talk badges and the About photo.
+// Homepage order, navigation, the six-event Speaking list, talk badges, the About photo and the DKT card.
 const strings = {
   en: {
     nav: ['Blog', 'Speaking', 'Podcasts', 'Book', 'About', 'Contact'],
@@ -10,6 +10,7 @@ const strings = {
     invite: 'Invite me to speak',
     photoAlt: 'Viktor Vedmich speaking at AWS Summit Berlin',
     badges: { video: 'Video', slides: 'Slides', article: 'Article' },
+    dktCta: 'Go to dk-t.dev',
   },
   ru: {
     nav: ['Блог', 'Выступления', 'Подкасты', 'Книга', 'Обо мне', 'Контакты'],
@@ -19,6 +20,7 @@ const strings = {
     invite: 'Пригласить выступить',
     photoAlt: 'Виктор Ведмич выступает на AWS Summit Berlin',
     badges: { video: 'Видео', slides: 'Слайды', article: 'Статья' },
+    dktCta: 'Перейти на dk-t.dev',
   },
 } as const;
 
@@ -129,20 +131,27 @@ for (const locale of ['en', 'ru'] as const) {
       expect(box!.height).toBeLessThanOrEqual(300);
     });
 
-    test('Podcasts and Book sit side by side on desktop and stack on a phone', async ({ page }) => {
-      await page.setViewportSize({ width: 1440, height: 900 });
-      await page.goto(`/${locale}/`);
-      const podcasts = (await page.locator('#podcasts').boundingBox())!;
-      const book = (await page.locator('#book').boundingBox())!;
-      expect(book.x).toBeGreaterThan(podcasts.x + podcasts.width - 1);
-      expect(Math.abs(book.y - podcasts.y)).toBeLessThan(4);
+    test('Podcasts and Book are separate full-width sections, one after the other', async ({ page }) => {
+      for (const width of [1440, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/${locale}/`);
+        const podcasts = (await page.locator('#podcasts').boundingBox())!;
+        const book = (await page.locator('#book').boundingBox())!;
+        expect(podcasts.width).toBeGreaterThan(width - 20);
+        expect(book.width).toBeGreaterThan(width - 20);
+        expect(book.y).toBeGreaterThanOrEqual(podcasts.y + podcasts.height - 1);
+      }
+    });
 
-      await page.setViewportSize({ width: 390, height: 844 });
-      await page.reload();
-      const podcastsMobile = (await page.locator('#podcasts').boundingBox())!;
-      const bookMobile = (await page.locator('#book').boundingBox())!;
-      expect(bookMobile.y).toBeGreaterThanOrEqual(podcastsMobile.y + podcastsMobile.height - 1);
-      expect(Math.abs(bookMobile.x - podcastsMobile.x)).toBeLessThan(4);
+    test('the DKT card leads to dk-t.dev and shows its numbers', async ({ page }) => {
+      await page.goto(`/${locale}/`);
+      const card = page.locator('article[aria-labelledby="podcast-dkt-title"]');
+      await expect(card.getByRole('link', { name: new RegExp(`^${s.dktCta}`) })).toHaveAttribute('href', 'https://dk-t.dev/');
+      await expect(card.locator('a[href="https://t.me/DevOpsKitchenTalks"]')).toHaveCount(1);
+      await expect(card.locator('a[href="https://dk-t.dev/conferences/dkt-conf-2026"]')).toHaveCount(1);
+      await expect(card.locator('[data-dkt-facts] dd')).toHaveText(['100+', '~10K', '500K+', '2020']);
+      // The community site is the main link, so the player row no longer repeats it.
+      await expect(card.locator('ul a[href="https://dk-t.dev/"]')).toHaveCount(0);
     });
 
     test('a talk with video, slides and an article shows three badges with the talk title in their names', async ({ page }) => {

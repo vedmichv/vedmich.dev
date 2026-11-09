@@ -1,6 +1,7 @@
 ---
 import { t, type Locale } from '../i18n/utils';
 import { langOfText } from '../i18n/lang-of-parts';
+import { dktLinks } from '../data/social';
 import PodcastLinks from './PodcastLinks.astro';
 
 interface Props {
@@ -9,54 +10,120 @@ interface Props {
 
 const { locale } = Astro.props;
 const i = t(locale);
+const newTab = (label: string) => `${label} (${i.contact.opens_in_new_tab})`;
 ---
 
-<!-- Rendered inside AlsoBand, which owns the band background, padding and container. -->
-<section id="podcasts" aria-labelledby="podcasts-title" class="min-w-0">
-  <div>
-    <h2 id="podcasts-title" class="section-title mb-10 animate-on-scroll">{i.podcasts.title}</h2>
+<section id="podcasts" aria-labelledby="podcasts-title" class="py-20 sm:py-28 bg-surface/30">
+  <div class="section-container">
+    <h2 id="podcasts-title" class="section-title mb-12 animate-on-scroll">{i.podcasts.title}</h2>
 
-    <div class="grid md:grid-cols-2 gap-5">
-      <!-- DKT card: PNG logo in badge slot per D-01, D-15. Not a link itself: the platform row holds the links. -->
-      <article aria-labelledby="podcast-dkt-title" class="p-6 rounded-xl bg-surface border border-border animate-on-scroll">
-        <div class="w-14 h-14 shrink-0 rounded-xl bg-white/95 p-1 flex items-center justify-center ring-1 ring-border">
-          <img
-            src="/images/dkt-logo.png"
-            alt="DevOps Kitchen Talks logo"
-            width="48"
-            height="48"
-            loading="lazy"
-            decoding="async"
-            class="w-full h-full object-contain"
-          />
+    <div class="flex flex-col gap-5">
+      <!-- DKT is the main project: a wide card whose main link is the community site, with its numbers and first conference. -->
+      <article aria-labelledby="podcast-dkt-title" class="p-6 sm:p-8 rounded-xl bg-surface border border-border animate-on-scroll">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-12">
+          <div class="min-w-0">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 shrink-0 rounded-xl bg-white/95 p-1.5 flex items-center justify-center ring-1 ring-border">
+                <!-- Decorative: the heading next to it names the show. -->
+                <img
+                  src="/images/dkt-logo.png"
+                  alt=""
+                  width="52"
+                  height="52"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-contain"
+                />
+              </div>
+              <div class="min-w-0">
+                <h3 id="podcast-dkt-title" lang={langOfText(i.podcasts.dkt_name, locale)} class="font-display text-2xl font-semibold text-text-primary">
+                  {i.podcasts.dkt_name}
+                </h3>
+                <p class="font-mono text-xs uppercase tracking-[0.08em] text-brand-accent mt-1">
+                  {i.podcasts.dkt_role}
+                </p>
+              </div>
+            </div>
+
+            <p class="font-body text-[15px] text-text-muted leading-relaxed mt-5">
+              {i.podcasts.dkt_desc}
+            </p>
+            <p class="font-body text-[15px] text-text-muted leading-relaxed mt-3">
+              {i.podcasts.dkt_site}
+            </p>
+            <p class="font-body text-[15px] text-text-muted leading-relaxed mt-3">
+              {i.podcasts.dkt_conf}{' '}
+              <a
+                href={dktLinks.conf}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={newTab(`${i.podcasts.dkt_conf_link}: DKT Conf 2026`)}
+                class="text-brand-primary underline underline-offset-4 hover:text-brand-primary-hover transition-colors"
+              >{i.podcasts.dkt_conf_link}</a>
+            </p>
+
+            <div class="flex flex-wrap gap-3 mt-6">
+              <a
+                href={dktLinks.site}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={newTab(i.podcasts.dkt_cta)}
+                class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-primary text-bg-base font-medium hover:bg-brand-primary-hover transition-colors"
+              >
+                {i.podcasts.dkt_cta}
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              <a
+                href={dktLinks.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={newTab(i.podcasts.dkt_telegram)}
+                class="inline-flex items-center px-5 py-2.5 rounded-lg border border-border text-text-primary font-medium hover:border-brand-primary hover:text-brand-primary-hover transition-colors"
+              >
+                {i.podcasts.dkt_telegram}
+              </a>
+            </div>
+          </div>
+
+          <div class="min-w-0">
+            <h4 class="sr-only">{i.podcasts.dkt_facts_title}</h4>
+            <dl data-dkt-facts class="grid grid-cols-2 gap-3 m-0">
+              {i.podcasts.dkt_facts.map((fact) => (
+                <div class="flex flex-col-reverse justify-end gap-1 rounded-lg border border-border bg-bg-base p-4">
+                  <dt class="font-body text-[13px] text-text-muted leading-snug">{fact.label}</dt>
+                  <dd class="m-0 font-display text-3xl font-bold text-brand-primary tracking-[-0.02em]">{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p class="font-mono text-xs text-text-muted mt-3 mb-0">{i.podcasts.dkt_facts_note}</p>
+            <PodcastLinks locale={locale} show="dkt" />
+          </div>
         </div>
-        <h3 id="podcast-dkt-title" lang={langOfText(i.podcasts.dkt_name, locale)} class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
-          {i.podcasts.dkt_name}
-        </h3>
-        <p class="font-body text-[15px] text-text-muted leading-relaxed">
-          {i.podcasts.dkt_desc}
-        </p>
-        <div class="font-mono text-xs text-text-muted mt-4">
-          {i.podcasts.dkt_stats}
-        </div>
-        <PodcastLinks locale={locale} show="dkt" />
       </article>
 
-      <!-- AWS RU card: inline amber text badge per D-02, D-06, D-14 -->
-      <article aria-labelledby="podcast-aws-title" class="p-6 rounded-xl bg-surface border border-border animate-on-scroll">
-        <span class="inline-block font-body text-[11px] font-semibold uppercase tracking-[0.08em] px-2 py-1 rounded text-brand-accent bg-brand-accent-soft border border-brand-accent/40">
-          AWS RU
-        </span>
-        <h3 id="podcast-aws-title" lang={langOfText(i.podcasts.aws_name, locale)} class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
-          {i.podcasts.aws_name}
-        </h3>
-        <p class="font-body text-[15px] text-text-muted leading-relaxed">
-          {i.podcasts.aws_desc}
-        </p>
-        <div class="font-mono text-xs text-text-muted mt-4">
-          {i.podcasts.aws_stats}
+      <!-- AWS RU card: inline amber text badge per D-02, D-06, D-14. Same columns as the DKT card. -->
+      <article aria-labelledby="podcast-aws-title" class="p-6 sm:p-8 rounded-xl bg-surface border border-border animate-on-scroll">
+        <div class="grid gap-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-12">
+          <div class="min-w-0">
+            <span class="inline-block font-body text-[11px] font-semibold uppercase tracking-[0.08em] px-2 py-1 rounded text-brand-accent bg-brand-accent-soft border border-brand-accent/40">
+              AWS RU
+            </span>
+            <h3 id="podcast-aws-title" lang={langOfText(i.podcasts.aws_name, locale)} class="font-display text-[22px] font-semibold text-text-primary mt-3 mb-2">
+              {i.podcasts.aws_name}
+            </h3>
+            <p class="font-body text-[15px] text-text-muted leading-relaxed">
+              {i.podcasts.aws_desc}
+            </p>
+            <div class="font-mono text-xs text-text-muted mt-4">
+              {i.podcasts.aws_stats}
+            </div>
+          </div>
+          <div class="min-w-0 lg:self-end">
+            <PodcastLinks locale={locale} show="aws" />
+          </div>
         </div>
-        <PodcastLinks locale={locale} show="aws" />
       </article>
     </div>
   </div>

@@ -29,7 +29,16 @@ export const socialLinks = [
   },
 ] as const;
 
-export type PodcastPlatform = 'apple' | 'spotify' | 'yandex' | 'youtube' | 'podbean' | 'site';
+export type PodcastPlatform = 'apple' | 'spotify' | 'yandex' | 'youtube' | 'podbean';
+
+// DevOps Kitchen Talks beyond the players: the community site is the card's main link.
+// Opened on 2026-11-09: dk-t.dev (episodes, news collection, articles, slides, conferences),
+// the official Telegram channel and the DKT Conf 2026 page (15 August 2026, Minsk and online).
+export const dktLinks = {
+  site: 'https://dk-t.dev/',
+  telegram: 'https://t.me/DevOpsKitchenTalks',
+  conf: 'https://dk-t.dev/conferences/dkt-conf-2026',
+} as const;
 
 // Where to listen, per show. Every URL was opened and matched to its show on 2026-11-09
 // (dk-t.dev for the DKT list; the Podbean site of "AWS на русском" for its list).
@@ -42,7 +51,6 @@ export const podcastLinks = {
     { platform: 'yandex', url: 'https://music.yandex.ru/album/10151746' },
     { platform: 'youtube', url: 'https://www.youtube.com/@DevOpsKitchenTalks' },
     { platform: 'podbean', url: 'https://devopskitchentalks.podbean.com/' },
-    { platform: 'site', url: 'https://dk-t.dev/' },
   ],
   aws: [
     { platform: 'apple', url: 'https://podcasts.apple.com/podcast/id1600771698' },
