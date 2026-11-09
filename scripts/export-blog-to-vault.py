@@ -106,7 +106,12 @@ for lang in ('en', 'ru'):
         title, desc, date = fm_value(fm, 'title'), fm_value(fm, 'description'), fm_value(fm, 'date')
         tags = fm_tags(fm)
         dump = lambda v: json.dumps(v, ensure_ascii=False)
-        head = ['---', 'aliases:', f'  - {name}', f'date_created: {now}', f'date_modified: {now}', 'tags:',
+        target = out / f'{name}.md'
+        created = now
+        if target.exists():
+            m = re.search(r'^date_created: (.+)$', target.read_text(encoding='utf-8'), re.M)
+            created = m.group(1) if m else now
+        head = ['---', 'aliases:', f'  - {name}', f'date_created: {created}', f'date_modified: {now}', 'tags:',
                 '  - blog', '  - vedmich-dev', '  - review',
                 f'status: {"draft" if draft else "published"}', f'lang: {lang}', f'title: {dump(title)}',
                 f'description: {dump(desc)}', f'date: {date}', f'site_tags: {dump(tags)}',
