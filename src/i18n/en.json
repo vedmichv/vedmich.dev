@@ -86,7 +86,7 @@
     "title": "Speaking",
     "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.6-4.8/5.0",
     "back_link": "Back to speaking",
-    "watch_video": "Watch on YouTube",
+    "watch_on": "Watch on {platform}",
     "view_slides": "View slides",
     "read_article": "Read the article",
     "all_talks": "All talks",

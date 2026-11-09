@@ -21,6 +21,17 @@ for (const locale of ['en', 'ru']) {
     expect(errors).toEqual([]);
   });
 
+  test(`${locale}: a recording outside YouTube is a named link without an embedded player`, async ({ page }) => {
+    const failed: string[] = [];
+    page.on('response', (response) => response.status() >= 400 && failed.push(response.url()));
+    await page.goto(`/${locale}/speaking/2025-infoq-munich-valkey/`);
+    await expect(page.locator('lite-youtube, iframe[src*="youtube"]')).toHaveCount(0);
+    // The body links the recording too, so find the button by its name.
+    const watch = page.getByRole('link', { name: new RegExp(`^${locale === 'en' ? 'Watch on InfoQ' : 'Смотреть на InfoQ'}`) });
+    await expect(watch).toHaveAttribute('href', 'https://www.infoq.com/presentations/valkey-datastore');
+    expect(failed).toEqual([]);
+  });
+
   for (const width of [320, 390, 768, 1024, 1440]) {
     test(`${locale}: header fits ${width}px and mobile menu is accessible`, async ({ page }) => {
       await page.setViewportSize({ width, height: 850 });

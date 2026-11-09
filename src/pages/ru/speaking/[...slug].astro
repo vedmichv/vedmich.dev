@@ -7,6 +7,7 @@ import { t } from '../../../i18n/utils';
 import { pageTitle, summarize } from '../../../lib/seo';
 import { talkEventJsonLd } from '../../../lib/structured-data';
 import { langOfText } from '../../../i18n/lang-of-parts';
+import { videoPlatform } from '../../../lib/video';
 
 export async function getStaticPaths() {
   const talks = await getCollection('speaking', ({ id }) => id.startsWith('ru/'));
@@ -35,6 +36,8 @@ const jsonLd = talkEventJsonLd({
   date: talk.data.date,
   video: talk.data.video,
 });
+
+const video = talk.data.video ? videoPlatform(talk.data.video) : undefined;
 
 // A `t=` timestamp in the video URL (e.g. &t=4500s) becomes the embed's start time.
 const videoStart = talk.data.video
@@ -78,7 +81,7 @@ const videoStart = talk.data.video
       </div>
     )}
 
-    {talk.data.video && (
+    {talk.data.video && video?.embeddable && (
       <div class="mb-8">
         <YouTube id={talk.data.video} params={videoStart ? `start=${videoStart}` : undefined} />
       </div>
@@ -92,9 +95,9 @@ const videoStart = talk.data.video
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-accent text-bg-base hover:bg-brand-accent-hover transition-colors font-semibold"
-            aria-label={`${i.speaking.watch_video} (${i.contact.opens_in_new_tab})`}
+            aria-label={`${i.speaking.watch_on.replace('{platform}', video!.name)} (${i.contact.opens_in_new_tab})`}
           >
-            {i.speaking.watch_video}
+            {i.speaking.watch_on.replace('{platform}', video!.name)}
           </a>
         )}
         {talk.data.slides && (
