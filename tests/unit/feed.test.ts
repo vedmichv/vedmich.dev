@@ -88,7 +88,7 @@ test('the feed paths and the channel metadata exist for both locales', () => {
   assert.match(FEED_CHANNEL.ru.title, /[а-я]/i);
   for (const meta of Object.values(FEED_CHANNEL)) {
     assert.ok(meta.title && meta.description);
-    for (const text of [meta.title, meta.description]) assert.ok(!/[–—]/.test(text));
+    for (const text of [meta.title, meta.description]) assert.ok(!/[\u2013\u2014]/.test(text));
   }
 });
 
