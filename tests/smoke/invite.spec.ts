@@ -166,6 +166,9 @@ for (const locale of ['en', 'ru'] as const) {
       expect(overflow).toBeLessThanOrEqual(0);
       const boxes = await page.locator('[data-bio-card]').evaluateAll((cards) => cards.map((card) => card.getBoundingClientRect().left));
       expect(new Set(boxes.map(Math.round)).size).toBe(1);
+      // The download button wraps under the photo instead of squeezing it.
+      const photo = (await page.locator('[data-speaker-kit] img').boundingBox())!;
+      expect(photo.width).toBeGreaterThanOrEqual(90);
     });
   });
 }

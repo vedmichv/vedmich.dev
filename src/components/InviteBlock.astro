@@ -100,7 +100,8 @@ const focusRing =
     <p class="text-sm text-text-secondary m-0 mb-6">{inv.kit_intro}</p>
 
     <div class="grid gap-8 lg:grid-cols-[160px_1fr]">
-      <div class="flex flex-row items-end gap-4 lg:flex-col lg:items-start">
+      <!-- The photo keeps its size; on narrow phones the download button wraps under it. -->
+      <div class="flex flex-row flex-wrap items-end gap-4 lg:flex-col lg:items-start">
         <img
           src={speakerPhoto.src640}
           alt={i.about.photo_alt}
@@ -108,7 +109,7 @@ const focusRing =
           height={speakerPhoto.height}
           loading="lazy"
           decoding="async"
-          class="block w-24 lg:w-40 h-auto rounded-xl border border-border"
+          class="block w-24 lg:w-40 h-auto shrink-0 rounded-xl border border-border"
         />
         <a
           href={speakerPhoto.download}
