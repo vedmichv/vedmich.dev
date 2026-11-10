@@ -27,6 +27,8 @@ const speaking = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()),
     video: z.string().url().optional(),
+    // A published transcript of the talk, e.g. the one InfoQ prints under its recording.
+    transcript: z.string().url().optional(),
     slides: z.string().url().optional(),
     post: companionPost,
     rating: z.string().optional(),

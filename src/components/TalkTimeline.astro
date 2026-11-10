@@ -22,12 +22,13 @@ const byYear = groupEventsByYear(limitEvents(groupTalksByEvent(talks), limit));
 const formatLabel = (format?: string) =>
   format && format !== 'talk' ? i.speaking.formats[format.replace('-', '_') as keyof typeof i.speaking.formats] : undefined;
 
-// Resource badges per session: Video, Slides, Article. Each one links to a field the talk already has.
+// Resource badges per session: Video, Transcript, Slides, Article. Each one links to a field the talk already has.
 const badgeClass =
   'inline-flex items-center min-h-6 px-2 rounded border border-border font-mono text-[11px] font-semibold tracking-[0.04em] text-text-secondary hover:border-brand-primary hover:text-brand-primary-hover transition-colors';
 const badgesOf = (talk: CollectionEntry<'speaking'>) =>
   [
     { key: 'video', label: i.speaking.badges.video, href: talk.data.video, external: true },
+    { key: 'transcript', label: i.speaking.badges.transcript, href: talk.data.transcript, external: true },
     { key: 'slides', label: i.speaking.badges.slides, href: talk.data.slides, external: true },
     { key: 'article', label: i.speaking.badges.article, href: talk.data.post, external: false },
   ].filter((badge): badge is typeof badge & { href: string } => Boolean(badge.href));

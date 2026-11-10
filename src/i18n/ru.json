@@ -87,11 +87,13 @@
     "subtitle": "30+ технических докладов в год. Рейтинг спикера: 4.6-4.8/5.0",
     "back_link": "Назад к выступлениям",
     "watch_on": "Смотреть на {platform}",
+    "read_transcript": "Читать расшифровку на {platform}",
     "view_slides": "Посмотреть слайды",
     "read_article": "Читать статью",
     "all_talks": "Все выступления",
     "badges": {
       "video": "Видео",
+      "transcript": "Расшифровка",
       "slides": "Слайды",
       "article": "Статья"
     },

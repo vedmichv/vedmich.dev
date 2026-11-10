@@ -87,11 +87,13 @@
     "subtitle": "30+ technical deep-dives per year. Speaker rating: 4.6-4.8/5.0",
     "back_link": "Back to speaking",
     "watch_on": "Watch on {platform}",
+    "read_transcript": "Read the transcript on {platform}",
     "view_slides": "View slides",
     "read_article": "Read the article",
     "all_talks": "All talks",
     "badges": {
       "video": "Video",
+      "transcript": "Transcript",
       "slides": "Slides",
       "article": "Article"
     },

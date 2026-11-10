@@ -21,7 +21,7 @@ for (const locale of ['en', 'ru']) {
     expect(errors).toEqual([]);
   });
 
-  test(`${locale}: a recording outside YouTube is a named link without an embedded player`, async ({ page }) => {
+  test(`${locale}: a recording outside YouTube is a named link without an embedded player, with its transcript`, async ({ page }) => {
     const failed: string[] = [];
     page.on('response', (response) => response.status() >= 400 && failed.push(response.url()));
     await page.goto(`/${locale}/speaking/2025-infoq-munich-valkey/`);
@@ -29,7 +29,14 @@ for (const locale of ['en', 'ru']) {
     // The body links the recording too, so find the button by its name.
     const watch = page.getByRole('link', { name: new RegExp(`^${locale === 'en' ? 'Watch on InfoQ' : 'Смотреть на InfoQ'}`) });
     await expect(watch).toHaveAttribute('href', 'https://www.infoq.com/presentations/valkey-datastore');
+    const transcript = page.getByRole('link', { name: new RegExp(`^${locale === 'en' ? 'Read the transcript on InfoQ' : 'Читать расшифровку на InfoQ'}`) });
+    await expect(transcript).toHaveAttribute('href', 'https://www.infoq.com/presentations/valkey-datastore');
     expect(failed).toEqual([]);
+
+    // The timeline shows the transcript as its own badge next to the video.
+    await page.goto(`/${locale}/speaking/`);
+    const row = page.locator('[data-talk-event] li').filter({ has: page.locator(`a[href="/${locale}/speaking/2025-infoq-munich-valkey/"]`) });
+    await expect(row.locator('[data-talk-badges] a')).toHaveText(locale === 'en' ? ['Video', 'Transcript'] : ['Видео', 'Расшифровка']);
   });
 
   for (const width of [320, 390, 768, 1024, 1440]) {

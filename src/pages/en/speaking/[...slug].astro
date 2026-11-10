@@ -7,7 +7,7 @@ import { t } from '../../../i18n/utils';
 import { pageTitle, summarize } from '../../../lib/seo';
 import { talkEventJsonLd } from '../../../lib/structured-data';
 import { langOfText } from '../../../i18n/lang-of-parts';
-import { videoPlatform } from '../../../lib/video';
+import { platformOf } from '../../../lib/platform';
 
 export async function getStaticPaths() {
   const talks = await getCollection('speaking', ({ id }) => id.startsWith('en/'));
@@ -37,7 +37,8 @@ const jsonLd = talkEventJsonLd({
   video: talk.data.video,
 });
 
-const video = talk.data.video ? videoPlatform(talk.data.video) : undefined;
+const video = talk.data.video ? platformOf(talk.data.video) : undefined;
+const transcript = talk.data.transcript ? platformOf(talk.data.transcript) : undefined;
 
 // A `t=` timestamp in the video URL (e.g. &t=4500s) becomes the embed's start time.
 const videoStart = talk.data.video
@@ -87,7 +88,7 @@ const videoStart = talk.data.video
       </div>
     )}
 
-    {(talk.data.video || talk.data.slides || talk.data.post) && (
+    {(talk.data.video || talk.data.transcript || talk.data.slides || talk.data.post) && (
       <div class="flex flex-wrap gap-3 mb-8">
         {talk.data.video && (
           <a
@@ -98,6 +99,17 @@ const videoStart = talk.data.video
             aria-label={`${i.speaking.watch_on.replace('{platform}', video!.name)} (${i.contact.opens_in_new_tab})`}
           >
             {i.speaking.watch_on.replace('{platform}', video!.name)}
+          </a>
+        )}
+        {talk.data.transcript && (
+          <a
+            href={talk.data.transcript}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-brand-primary text-brand-primary hover:bg-brand-primary-soft transition-colors font-semibold"
+            aria-label={`${i.speaking.read_transcript.replace('{platform}', transcript!.name)} (${i.contact.opens_in_new_tab})`}
+          >
+            {i.speaking.read_transcript.replace('{platform}', transcript!.name)}
           </a>
         )}
         {talk.data.slides && (
