@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /slides/vv-demo/
+Disallow: /slides/how-llms-work/
 
 Sitemap: https://vedmich.dev/sitemap-index.xml
