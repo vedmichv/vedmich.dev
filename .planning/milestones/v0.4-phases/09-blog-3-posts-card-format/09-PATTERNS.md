@@ -1729,7 +1729,6 @@ Every i18n or content change MUST edit both EN and RU in the same commit:
 ```
 feat(09-01): extract BlogCard + rewrite BlogPreview
 
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ```
 Follow GSD convention `docs/feat($PHASE-$PLAN):`.
 

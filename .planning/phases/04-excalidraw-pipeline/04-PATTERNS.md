@@ -835,7 +835,6 @@ docs(04): fix DIAG-05 language — MCP + karpenter + stretch targets per D-04b
 
 Pattern: Phase 3 D-01e post-phase doc-drift commit.
 
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ```
 
 **When to commit:** POST-phase, after Phase 4 verification passes. Part of Phase 4's cleanup-and-close wave (same wave as UAT close and STATE.md advance).
@@ -899,7 +898,6 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 **Commit shape:**
 - Title: `fix(04-NN): <slug> — <one-line description>` (NN = plan or wave number).
 - Body: bullet list covering (a) source JSON path, (b) output SVG path + byte count, (c) MDX edits in EN + RU (both locales named).
-- Tail: `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`.
 
 **Example projection:**
 
@@ -915,7 +913,6 @@ fix(04-02): mcp-servers — swap ASCII diagram for client-server SVG
   - loading="eager" width="1800" height="400"
 - Same swap in src/content/blog/ru/2026-03-02-mcp-servers-plainly-explained.md with RU-localized alt.
 
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ```
 
 **What includes atomically (single commit):**
