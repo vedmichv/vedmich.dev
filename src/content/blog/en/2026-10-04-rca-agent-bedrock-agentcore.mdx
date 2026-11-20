@@ -70,7 +70,7 @@ A tool call gives the model one observation. The agent part is the loop that use
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={12} clicks={4} title="The agent loop chooses the next check" caption="A bounded investigation loop: evidence, choose the next check, scoped tool, observed result. It ends with a supported report when the evidence is sufficient or the budget is reached." />
 
-Two properties keep this loop under control. It is **bounded**: the application, not the model, enforces limits on tool calls, time and tokens, and when a limit is reached the agent stops and says what it could not establish. And **only an observed result can trigger another check**, an error included. The loop moves forward on evidence, not on the model talking itself into something. Permissions and untrusted content need their own controls, covered below.
+Two properties keep this loop under control. It is **bounded**: the application, not the model, enforces limits on tool calls, time and tokens. When a limit is reached, the agent stops and says what it could not establish. And **only an observed result can trigger another check**, an error included. The loop moves forward on evidence, not on the model convincing itself. Permissions and untrusted content need their own controls, covered below.
 
 ### Not everything needs to be an agent
 
@@ -84,7 +84,7 @@ In the RCA design, only the investigation itself is agentic. Alert intake is a f
 
 Two more capabilities come in when the task needs them.
 
-A **skill** is a reusable procedure for a recurring job. "Restart investigation" says when to use it (a container restart, not every Kubernetes question) and how to proceed: inspect the previous termination state, align metrics with the restart time, compare plausible causes, report the evidence and the missing checks. The skill is loaded into the prompt when the job matches. Skills provide instructions. Tools provide capabilities.
+A **skill** is a reusable procedure for a recurring job. "Restart investigation" says when to use it (a container restart, not every Kubernetes question). It also says how to proceed: inspect the previous termination state, align metrics with the restart time, compare plausible causes, report the evidence and the missing checks. The skill is loaded into the prompt when the job matches. Skills provide instructions. Tools provide capabilities.
 
 A **subagent** gets a bounded task in a fresh context. The investigator's context fills up fast: the question, pod state, runbook passages, ten screens of logs and metrics. Handing "look at memory around the restart" to a telemetry specialist keeps that noise out. The specialist returns compressed findings, not its transcript. It costs latency, another handoff and several times the tokens of one agent. The reason to delegate is context budget, not an org chart.
 
@@ -104,7 +104,7 @@ An agent needs three separate access decisions, and a login covers only the firs
 
 <SlideEmbed slug="ai-agents-devops-tashkent" slide={19} clicks={4} title="Access and protection need explicit boundaries" caption="Caller: who may invoke the agent. Tools: which actions on which resources. Content: logs are evidence, not authority. Private data, untrusted content and a way out are all present here." />
 
-The first is who may invoke the agent. The second is what the agent may do with its tools. Inspect one workload: yes. Change an alarm: no. The third is the one people skip: content. Logs are untrusted input. Anyone who can write a log line can write text that ends up in your model's context. Treat content as evidence, never as authority.
+The first is who may invoke the agent. The second is what the agent may do with its tools. Inspect one workload: yes. Change an alarm: no. The third is the one people skip: content. Logs are untrusted input. Anyone who can write a log line can write text that reaches your model's context. Treat content as evidence, never as authority.
 
 This RCA agent has all three ingredients that make an agent risky: private data (the cluster), untrusted content (logs) and a way out (the report). So each boundary has to be explicit, in configuration you can test. Writing "be careful" in a prompt replaces none of these decisions.
 
@@ -128,7 +128,7 @@ Who called which API, and when? That is the audit trail. Which steps ran, failed
 
 ## Where Strands and AgentCore fit
 
-I work at AWS; this is my own view. Two AWS pieces do the work: **Strands Agents**, an open-source SDK from AWS (Python and TypeScript) that runs the agent loop in your application code, and **Amazon Bedrock AgentCore**, a set of services for running agents in production.
+I work at AWS; this is my own view. Two AWS pieces do the work. **Strands Agents** is an open-source SDK from AWS (Python and TypeScript) that runs the agent loop in your application code. **Amazon Bedrock AgentCore** is a set of services for running agents in production.
 
 Strands is pleasantly boring. An agent is a model, a list of tools and a system prompt:
 
@@ -174,9 +174,9 @@ The third is Amazon Bedrock model invocation logging, which captures model input
 
 The worked example starts with a deliberately small job: the 2AM pod.
 
-- **Gather:** pod state, logs, metrics and the applicable runbook.
-- **Explain:** a diagnosis based on those observations, and what is missing.
-- **Hand over:** the engineer reviews and decides the remedy.
+- Gather: pod state, logs, metrics and the applicable runbook.
+- Explain: a diagnosis based on those observations, and what is missing.
+- Hand over: the engineer reviews and decides the remedy.
 
 The hypothesis is that the agent reduces repeated evidence gathering without replacing the engineer.
 
@@ -229,9 +229,9 @@ It returns the resources and the current and previous container state. The runbo
 
 A useful RCA report has three parts:
 
-- **Diagnosis:** the explanation supported by the observations.
-- **Evidence:** what the tools returned, and what is missing.
-- **Remediation:** recommended actions and a verification step.
+- Diagnosis: the explanation supported by the observations.
+- Evidence: what the tools returned, and what is missing.
+- Remediation: recommended actions and a verification step.
 
 And one rule: verify the captured observations before you trust a generated report. The evidence is the product. The prose around it is packaging.
 
@@ -307,14 +307,14 @@ I closed the talk with a question, and it is still the one I would ask you: what
 
 ## Related
 
-- **Slides:** [Building an RCA Agent with Amazon Bedrock AgentCore](/slides/ai-agents-devops-tashkent/), the full deck (52 slides, recorded demo on slide 44).
-- **Recording:** the [full-day livestream](https://www.youtube.com/watch?v=e1PsDlzj6og&t=4500s) on the AWS User Group Uzbekistan channel. My talk starts at about 1:15:00.
-- **Talk page:** [Building an RCA Agent at AWS Community Day Central Asia](/en/speaking/2026-rca-agent-agentcore/).
-- **Background:** [MCP servers, plainly explained](/en/blog/2026-03-02-mcp-servers-plainly-explained/).
+- Slides: [Building an RCA Agent with Amazon Bedrock AgentCore](/slides/ai-agents-devops-tashkent/), the full deck (52 slides, recorded demo on slide 44).
+- Recording: the [full-day livestream](https://www.youtube.com/watch?v=e1PsDlzj6og&t=4500s) on the AWS User Group Uzbekistan channel. My talk starts at about 1:15:00.
+- Talk page: [Building an RCA Agent at AWS Community Day Central Asia](/en/speaking/2026-rca-agent-agentcore/).
+- Background: [MCP servers, plainly explained](/en/blog/2026-03-02-mcp-servers-plainly-explained/).
 
 ## Sources
 
-*AWS, Strands and MCP statements checked against these official sources on 2026-11-08.*
+*AWS, Strands and MCP statements checked against these official sources on 8 November 2026.*
 
 - [What is Amazon Bedrock AgentCore?](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html) and [how AgentCore Runtime works](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-how-it-works.html)
 - [AgentCore Gateway](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html), [AgentCore Policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html) and [Policy core concepts](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-core-concepts.html)
