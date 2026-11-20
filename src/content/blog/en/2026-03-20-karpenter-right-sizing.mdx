@@ -47,7 +47,7 @@ A related claim is a myth: that Karpenter grabs whatever instance fits, so an un
 
 The fix uses two different knobs, and they are easy to mix up:
 
-- **`spec.limits` caps the NodePool as a whole:** total CPU, memory, or node count. It does not limit the size of one node. Limit checks are eventually consistent, so rapid parallel provisioning can exceed the limits. Once a limit is exceeded, Karpenter launches nothing more for that NodePool until nodes go away.
+- **`spec.limits` caps the NodePool as a whole.** It caps total CPU, memory, or node count. It does not limit the size of one node. Limit checks are eventually consistent, so rapid parallel provisioning can exceed the limits. Once a limit is exceeded, Karpenter launches nothing more for that NodePool until nodes go away.
 - **`requirements` shape each node.** `karpenter.k8s.aws/instance-cpu` bounds the node size; `karpenter.k8s.aws/instance-category` keeps you on general-purpose, compute, and memory families. Constrain sizes, not the variety of families. The Karpenter FAQ is explicit that more distinct instance types keep you on Spot longer.
 
 ```yaml
@@ -156,7 +156,7 @@ Two budgets, and the first one matters as much as the second. Once you define `b
 Three more details about budgets:
 
 - Schedules are cron in UTC, with no time zone support. A team in Berlin has to shift the window and remember that it moves by an hour with daylight saving.
-- To stop only the disruptive work during the day, add `reasons: ["Underutilized", "Drifted"]` to the scheduled budget. Empty nodes then keep going away under the 10% budget.
+- To stop only the changes that evict running pods during the day, add `reasons: ["Underutilized", "Drifted"]` to the scheduled budget. Empty nodes then keep going away under the 10% budget.
 - Budgets cover voluntary disruption only: consolidation, emptiness, and drift. Expiration (`expireAfter`, 720h by default) and interruption are forceful methods that NodePool budgets do not rate-limit. PDBs still shape the drain, but they cannot keep a reclaimed Spot instance alive.
 
 `5m` is a starting point, not a magic value. Watch your churn for a full week, then decide whether to stretch it or tighten it.
@@ -249,9 +249,9 @@ Back to the guess from the top. The savings were the modest number, and every pr
 
 ## Related
 
-- **Talk:** [Karpenter in Production: Architecting Cost-Efficient K8s Clusters](/en/speaking/2026-karpenter-production/), AWS Community Day Slovakia, Košice, 11 March 2026.
-- **Talk:** [Mastering Kubernetes Scalability with Karpenter](/en/speaking/2026-karpenter-scalability/), Code Europe, Kraków, 1 July 2025.
-- **Case study:** [How Salesforce migrated from Cluster Autoscaler to Karpenter across their fleet of 1,000 EKS clusters](https://aws.amazon.com/blogs/architecture/how-salesforce-migrated-from-cluster-autoscaler-to-karpenter-across-their-fleet-of-1000-eks-clusters/), AWS Architecture Blog, 12 January 2026.
-- **Karpenter docs:** [NodePools](https://karpenter.sh/docs/concepts/nodepools/), [NodeClaims](https://karpenter.sh/v1.14/concepts/nodeclaims/), [Disruption](https://karpenter.sh/docs/concepts/disruption/), [Metrics](https://karpenter.sh/docs/reference/metrics/), [Migrating from Cluster Autoscaler](https://karpenter.sh/docs/getting-started/migrating-from-cas/).
-- **Kubernetes docs:** [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
-- **LinkedIn:** [linkedin.com/in/vedmich](https://www.linkedin.com/in/vedmich).
+- Talk: [Karpenter in Production: Architecting Cost-Efficient K8s Clusters](/en/speaking/2026-karpenter-production/), AWS Community Day Slovakia, Košice, 11 March 2026.
+- Talk: [Mastering Kubernetes Scalability with Karpenter](/en/speaking/2026-karpenter-scalability/), Code Europe, Kraków, 1 July 2025.
+- Case study: [How Salesforce migrated from Cluster Autoscaler to Karpenter across their fleet of 1,000 EKS clusters](https://aws.amazon.com/blogs/architecture/how-salesforce-migrated-from-cluster-autoscaler-to-karpenter-across-their-fleet-of-1000-eks-clusters/), AWS Architecture Blog, 12 January 2026.
+- Karpenter docs: [NodePools](https://karpenter.sh/docs/concepts/nodepools/), [NodeClaims](https://karpenter.sh/v1.14/concepts/nodeclaims/), [Disruption](https://karpenter.sh/docs/concepts/disruption/), [Metrics](https://karpenter.sh/docs/reference/metrics/), [Migrating from Cluster Autoscaler](https://karpenter.sh/docs/getting-started/migrating-from-cas/).
+- Kubernetes docs: [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
+- LinkedIn: [linkedin.com/in/vedmich](https://www.linkedin.com/in/vedmich).

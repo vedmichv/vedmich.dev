@@ -47,7 +47,7 @@ Karpenter обходится без групп. Он следит за пода�
 
 Исправление опирается на две разные ручки, и их легко перепутать:
 
-- **`spec.limits` ограничивает NodePool целиком:** суммарные CPU, память или число нод. Размер отдельной ноды он не ограничивает. Данные для проверки лимитов обновляются с задержкой (eventually consistent), поэтому при массовом параллельном запуске нод лимиты можно превысить. Когда лимит превышен, Karpenter больше не запускает ноды для этого NodePool, пока часть нод не уйдёт.
+- **`spec.limits` ограничивает NodePool целиком.** Он задаёт потолок для суммарных CPU, памяти или числа нод. Размер отдельной ноды он не ограничивает. Данные для проверки лимитов обновляются с задержкой (eventually consistent), поэтому при массовом параллельном запуске нод лимиты можно превысить. Когда лимит превышен, Karpenter больше не запускает ноды для этого NodePool, пока часть нод не уйдёт.
 - **`requirements` ограничивают характеристики каждой ноды.** `karpenter.k8s.aws/instance-cpu` ограничивает размер ноды, `karpenter.k8s.aws/instance-category` оставляет вычислительные семейства, семейства общего назначения и с упором на память. Ограничивай размеры, а не разнообразие семейств: в FAQ Karpenter прямо сказано, что чем больше разных типов инстансов, тем дольше удаётся оставаться на Spot.
 
 ```yaml
@@ -156,7 +156,7 @@ spec:
 Ещё три детали про бюджеты:
 
 - Расписание задаётся в формате cron и всегда в UTC, часовые пояса не поддерживаются. Команде в Берлине придётся сдвинуть окно и помнить, что при переходе на летнее время оно уезжает на час.
-- Чтобы днём останавливать только то, что тревожит поды, добавь в бюджет с расписанием `reasons: ["Underutilized", "Drifted"]`. Пустые ноды тогда продолжат уходить в пределах постоянного бюджета.
+- Чтобы днём останавливать только изменения, при которых выселяются работающие поды, добавь в бюджет с расписанием `reasons: ["Underutilized", "Drifted"]`. Пустые ноды тогда продолжат уходить в пределах постоянного бюджета.
 - Бюджеты ограничивают только добровольные замены, то есть консолидацию, удаление пустых нод и дрейф. Истечение срока (`expireAfter`, по умолчанию 720h) и прерывания относятся к принудительным методам, и бюджеты NodePool их не сдерживают. PDB по-прежнему влияют на то, как освобождается нода, но отозванный спотовый инстанс они не спасут.
 
 `5m` это стартовая точка, а не магическое значение. Понаблюдай за частотой замен нод полную неделю, потом решай, растянуть его или сократить.
@@ -249,9 +249,9 @@ sum by (nodepool, reason) (increase(karpenter_nodeclaims_disrupted_total[1h]))
 
 ## Связанные материалы
 
-- **Доклад:** [Karpenter в продакшене: архитектура экономичных K8s кластеров](/ru/speaking/2026-karpenter-production/), AWS Community Day Slovakia, Кошице, 2026-03-11.
-- **Доклад:** [Масштабирование Kubernetes с Karpenter](/ru/speaking/2026-karpenter-scalability/), Code Europe, Краков, 2025-07-01.
-- **Кейс:** [How Salesforce migrated from Cluster Autoscaler to Karpenter across their fleet of 1,000 EKS clusters](https://aws.amazon.com/blogs/architecture/how-salesforce-migrated-from-cluster-autoscaler-to-karpenter-across-their-fleet-of-1000-eks-clusters/), блог AWS Architecture, 2026-01-12.
-- **Документация Karpenter:** [NodePools](https://karpenter.sh/docs/concepts/nodepools/), [NodeClaims](https://karpenter.sh/v1.14/concepts/nodeclaims/), [Disruption](https://karpenter.sh/docs/concepts/disruption/), [Metrics](https://karpenter.sh/docs/reference/metrics/), [Migrating from Cluster Autoscaler](https://karpenter.sh/docs/getting-started/migrating-from-cas/).
-- **Документация Kubernetes:** [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
-- **LinkedIn:** [linkedin.com/in/vedmich](https://www.linkedin.com/in/vedmich).
+- Доклад: [Karpenter в продакшене: архитектура экономичных K8s кластеров](/ru/speaking/2026-karpenter-production/), AWS Community Day Slovakia, Кошице, 11 марта 2026.
+- Доклад: [Масштабирование Kubernetes с Karpenter](/ru/speaking/2026-karpenter-scalability/), Code Europe, Краков, 1 июля 2025.
+- Кейс: [How Salesforce migrated from Cluster Autoscaler to Karpenter across their fleet of 1,000 EKS clusters](https://aws.amazon.com/blogs/architecture/how-salesforce-migrated-from-cluster-autoscaler-to-karpenter-across-their-fleet-of-1000-eks-clusters/), блог AWS Architecture, 12 января 2026.
+- Документация Karpenter: [NodePools](https://karpenter.sh/docs/concepts/nodepools/), [NodeClaims](https://karpenter.sh/v1.14/concepts/nodeclaims/), [Disruption](https://karpenter.sh/docs/concepts/disruption/), [Metrics](https://karpenter.sh/docs/reference/metrics/), [Migrating from Cluster Autoscaler](https://karpenter.sh/docs/getting-started/migrating-from-cas/).
+- Документация Kubernetes: [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
+- LinkedIn: [linkedin.com/in/vedmich](https://www.linkedin.com/in/vedmich).
