@@ -136,7 +136,7 @@ The Gateway API CRDs are not built into Kubernetes; you install them separately.
 
 Before applying the examples, install a controller, create the `infra` and `shop` namespaces, and deploy the `web` Service on port `8080`. The `prod` class and the `example.net/gateway-controller` name are placeholders; use the GatewayClass your controller provides.
 
-The first command installs the CRDs from the Standard channel, the second checks that they are present, and the third lists the GatewayClass of your controller:
+The first command installs the CRDs from the Standard channel, the second checks that they are present, and the third lists the GatewayClass of your controller. Commented lines show example output:
 
 ```bash
 # 1. Install the Gateway API CRDs (Standard channel, GA resources)
@@ -201,7 +201,7 @@ spec:
     - backendRefs: [{ name: web, port: 8080 }]   # no matches = PathPrefix /, within hostnames
 ```
 
-Now verify each seam. People skip this part and then wonder why nothing works. Gateway API gives you rich status, which Ingress never did:
+Now verify each seam. People skip this part and then wonder why nothing works. Gateway API gives you rich status, which Ingress never did. The commented lines show example output; your class and address will differ:
 
 ```bash
 # Is the Gateway programmed and did it get an address?
@@ -243,6 +243,8 @@ rules:
         port: 8080
         weight: 10
 ```
+
+The fragment belongs under `spec` of the cart's HTTPRoute and needs two Services in the route's namespace, `cart-v1` and `cart-v2`, both on port 8080.
 
 To roll forward you shift the weights: 90/10, then 50/50, then 0/100, watching your metrics at each step. Something looks wrong? Shift them back. For a manual canary you need no Argo Rollouts and no Flagger, just the weights in your HTTPRoute. Those tools still earn their place when you want metric analysis and promotion automated, but the primitive is built in.
 
@@ -319,6 +321,23 @@ Third, the **gotchas** that catch people in real migrations:
 - **Know which permission you are missing.** Attaching a route to a Gateway in another namespace is governed by `allowedRoutes`. Referencing a backend in another namespace needs a ReferenceGrant. Without it, the route reports `ResolvedRefs=False` with reason `RefNotPermitted`, and requests for that backend get HTTP 500.
 - **Read the right status conditions.** On the HTTPRoute, check `Accepted` and `ResolvedRefs` for each parent. On the Gateway, check `Programmed`. When something is wrong, the condition message usually tells you exactly what.
 - **Not every annotation maps cleanly.** Some nginx config-snippet tricks (raw rate limiting, custom Lua) have no typed Gateway API equivalent. Check your controller's policy resources, and plan a redesign where there is no match.
+
+## Clean up
+
+The examples live in the `infra` and `shop` namespaces you created for them. Deleting both removes the Gateway, the routes, the `shop-tls` Secret and the `web` Service:
+
+```bash
+kubectl delete namespace shop infra
+```
+
+The output is similar to the following:
+
+```text
+namespace "shop" deleted
+namespace "infra" deleted
+```
+
+If your controller created a cloud load balancer for the Gateway, the load balancer keeps billing until the Gateway is deleted. The CRDs and the controller stay installed.
 
 ## Start with one service
 
