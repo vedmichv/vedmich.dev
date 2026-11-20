@@ -240,6 +240,8 @@ iperf3 -c "${TEST_SERVER:?set TEST_SERVER to your test server}" -R -t 30
 #  RTT climbing and staying high = a queue building at the bottleneck
 ```
 
+For `ping`, read the `time=` value on each reply and the `min/avg/max` summary at the end. For `mtr`, read the `Loss%` and `Avg` columns, starting with the last hop. For `iperf3`, read the `Bitrate` on the `sender` and `receiver` lines that close the run.
+
 The last test is the most useful diagnostic habit you can build: **run ping during a download.** Read the line like this:
 
 - If latency stays flat, this test showed no added delay for those probes. Make sure the transfer really saturated the bottleneck, and test upload as well as download.
@@ -249,6 +251,8 @@ Here it is live. Start the download and watch the line. The red area is the extr
 
 <HtmlEmbed src="/embeds/ltb/04-ping-during-download.html" minHeight={930}
   title="Ping during a download, the one diagnostic for bufferbloat" />
+
+When you finish, terminate the test instance, which bills while it runs, and remove the rule you added to its security group.
 
 ## Find the bottleneck before you buy bandwidth
 
