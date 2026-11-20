@@ -15,12 +15,12 @@ The app feels slow, so the request comes in: double the bandwidth.
 
 Someone doubles it. Nothing changes.
 
-This happens a lot, because "slow" is often not a capacity problem. A chatty service (one that makes many small calls in sequence) pays a full round trip on every call, and a buffer somewhere fills up as soon as traffic grows. Extra megabits per second can't remove round trips, and they don't cure a bloated buffer. The money goes into a wider pipe that was never the bottleneck.
+This happens a lot, because "slow" is often not a capacity problem. A chatty service (one that makes many small calls in sequence) pays a full round trip on every call. And a buffer somewhere fills up as soon as traffic grows. Extra megabits per second can't remove round trips, and they don't cure a bloated buffer. The money goes into a wider pipe that was never the bottleneck.
 
 The mix-up almost always comes from blurring three different numbers into one vague idea called "network speed." Speed isn't one number. It's three, and each tells a different story:
 
 - **Latency** is the delay.
-- **Throughput** is what actually gets delivered.
+- **Throughput** is what gets delivered.
 - **Bandwidth** is the ceiling.
 
 Mix them up and you'll fix the wrong problem. Here are all three on the same connection, animated. Watch one packet's trip, the stream that arrives, and the channel they share:
@@ -33,7 +33,7 @@ Mix them up and you'll fix the wrong problem. Here are all three on the same con
 A **water pipe** shows all three numbers at once.
 
 - The **width of the pipe** is bandwidth. It sets the maximum.
-- The **water actually flowing out the far end** per second is throughput.
+- The **water flowing out the far end** per second is throughput.
 - The **time it takes the first drop to travel the length of the pipe** is latency.
 - The **volume of water inside the pipe** is the data in flight. You will meet it below as the bandwidth-delay product.
 
@@ -66,7 +66,7 @@ In the pipe analogy: latency is mostly about the length of the pipe and how fast
 
 **A real number:** a "100 Mbps" connection might deliver 62 Mbps when you test it. That gap is normal. Congestion, packet loss, retransmissions (packets sent again), protocol overhead, Wi-Fi and a busy server on the far end all take their share.
 
-In the pipe analogy: throughput is the liters per second actually coming out the end. Never the theoretical maximum, always the real, messy number you measure on that day.
+In the pipe analogy: throughput is the liters per second coming out the end. Never the theoretical maximum, always the real, messy number you measure on that day.
 
 ## Bandwidth: the ceiling
 
@@ -89,7 +89,7 @@ One relationship clears up most of the confusion:
 <HtmlEmbed src="/embeds/ltb/02-throughput-ceiling.html" minHeight={690}
   title="Throughput never beats bandwidth" />
 
-Bandwidth is the ceiling of the narrowest link. Throughput is what you actually get after losses, overhead and the rest of the real world. If your link is rated 100 Mbps and you measure 62 Mbps, those numbers aren't in conflict. One is the ceiling, the other is the delivery.
+Bandwidth is the ceiling of the narrowest link. Throughput is what you get after losses, overhead and the rest of the real world. If your link is rated 100 Mbps and you measure 62 Mbps, those numbers aren't in conflict. One is the ceiling, the other is the delivery.
 
 And then the part people miss most:
 
@@ -150,9 +150,9 @@ You need 12.5 MB in flight to keep that pipe full. But the window field in the T
 
 Here's the uncomfortable result: a single connection uses about **0.5% of a 1 Gbps pipe**, purely because of the round-trip time and a small window. The fix is TCP window scaling (RFC 7323), which lets the receive window grow up to 1 GiB. It's on by default on modern systems; on Linux, `net.ipv4.tcp_window_scaling` defaults to 1.
 
-It still causes trouble, for three reasons:
+It still causes trouble:
 
-- The scale factor is negotiated only in the SYN (the first packet of the connection), and RFC 7323 notes that some middleboxes (devices on the path) have been known to strip the option.
+- The scale factor is negotiated only in the SYN (the first packet of the connection). RFC 7323 notes that some middleboxes (devices on the path) have been known to strip the option.
 - The receive window can't outgrow the socket's receive buffer. On Linux, an application that sets `SO_RCVBUF` switches off buffer autotuning for that socket.
 - A big rwnd removes only one limit. cwnd still has to grow large enough for the BDP, which takes round trips, and congestion events can cut it back.
 
@@ -177,7 +177,7 @@ The fix is to wait on fewer round trips, or make each one shorter: batch calls, 
 
 Bufferbloat means oversized buffers in routers and modems fill up under load. It is the queueing part of latency, grown large. Your idle ping is, say, 20 ms; then you start a download and it jumps to 200 ms or worse. Everything interactive (video calls, gaming, SSH) suffers.
 
-The fix is queue management at the bottleneck: an active queue management (AQM) algorithm such as CoDel or FQ-CoDel (RFC 8289, RFC 8290), usually with shaping set a little below the link rate so the queue forms where it can be managed. OpenWrt packages this as SQM (smart queue management).
+The fix is queue management at the bottleneck: an active queue management (AQM) algorithm such as CoDel or FQ-CoDel (RFC 8289, RFC 8290). It usually comes with shaping set a little below the link rate, so the queue forms where it can be managed. OpenWrt packages this as SQM (smart queue management).
 
 Two things only partly help. BBR works at a different layer: it's sender-side congestion control that aims for high throughput with low queueing delay, but it doesn't guarantee a short queue or manage the router's other traffic. A faster link drains the same buffer sooner, so more bandwidth may shrink the spike, but a sustained transfer can still build a long queue whenever the sender pushes faster than the bottleneck drains.
 
@@ -252,14 +252,14 @@ Here it is live. Start the download and watch the line. The red area is the extr
 
 ## Find the bottleneck before you buy bandwidth
 
-When an app feels slow, the first question is never "how much bandwidth do we have." It's: **which of the three is actually the bottleneck?**
+When an app feels slow, the first question is never "how much bandwidth do we have." It's: **which of the three is the bottleneck?**
 
 - If it's latency (high RTT, many round trips), move the data closer or cut the round trips.
 - If RTT climbs under load, fix the queue at the bottleneck before buying capacity.
 - If it's throughput on a long path, look at the windows (scaling, buffers, cwnd), parallel connections, and packet loss.
-- If it's genuinely bandwidth (the bottleneck link really is full), then, and only then, buy more.
+- If it's bandwidth (the bottleneck link really is full), then, and only then, buy more.
 
-Get that diagnosis wrong and you end up where the request at the top of this post did: paying for a wider pipe that was never the problem.
+Get that diagnosis wrong and you pay for a wider pipe that was never the problem, as the request at the top of this post did.
 
 Your first step needs one server and two terminals: run ping during a download, and read the line.
 
