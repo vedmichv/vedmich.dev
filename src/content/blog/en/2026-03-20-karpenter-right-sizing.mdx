@@ -83,13 +83,13 @@ spec:
 
 A word on Spot. With both `spot` and `on-demand` allowed, Karpenter prefers Spot and falls back to On-Demand when no compatible Spot offering is available, "generally within milliseconds" in the words of the docs. There is no 60-second timer to configure. An instance type and zone that just returned insufficient capacity is skipped for the next 3 minutes. The savings depend on the Spot market, and a PDB does nothing against a Spot reclaim. Use Spot for workloads that can live with a two-minute notice, and let interruption handling (covered below) do the draining.
 
-To check the result, compare `karpenter_nodepools_usage` with `karpenter_nodepools_limit` for each NodePool. Both are labeled by NodePool and resource type. Then scale a test Deployment past the limit. Once the limit is exceeded, Karpenter launches nothing more for that NodePool, and the extra pods stay Pending.
+To check the limits, compare `karpenter_nodepools_usage` with `karpenter_nodepools_limit` for each NodePool. Both are labeled by NodePool and resource type. Then scale a test Deployment past the limit. Once the limit is exceeded, Karpenter launches nothing more for that NodePool, and the extra pods stay Pending.
 
 ## Trap 2: two autoscalers react to one pending pod
 
 Trouble starts when the same pending pod is eligible for both autoscalers. During a migration you will run both for a while, and that is supported: the Karpenter FAQ says Karpenter can work alongside Cluster Autoscaler.
 
-Both controllers react to pods the scheduler marked unschedulable. Cluster Autoscaler grows a node group whose template fits the pod; Karpenter launches a node for the same pod. One demand, two new nodes. The scheduler binds the pod to whichever is Ready first, and the other node sits empty until its owner removes it: Karpenter through consolidation, Cluster Autoscaler after its scale-down delay (10 minutes by default).
+Both controllers react to pods the scheduler marked unschedulable. Cluster Autoscaler grows a node group whose template fits the pod; Karpenter launches a node for the same pod. One demand, two new nodes. The scheduler binds the pod to whichever is Ready first. The other node sits empty until its owner removes it: Karpenter through consolidation, Cluster Autoscaler after its scale-down delay (10 minutes by default).
 
 Note what does not happen: Karpenter does not drain the Cluster Autoscaler node. It disrupts only nodes it launched itself, the ones backed by a NodeClaim from a NodePool. Everything else is never a candidate, so the popular story of both autoscalers consolidating the same nodes is wrong. The real interaction is quieter. When Karpenter decides whether one of its own nodes can go, it counts free room on every node in the cluster, node group nodes included. Cluster Autoscaler asks the same question about its own nodes: can these pods move elsewhere? So pods drift between the two pools, and you pay for duplicate launches.
 
@@ -203,7 +203,7 @@ Per cluster, this post's checklist, built from the traps above, then reads:
 
 1. **Separate eligibility.** A taint plus a required affinity for the system node group, NodePools for everything else (Trap 2).
 2. **Bound every NodePool.** `limits` for the total, `instance-cpu` for the node size, both capacity types where the workload tolerates Spot (Trap 1).
-3. **PDBs and budgets before the first drain.** Find PDBs that allow zero evictions and workloads with one replica, and pair the business-hours budget with an always-on one (Trap 3).
+3. **Check PDBs and budgets before the first drain.** Find PDBs that allow zero evictions and workloads with one replica, and pair the business-hours budget with an always-on one (Trap 3).
 4. **Observe, then take the next stage.** Metrics and interruption handling are in place before production moves (next section).
 
 When you shrink the old node groups, go slowly. The migration guide suggests scaling them down a few instances at a time and watching for workloads without enough replicas or PDBs.
@@ -249,9 +249,9 @@ Back to the guess from the top. The savings were the modest number, and every pr
 
 ## Related
 
-- **Talk:** [Karpenter in Production: Architecting Cost-Efficient K8s Clusters](/en/speaking/2026-karpenter-production/), AWS Community Day Slovakia, Košice, 2026-03-11.
-- **Talk:** [Mastering Kubernetes Scalability with Karpenter](/en/speaking/2026-karpenter-scalability/), Code Europe, Kraków, 2025-07-01.
-- **Case study:** [How Salesforce migrated from Cluster Autoscaler to Karpenter across their fleet of 1,000 EKS clusters](https://aws.amazon.com/blogs/architecture/how-salesforce-migrated-from-cluster-autoscaler-to-karpenter-across-their-fleet-of-1000-eks-clusters/), AWS Architecture Blog, 2026-01-12.
+- **Talk:** [Karpenter in Production: Architecting Cost-Efficient K8s Clusters](/en/speaking/2026-karpenter-production/), AWS Community Day Slovakia, Košice, 11 March 2026.
+- **Talk:** [Mastering Kubernetes Scalability with Karpenter](/en/speaking/2026-karpenter-scalability/), Code Europe, Kraków, 1 July 2025.
+- **Case study:** [How Salesforce migrated from Cluster Autoscaler to Karpenter across their fleet of 1,000 EKS clusters](https://aws.amazon.com/blogs/architecture/how-salesforce-migrated-from-cluster-autoscaler-to-karpenter-across-their-fleet-of-1000-eks-clusters/), AWS Architecture Blog, 12 January 2026.
 - **Karpenter docs:** [NodePools](https://karpenter.sh/docs/concepts/nodepools/), [NodeClaims](https://karpenter.sh/v1.14/concepts/nodeclaims/), [Disruption](https://karpenter.sh/docs/concepts/disruption/), [Metrics](https://karpenter.sh/docs/reference/metrics/), [Migrating from Cluster Autoscaler](https://karpenter.sh/docs/getting-started/migrating-from-cas/).
 - **Kubernetes docs:** [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
 - **LinkedIn:** [linkedin.com/in/vedmich](https://www.linkedin.com/in/vedmich).
