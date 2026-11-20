@@ -92,7 +92,7 @@ That's the answer that gets you hired. Not the four checks, which a good junior 
 
 ## The whole flow in one diagram
 
-Here is the full picture from my book. The scheduling cycle runs top to bottom through the gates, and the scheduler selection branch on top is the `schedulerName` check that produces the silent case. The red Pending box names only the affinity event. In a real cluster, `FailedScheduling` lists every reason, with node counts.
+Here is the full picture from my book. The scheduling cycle runs top to bottom through the gates. The scheduler selection branch on top is the `schedulerName` check that produces the silent case. The red Pending box names only the affinity event. In a real cluster, `FailedScheduling` lists every reason, with node counts.
 
 <img src="/blog-assets/2026-06-22-pod-pending-decode-tree/scheduling-flow-diagram.webp" alt="Book flowchart. Scheduler selection: an empty schedulerName goes to the default-scheduler, a named one to its custom scheduler. Scheduling cycle: resources, taints, affinity. Any failed gate leads to Pending; all passed leads to Assign Pod to Node." width="1600" height="1797" loading="lazy" />
 
