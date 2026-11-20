@@ -7,6 +7,6 @@ tags: ["Kubernetes", "AWS", "Karpenter", "Scaling"]
 draft: false
 ---
 
-Глубокое погружение в архитектуру Karpenter и паттерны развёртывания в продакшене для экономичного автомасштабирования кластеров Kubernetes.
+Подробный разбор архитектуры Karpenter и паттернов развёртывания в продакшене для экономичного автомасштабирования кластеров Kubernetes.
 
 Доклад на [Code Europe](https://codeeurope.pl/) 2025 ([EXPO Kraków](https://expokrakow.com/), с 30 июня по 1 июля 2025).
