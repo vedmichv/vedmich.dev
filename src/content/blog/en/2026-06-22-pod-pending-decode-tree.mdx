@@ -64,7 +64,7 @@ Look for `didn't match Pod's node affinity/selector`. No node matches the Pod's 
 
 Look for `unbound immediate PersistentVolumeClaims` or `didn't find available persistent volumes to bind`. The Pod references a PersistentVolumeClaim that has no matching PersistentVolume or StorageClass. The Pod can't schedule until the volume binds, and if the storage class can't provision, it waits forever. This one catches people because the Pod spec looks fine. The problem is one level down, in the volume.
 
-Match each reason to one of these four and you will resolve the overwhelming majority of Pending Pods. But there's one case that breaks the whole approach: nothing to match.
+After any of these fixes, the `STATUS` column of `kubectl get pods` should show the Pod move on from `Pending`. Match each reason to one of these four and you will resolve the overwhelming majority of Pending Pods. But there's one case that breaks the whole approach: nothing to match.
 
 ## The senior follow-up: no events at all
 
@@ -84,7 +84,7 @@ It prints `default-scheduler` unless the Pod names another scheduler. Here it pr
 
 By default, Pods are handled by the `default-scheduler`. But you can assign a Pod to a custom scheduler by name. If that name points to a scheduler that isn't running in the cluster, nothing happens. The default scheduler ignores the Pod because it's not its responsibility. The named scheduler doesn't exist to claim it. So the Pod waits, and because no scheduler ever looked at it, there are no `FailedScheduling` events to read.
 
-To fix it, install that scheduler or remove `schedulerName` from the manifest.
+If the Pod needs that scheduler, install it. If the name came in by mistake, remove `schedulerName` from the manifest. Either way, check that the Pod moves on from `Pending` in `kubectl get pods`.
 
 I've seen this happen. A team copied a manifest from a GPU-scheduling setup that used a custom scheduler, pasted it into a normal namespace, and couldn't see why the Pod never moved. The events were empty because the scheduler they named was never installed.
 
