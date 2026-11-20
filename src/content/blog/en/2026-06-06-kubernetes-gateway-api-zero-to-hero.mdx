@@ -136,6 +136,8 @@ The Gateway API CRDs are not built into Kubernetes; you install them separately.
 
 Before applying the examples, install a controller, create the `infra` and `shop` namespaces, and deploy the `web` Service on port `8080`. The `prod` class and the `example.net/gateway-controller` name are placeholders; use the GatewayClass your controller provides.
 
+The first command installs the CRDs from the Standard channel, the second checks that they are present, and the third lists the GatewayClass of your controller:
+
 ```bash
 # 1. Install the Gateway API CRDs (Standard channel, GA resources)
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/\
@@ -219,7 +221,7 @@ ADDR=$(kubectl get gateway shop-gateway -n infra \
 curl -H "Host: shop.example.com" "http://$ADDR/"
 ```
 
-Three checks, three seams: infrastructure, attachment, traffic. To grow the shop, the team adds more HTTPRoutes (`/products` to products, `/cart` to cart) in its own namespace. As long as the listener already admits that namespace, nobody touches the Gateway and nobody files a ticket with the platform team. The Gateway is shared infrastructure; the routes are self-service.
+Three checks, three seams: infrastructure, attachment, traffic. On the Gateway, read `PROGRAMMED` and `ADDRESS`; on the route, read `Accepted` and `ResolvedRefs`. When `curl` gets a response from `web`, the shop's first route works through the shared Gateway. To grow the shop, the team adds more HTTPRoutes (`/products` to products, `/cart` to cart) in its own namespace. As long as the listener already admits that namespace, nobody touches the Gateway and nobody files a ticket with the platform team. The Gateway is shared infrastructure; the routes are self-service.
 
 ## HTTPRoute matching, traffic splitting, and filters
 
@@ -248,7 +250,7 @@ Finally, **filters** process a request as it passes through, and they are typed 
 
 ## Production: TLS, multi-team, cross-namespace
 
-TLS lives on a Gateway listener, owned by the platform team, not in the developer's route. First create the `shop-tls` Secret in `infra` with a certificate for `shop.example.com`. Then replace the HTTP listener with the HTTPS one below (if you keep HTTP, add a redirect to HTTPS). The new listener keeps the same `allowedRoutes` selector. Without it, the listener would only admit routes from the Gateway's own namespace:
+TLS lives on a Gateway listener, owned by the platform team, not in the developer's route. First create the `shop-tls` Secret in `infra` with a certificate for `shop.example.com`. Then, in the `shop-gateway` Gateway, replace the HTTP listener with the HTTPS one below (if you keep HTTP, add a redirect to HTTPS). The new listener keeps the same `allowedRoutes` selector. Without it, the listener would only admit routes from the Gateway's own namespace:
 
 ```yaml
 listeners:
@@ -297,7 +299,7 @@ The key twist: the HTTPRoute's `parentRefs` entry points at a **Service** instea
 
 ## The whole shop, every concept
 
-Here is the whole shop on one slide: the amber `shop-gateway` on 443 with TLS, the shop namespace with four HTTPRoutes (including the 90/10 cart canary), and the `payments` Service in another team's namespace, which the shop's route may reference only because the ReferenceGrant permits it.
+Here is the whole shop on one slide: the amber `shop-gateway` on 443 with TLS, the shop namespace with four HTTPRoutes (including the 90/10 cart canary), and the `payments` Service in another team's namespace. The shop's route may reference `payments` only because the ReferenceGrant permits it.
 
 <SlideEmbed slide={34} title="The whole shop, every concept" caption="Left to right: the Gateway at the edge, the shop team's routes, and payments in another team's namespace. From one web service to this." />
 
@@ -305,7 +307,7 @@ The core never changed. GatewayClass, Gateway, HTTPRoute, Service, and Pods carr
 
 ## Operating it in 2026
 
-Three things matter for running it well. First, **what is current**. v1.5 was released on 27 February 2026, the biggest release yet, themed around promoting Experimental features to Standard. The headline is **ListenerSet**: listeners can be defined independently and merged onto a Gateway, which lets platform teams delegate listeners to app teams and lets a shared Gateway take more than 64 listeners. The Gateway has to opt in through `allowedListeners`; by default it accepts no ListenerSets. TLSRoute and ReferenceGrant reached `v1`, and the HTTPRoute CORS filter entered the Standard channel, so CORS no longer needs annotations on controllers that support it.
+Three things matter for running it well. First, **what is current**. v1.5 was released on 27 February 2026, the biggest release yet, themed around promoting Experimental features to Standard. The headline is **ListenerSet**: listeners can be defined independently and merged onto a Gateway. That way, platform teams can delegate listeners to app teams, and a shared Gateway can take more than 64 listeners. The Gateway has to opt in through `allowedListeners`; by default it accepts no ListenerSets. TLSRoute and ReferenceGrant reached `v1`, and the HTTPRoute CORS filter entered the Standard channel, so CORS no longer needs annotations on controllers that support it.
 
 > **Update, November 2026:** Gateway API v1.7 shipped on 29 October 2026. HTTPRoute retries (`codes`, `attempts`, and `backoff`) graduated to the Standard channel, and `backoff` stays implementation-specific. Earlier, v1.6 shipped on 30 June 2026. TCPRoute and UDPRoute graduated to the Standard channel, and new Experimental resources moved to a separate API group, `gateway.networking.x-k8s.io`. Everything in this post still applies.
 
